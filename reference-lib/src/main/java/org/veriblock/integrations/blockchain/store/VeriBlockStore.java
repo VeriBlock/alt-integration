@@ -97,11 +97,15 @@ public class VeriBlockStore {
         return blocks.isEmpty() ? null : blocks.get(0);
     }
 
-    ///HACK: it is actually a delete method. It deletes block with hash.
-    ///HACK: storedBlock is not being used.
+    public StoredVeriBlockBlock erase(VBlakeHash hash) throws BlockStoreException, SQLException {
+         StoredVeriBlockBlock erased = get(hash);
+         veriBlockRepository.delete(hash);
+         return erased;
+     }
+
     public StoredVeriBlockBlock replace(VBlakeHash hash, StoredVeriBlockBlock storedBlock) throws BlockStoreException, SQLException {
-        StoredVeriBlockBlock replaced = get(hash);
-        veriBlockRepository.delete(hash);
+        StoredVeriBlockBlock replaced = erase(hash);
+        put(storedBlock);
         return replaced;
     }
 
