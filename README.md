@@ -1,4 +1,4 @@
-# VeriBlock Integration Library
+# VeriBlock Integration Service
 ## Overview
 Altchains adopting Bitcoin security through VeriBlock will use the VeriBlock Integration Point
 to record and maintain SPV-level knowledge of VeriBlock (and by extension, Bitcoin). VTB
