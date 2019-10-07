@@ -9,6 +9,7 @@ build/
 *.jrnl
 tmp/
 data/
+*.log
 
 # Eclipse
 .settings
