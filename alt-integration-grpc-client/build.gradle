@@ -1,0 +1,36 @@
+plugins {
+    id "java"
+    id "application"
+}
+
+repositories {
+    flatDir {
+        dirs '../libs'
+    }
+}
+
+version = '0.1.2'
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.60'
+    compile group: 'io.grpc', name: 'grpc-netty-shaded', version: '1.23.0'
+    implementation name: 'integration-grpc-java-1.0'
+    compile project(':core')
+    compile project(':alt-integration-adapter-java')
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['conf']
+            includes = ["**/*.properties"]
+        }
+
+        java {
+            srcDirs += ['conf']
+        }
+    }
+}
+
+mainClassName = 'org.veriblock.webclient.Application'

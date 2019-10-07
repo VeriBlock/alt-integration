@@ -1,0 +1,7 @@
+include 'core'
+include 'reference-lib'
+include 'alt-integration-adapter-java'
+include 'alt-integration-grpc-client'
+include 'alt-integration-grpc-service'
+
+rootProject.name = 'alt-integration'

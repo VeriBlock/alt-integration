@@ -1,0 +1,21 @@
+# Gradle
+.idea/**/gradle.xml
+.idea/**/libraries
+.gradle/
+build/
+
+# Application specific
+*.spv
+*.jrnl
+tmp/
+data/
+lib/
+*.log
+webservice.properties
+webservice.jar
+
+# Eclipse
+.settings
+.classpath
+.project
+bin/

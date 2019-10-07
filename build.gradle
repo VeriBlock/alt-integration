@@ -1,0 +1,38 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.netflix.nebula:nebula-release-plugin:6.0.0'
+        classpath 'org.ajoberstar:grgit:1.1.0'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.3"
+    }
+}
+
+apply plugin: 'nebula.release'
+
+version = '0.1.2'
+
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+}
+
+nebulaRelease {
+    addReleaseBranchPattern(/develop/)
+    addReleaseBranchPattern(/(release(-|\/))?\d+(.\d+)?(.\d+)?/)
+}
+
+subprojects {
+    version = version
+}
+
+task printTCBuildNumber() {
+    println "##teamcity[buildNumber \'${version}\']"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.10.2'
+}
