@@ -15,11 +15,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.VeriBlockSecurity;
-import org.veriblock.protoconverters.AltPublicationProtoConverter;
-import org.veriblock.protoconverters.BitcoinBlockProtoConverter;
-import org.veriblock.protoconverters.BlockIndexProtoConverter;
-import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
-import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
+import org.veriblock.protoconverters.*;
 import org.veriblock.sdk.AltPublication;
 import org.veriblock.sdk.BlockIndex;
 import org.veriblock.sdk.BlockStoreException;
@@ -221,5 +217,10 @@ public class VeriBlockSecurityProtoService {
                 .setResult(replyResult)
                 .build();
         return reply;
+    }
+
+    public static VeriBlockMessages.GeneralReply setAltChainParametersConfig(VeriBlockMessages.AltChainConfigRequest config){
+        security.setAltChainParametersConfig(AltChainParametresConfigProtoConverter.fromProto(config));
+        return VeriBlockServiceCommon.validationResultToProto(ValidationResult.success());
     }
 }

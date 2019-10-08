@@ -14,6 +14,7 @@ import java.sql.SQLException;
 
 import org.veriblock.integrations.auditor.store.AuditorChangesStore;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
+import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.integrations.params.MainNetParameters;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
@@ -34,14 +35,16 @@ public class VeriBlockIntegrationLibraryManager {
         VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
         BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
         AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
+        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
             
-        securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore);
+        securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
         
         // erase database for testing determination
         if(securityFiles != null) {            
             securityFiles.getBitcoinStore().clear();
             securityFiles.getVeriblockStore().clear();
             securityFiles.getChangeStore().clear();
+            securityFiles.getPopTxDBRepo().clear();
         }
 
         security = new VeriBlockSecurity(securityFiles);

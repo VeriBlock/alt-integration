@@ -8,13 +8,32 @@
 
 package org.veriblock.integrations.rewards;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.SQLClientInfoException;
+import java.sql.SQLException;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
+import org.veriblock.integrations.VeriBlockSecurity;
 
 public class VeriBlockRewardCalculatorTest {
+
+    @Before
+    public void setUp() throws SQLException, IOException
+    {
+        VeriBlockSecurity security = VeriBlockIntegrationLibraryManager.init();
+        PopRewardCalculator.setSecurity(security);
+    }
+
+    @After
+    public void tearDown() throws SQLException {
+        VeriBlockIntegrationLibraryManager.shutdown();
+    }
     
     @Test
     public void roundsBasic() {        
@@ -169,9 +188,9 @@ public class VeriBlockRewardCalculatorTest {
         
         // now let's see how the keystone block is being rewarded
         BigDecimal totalRewardKeystone1 = PopRewardCalculator.calculatePopRewardForBlock(
-                PopRewardCalculator.getCalculatorConfig().keystoneInterval, defaultScore, defaultDifficulty);
+                PopRewardCalculator.getAltChainConfig().keystoneInterval, defaultScore, defaultDifficulty);
         BigDecimal totalRewardKeystone2 = PopRewardCalculator.calculatePopRewardForBlock(
-                PopRewardCalculator.getCalculatorConfig().keystoneInterval, halfScore, defaultDifficulty);
+                PopRewardCalculator.getAltChainConfig().keystoneInterval, halfScore, defaultDifficulty);
         Assert.assertTrue(totalRewardKeystone1.compareTo(totalRewardKeystone2) > 0);
         
         // we see that even when cut in half the keystone reward is higher than any normal reward from rounds 1-3

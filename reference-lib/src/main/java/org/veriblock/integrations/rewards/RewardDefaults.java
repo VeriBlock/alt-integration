@@ -15,9 +15,7 @@ public final class RewardDefaults {
     
     // this is our 100% reward budget. May vary up to 500%
     public static final long POP_DEFAULT_REWARD_PER_BLOCK = 10 * 1000000;
-    
-    // we expect keystones every 10th block
-    public static final int KEYSTONE_INTERVAL_BLOCKS = 10;
+
     // average 50 blocks before the endorsed block to calculate it's difficulty
     public static final int POP_DIFFICULTY_AVERAGING_INTERVALBLOCKS = 50;
     // we only store 50 values in relativeScoreLookupTable and do not want to search more blocks

@@ -17,8 +17,11 @@ import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.auditor.store.AuditorChangesStore;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
+import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
+import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
 import org.veriblock.integrations.params.MainNetParameters;
+import org.veriblock.integrations.rewards.PopRewardCalculator;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
 
@@ -51,8 +54,12 @@ public final class Application {
             VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
             BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
             AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
-            Context securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore);
+            PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
+            Context securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
             security = new VeriBlockSecurity(securityFiles);
+
+            ForkresolutionComparator.setSecurity(security);
+            PopRewardCalculator.setSecurity(security);
         } catch (Exception e) {
             log.debug("Could not initialize VeriBlock security", e);
             return;
@@ -68,6 +75,7 @@ public final class Application {
                 .addService(new GrpcDeserializeService())
                 .addService(new GrpcSerializeService())
                 .addService(new GrpcValidationService())
+                .addService(new ForkresolutionGrpcService())
                 .build();
         try {
             server.start();

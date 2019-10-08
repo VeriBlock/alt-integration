@@ -15,6 +15,7 @@ import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.integrations.params.MainNetParameters;
 import org.veriblock.integrations.params.NetworkParameters;
+import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.util.Preconditions;
 import org.veriblock.sdk.BlockStoreException;
 
@@ -23,6 +24,7 @@ public class Context {
     private VeriBlockStore veriblockStore;
     private BitcoinStore bitcoinStore;
     private AuditorChangesStore changeStore;
+    private PoPTransactionsDBStore popTxDBRepo;
 
     public NetworkParameters getNetworkParameters() {
         return networkParameters;
@@ -40,8 +42,10 @@ public class Context {
         return changeStore;
     }
 
+    public PoPTransactionsDBStore getPopTxDBRepo() {return popTxDBRepo;}
+
     public Context(NetworkParameters networkParameters, VeriBlockStore veriblockStore,
-            BitcoinStore bitcoinStore, AuditorChangesStore changeStore) {
+            BitcoinStore bitcoinStore, AuditorChangesStore changeStore, PoPTransactionsDBStore popTxDBRepo) {
         Preconditions.notNull(networkParameters, "Network parameters cannot be null");
         Preconditions.notNull(veriblockStore, "VeriBlock store cannot be null");
         Preconditions.notNull(bitcoinStore, "Bitcoin store cannot be null");
@@ -51,12 +55,13 @@ public class Context {
         this.veriblockStore = veriblockStore;
         this.bitcoinStore = bitcoinStore;
         this.changeStore = changeStore;
+        this.popTxDBRepo = popTxDBRepo;
     }
     
     public Context() throws BlockStoreException, SQLException {
         this(new MainNetParameters(),
                 new VeriBlockStore(),
                 new BitcoinStore(),
-                new AuditorChangesStore());
+                new AuditorChangesStore(), new PoPTransactionsDBStore());
     }
 }

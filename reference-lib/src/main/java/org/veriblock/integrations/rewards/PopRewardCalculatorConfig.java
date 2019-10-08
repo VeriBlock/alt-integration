@@ -17,7 +17,6 @@ public class PopRewardCalculatorConfig {
     public BigInteger basicReward;
     public int payoutRounds;
     public int keystoneRound;
-    public int keystoneInterval;
     public List<BigDecimal> roundRatios;
     public BigDecimal maxRewardThresholdNormal;
     public BigDecimal maxRewardThresholdKeystone;
@@ -30,7 +29,6 @@ public class PopRewardCalculatorConfig {
         basicReward = new BigInteger(Long.toString(RewardDefaults.POP_DEFAULT_REWARD_PER_BLOCK));
         payoutRounds = RewardDefaults.PAYOUT_ROUNDS_COUNT;
         keystoneRound = RewardDefaults.ROUND_4;
-        keystoneInterval = RewardDefaults.KEYSTONE_INTERVAL_BLOCKS;
         roundRatios = new ArrayList<>();
         roundRatios.add(new BigDecimal(RewardDefaults.ROUND_1_RATIO));
         roundRatios.add(new BigDecimal(RewardDefaults.ROUND_2_RATIO));

@@ -11,11 +11,8 @@ package org.veriblock.protoservice;
 import java.util.Collections;
 import java.util.List;
 
-import org.veriblock.protoconverters.AltPublicationProtoConverter;
-import org.veriblock.protoconverters.BitcoinBlockProtoConverter;
-import org.veriblock.protoconverters.BlockIndexProtoConverter;
-import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
-import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
+import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.protoconverters.*;
 import org.veriblock.sdk.AltPublication;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.BlockIndex;
@@ -118,5 +115,11 @@ public class VeriBlockSecurityProtoClient {
         if(!resultValid.isValid()) return new Pair<>(resultValid, 0);
         
         return new Pair<>(resultValid, reply.getHeight());
+    }
+
+    public ValidationResult setAltChainParametersConfig(AltChainParametersConfig config)
+    {
+        VeriBlockMessages.GeneralReply reply = service.setAltChainParametersConfig(AltChainParametresConfigProtoConverter.toProto(config));
+        return VeriBlockServiceCommon.validationResultFromProto(reply);
     }
 }

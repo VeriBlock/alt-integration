@@ -109,4 +109,11 @@ public class IntegrationGrpcService extends IntegrationServiceImplBase {
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void setAltChainParametersConfig(VeriBlockMessages.AltChainConfigRequest request, StreamObserver<GeneralReply> responseObserver) {
+        VeriBlockMessages.GeneralReply reply = VeriBlockSecurityProtoService.setAltChainParametersConfig(request);
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
 }

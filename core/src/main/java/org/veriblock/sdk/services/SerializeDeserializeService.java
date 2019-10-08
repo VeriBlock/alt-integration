@@ -223,6 +223,12 @@ public class SerializeDeserializeService {
         return new VeriBlockPublication(transaction, merklePath, containingBlock, contextBlocks);
     }
 
+    public static VeriBlockPublication parseVeriBlockPublication(byte[] raw)
+    {
+        ByteBuffer buffer = ByteBuffer.wrap(raw);
+        return parseVeriBlockPublication(buffer);
+    }
+
     public static byte[] serialize(VeriBlockPublication veriBlockPublication) {
         try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
             serialize(veriBlockPublication, stream);

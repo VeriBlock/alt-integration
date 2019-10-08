@@ -24,7 +24,6 @@ public final class CalculatorConfigProtoConverter {
     public static PopRewardCalculatorConfig fromProto(VeriBlockMessages.CalculatorConfig protoData) {
         PopRewardCalculatorConfig config = new PopRewardCalculatorConfig();
         config.basicReward = new BigInteger(protoData.getBasicReward());
-        config.keystoneInterval = protoData.getKeystoneInterval();
         config.keystoneRound = protoData.getKeystoneRound();
         config.payoutRounds = protoData.getPayoutRounds();
         config.roundRatios = new ArrayList<>();
@@ -78,7 +77,6 @@ public final class CalculatorConfigProtoConverter {
         
         result = result
                 .setBasicReward(data.basicReward.toString())
-                .setKeystoneInterval(data.keystoneInterval)
                 .setKeystoneRound(data.keystoneRound)
                 .setPayoutRounds(data.payoutRounds)
                 .setRoundRatios(roundRatiosConfig.build())

@@ -32,19 +32,21 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public final class VeriBlockSecurity {
+public class VeriBlockSecurity {
 
     private final Context context;
     private final VeriBlockBlockchain veriblockBlockchain;
     private final BitcoinBlockchain bitcoinBlockchain;
     private final AuditJournal journal;
     private final BitcoinStore bitcoinStore;
+    private AltChainParametersConfig altChainParametersConfig;
 
     public VeriBlockSecurity(Context context) {
         veriblockBlockchain = new VeriBlockBlockchain(context.getNetworkParameters(), context.getVeriblockStore(), context.getBitcoinStore());
         bitcoinBlockchain = new BitcoinBlockchain(context.getBitcoinStore());
         journal = new AuditJournal(context.getChangeStore());
         bitcoinStore = context.getBitcoinStore();
+        altChainParametersConfig = new AltChainParametersConfig();
         this.context = context;
     }
     
@@ -56,6 +58,7 @@ public final class VeriBlockSecurity {
         context.getBitcoinStore().shutdown();
         context.getVeriblockStore().shutdown();
         context.getChangeStore().shutdown();
+        context.getPopTxDBRepo().shutdown();
     }
     
     public VeriBlockBlockchain getVeriBlockBlockchain() {
@@ -69,6 +72,10 @@ public final class VeriBlockSecurity {
     public Context getSecurityFiles() {
         return context;
     }
+
+    public void setAltChainParametersConfig(AltChainParametersConfig config) { this.altChainParametersConfig = config; }
+
+    public AltChainParametersConfig getAltChainParametersConfig() { return this.altChainParametersConfig; }
 
     public ValidationResult checkATVInternally(AltPublication publication) {
         try {

@@ -1,0 +1,85 @@
+// VeriBlock Blockchain Project
+// Copyright 2017-2018 VeriBlock, Inc
+// Copyright 2018-2019 Xenios SEZC
+// All rights reserved.
+// https://www.veriblock.org
+// Distributed under the MIT software license, see the accompanying
+// file LICENSE or http://www.opensource.org/licenses/mit-license.php.
+
+package org.veriblock.integrations.sqlite.tables;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class PoPTransactionsVeriblockPublicationRefRepository {
+
+    private Connection connectionSource;
+
+    public static final String tableName = "PoPTransactionsVeriblockPublicationRef";
+    public static final String txHashColumnName = "txHash";
+    public static final String veriBlockPublciationIdColumnName = "veriBlockPublicationId";
+
+    public PoPTransactionsVeriblockPublicationRefRepository(Connection connection) throws SQLException
+    {
+        this.connectionSource = connection;
+
+        Statement stmt = null;
+        try{
+            stmt = connectionSource.createStatement();
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName
+                    + "(\n "
+                    + txHashColumnName + " TEXT NOT NULL,\n "
+                    + veriBlockPublciationIdColumnName + " INTEGER NOT NULL,\n "
+                    + " PRIMARY KEY (" + txHashColumnName + "," + veriBlockPublciationIdColumnName + ")\n "
+                    + " FOREIGN KEY (" + txHashColumnName + ")\n "
+                    + " REFERENCES " + PoPTransactionsRepository.tableName + " (" + PoPTransactionsRepository.txHashColumnName + ")\n "
+                    + " FOREIGN KEY (" + veriBlockPublciationIdColumnName + ")\n "
+                    + " REFERENCES " + VeriBlockPublicationRepository.tableName + " (" + VeriBlockPublicationRepository.idColumnName + ")\n "
+                    + ");");
+        }
+        finally{
+            if(stmt != null) stmt.close();
+            stmt = null;
+        }
+
+        try {
+            stmt = connectionSource.createStatement();
+            stmt.execute("PRAGMA journal_mode=WAL;");
+        } finally {
+            if(stmt != null) stmt.close();
+            stmt = null;
+        }
+
+    }
+
+    public void clear() throws SQLException
+    {
+        Statement stmt = null;
+        try{
+            stmt = connectionSource.createStatement();
+            stmt.execute( "DELETE FROM " + tableName);
+        }
+        finally {
+            if(stmt != null) stmt.close();
+            stmt = null;
+        }
+    }
+
+    public void save(String txHash, int veriBlockPublicationId) throws SQLException
+    {
+        PreparedStatement stmt = null;
+        try {
+            stmt = connectionSource.prepareStatement("REPLACE INTO " + tableName + " ('" + txHashColumnName + "', '" + veriBlockPublciationIdColumnName + "') " +
+                    "VALUES(?, ?)");
+            int i = 0;
+            stmt.setObject(++i, txHash);
+            stmt.setObject(++i, veriBlockPublicationId);
+            stmt.execute();
+        } finally {
+            if(stmt != null) stmt.close();
+            stmt = null;
+        }
+    }
+}

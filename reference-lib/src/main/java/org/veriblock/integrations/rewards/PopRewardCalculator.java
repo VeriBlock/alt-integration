@@ -8,6 +8,11 @@
 
 package org.veriblock.integrations.rewards;
 
+import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.integrations.VeriBlockSecurity;
+import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -17,7 +22,17 @@ public class PopRewardCalculator {
     // payout rounds methods
     
     private static PopRewardCalculatorConfig config = new PopRewardCalculatorConfig();
-    
+
+    private static VeriBlockSecurity security;
+
+    private static PoPTransactionsDBStore popTxDBStore;
+
+    public static void setSecurity(VeriBlockSecurity security)
+    {
+        PopRewardCalculator.security = security;
+        PopRewardCalculator.popTxDBStore = security.getSecurityFiles().getPopTxDBRepo();
+    }
+
     public static PopRewardCalculatorConfig getCalculatorConfig() {
         return config;
     }
@@ -25,6 +40,8 @@ public class PopRewardCalculator {
     public static void setCalculatorConfig(PopRewardCalculatorConfig config) {
         PopRewardCalculator.config = config;
     }
+
+    public static AltChainParametersConfig getAltChainConfig() { return security.getAltChainParametersConfig(); }
     
     public static boolean isKeystoneRound(int payoutRound) {
         return payoutRound == config.keystoneRound;
@@ -32,7 +49,7 @@ public class PopRewardCalculator {
     
     // rounds for blocks are [4, 1, 2, 3, 1, 2, 3, 1, 2, 3, 4, ...]
     public static int getRoundForBlockNumber(int number) {
-        if (number % config.keystoneInterval == 0) {
+        if (number % security.getAltChainParametersConfig().keystoneInterval == 0) {
             return config.keystoneRound;
         }
         
@@ -40,7 +57,7 @@ public class PopRewardCalculator {
             return 0;
         }
 
-        int round = ((number - 1) % config.keystoneInterval) % (config.payoutRounds - 1);
+        int round = ((number - 1) % security.getAltChainParametersConfig().keystoneInterval) % (config.payoutRounds - 1);
         return round;
     }
     
@@ -60,7 +77,7 @@ public class PopRewardCalculator {
         int roundForBlockNumber = getRoundForBlockNumber(blockNumber);
         if (round != roundForBlockNumber) return -1;
 
-        int keystonePeriodIndex = blockNumber % config.keystoneInterval;
+        int keystonePeriodIndex = blockNumber % security.getAltChainParametersConfig().keystoneInterval;
         
         if(keystonePeriodIndex == 0) return 1;
         if(config.payoutRounds == 0) return -1;
