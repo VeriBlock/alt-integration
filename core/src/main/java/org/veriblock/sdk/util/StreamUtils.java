@@ -37,6 +37,10 @@ public class StreamUtils {
         stream.write(value);
     }
 
+    public static int getSingleIntValue(ByteBuffer buffer) {
+        return Utils.toInt(getSingleByteLengthValue(buffer, 4, 4));
+    }
+
     public static byte[] getSingleByteLengthValue(ByteBuffer buffer, int maxLength, int minLength) {
         int length = buffer.get();
         checkLength(length, maxLength, minLength);

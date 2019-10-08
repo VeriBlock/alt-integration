@@ -421,12 +421,9 @@ public class SerializeDeserializeService {
         byte[] merkleBytes = StreamUtils.getVariableLengthValue(buffer, Constants.MAX_MERKLE_BYTES, 0);
         ByteBuffer localBuffer = ByteBuffer.wrap(merkleBytes);
 
-        ///HACK: minimum and maximum limit is 4 cause the number was written with Utils.toByteArray
-        ///      Utils.toByteArray always creates an array of 4 bytes
-        int index = Utils.toInt(StreamUtils.getSingleByteLengthValue(localBuffer, 4, 4));
-        int numLayers = Utils.toInt(StreamUtils.getSingleByteLengthValue(localBuffer, 4, 4));
-
-        int sizeOfSizeBottomData = Utils.toInt(StreamUtils.getSingleByteLengthValue(localBuffer, 4, 4));
+        int index = StreamUtils.getSingleIntValue(localBuffer);
+        int numLayers = StreamUtils.getSingleIntValue(localBuffer);
+        int sizeOfSizeBottomData = StreamUtils.getSingleIntValue(localBuffer);
         byte[] sizeBottomData = new byte[sizeOfSizeBottomData];
         localBuffer.get(sizeBottomData);
 
@@ -536,12 +533,10 @@ public class SerializeDeserializeService {
     }
 
     public static VeriBlockMerklePath parseVeriBlockMerklePath(ByteBuffer buffer) {
-        ///HACK: minimum and maximum limit is 4 cause the number was written with Utils.toByteArray
-        ///      Utils.toByteArray always creates an array of 4 bytes
-        int treeIndex = Utils.toInt(StreamUtils.getSingleByteLengthValue(buffer, 4, 4));
-        int index = Utils.toInt(StreamUtils.getSingleByteLengthValue(buffer, 4, 4));
+        int treeIndex = StreamUtils.getSingleIntValue(buffer);
+        int index = StreamUtils.getSingleIntValue(buffer);
         Sha256Hash subject = Sha256Hash.wrap(StreamUtils.getSingleByteLengthValue(buffer, Sha256Hash.BITCOIN_LENGTH, Sha256Hash.BITCOIN_LENGTH));
-        int numLayers = Utils.toInt(StreamUtils.getSingleByteLengthValue(buffer, 4, 4));
+        int numLayers = StreamUtils.getSingleIntValue(buffer);
 
         if (numLayers < 0 || numLayers > Constants.MAX_LAYER_COUNT_MERKLE) {
             throw new IllegalArgumentException("Unexpected layer count: " + numLayers
