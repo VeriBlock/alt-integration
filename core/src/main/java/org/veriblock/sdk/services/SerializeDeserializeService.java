@@ -480,18 +480,15 @@ public class SerializeDeserializeService {
 
     public static void serializeComponentsToStream(MerklePath merklePath, OutputStream stream) throws IOException {
         // Index
-        byte[] indexBytes = Utils.toByteArray(merklePath.getIndex());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, indexBytes);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, merklePath.getIndex());
 
         // Layer size
-        byte[] numLayerBytes = Utils.toByteArray(merklePath.getLayers().size());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, numLayerBytes);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, merklePath.getLayers().size());
 
         byte[] sizeBottomData = Utils.toByteArray(merklePath.getSubject().length);
 
         // Write size of the int describing the size of the bottom layer of data
-        byte[] sizeOfSizeBottomData = Utils.toByteArray(sizeBottomData.length);
-        StreamUtils.writeSingleByteLengthValueToStream(stream, sizeOfSizeBottomData);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, sizeBottomData.length);
 
         stream.write(sizeBottomData);
 
@@ -516,20 +513,18 @@ public class SerializeDeserializeService {
     }
 
     public static void serialize(VeriBlockMerklePath blockMerklePath, OutputStream stream) throws IOException {
-        byte[] treeIndexBytes = Utils.toByteArray(blockMerklePath.getTreeIndex());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, treeIndexBytes);
+    	// Tree index
+        StreamUtils.writeSingleIntLengthValueToStream(stream, blockMerklePath.getTreeIndex());
 
         // Index
-        byte[] indexBytes = Utils.toByteArray(blockMerklePath.getIndex());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, indexBytes);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, blockMerklePath.getIndex());
 
         // Subject
         byte[] subjectBytes = blockMerklePath.getSubject().getBytes();
         StreamUtils.writeSingleByteLengthValueToStream(stream, subjectBytes);
 
         // Layer size
-        byte[] numLayerBytes = Utils.toByteArray(blockMerklePath.getLayers().size());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, numLayerBytes);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, blockMerklePath.getLayers().size());
 
         // Layers
         for (Sha256Hash hash : blockMerklePath.getLayers()) {
