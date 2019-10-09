@@ -20,7 +20,7 @@ public class PoPTransactionsRepository {
     public static final String tableName = "PoPTransactions";
     public static final String txHashColumnName = "txHash";
     public static final String endorsedBlockHashColumnName = "endorsedBlockHash";
-    public static final String altPublicationIdColumnName = "AltPublicationId";
+    public static final String altPublicationHashColumnName = "AltPublicationHash";
 
     public PoPTransactionsRepository(Connection connection) throws SQLException
     {
@@ -33,9 +33,9 @@ public class PoPTransactionsRepository {
                     + "(\n "
                     + txHashColumnName + " TEXT PRIMARY KEY,\n "
                     + endorsedBlockHashColumnName + " TEXT NOT NULL,\n "
-                    + altPublicationIdColumnName + " INTEGER NOT NULL,\n "
-                    + " FOREIGN KEY (" + altPublicationIdColumnName + ")\n "
-                    + " REFERENCES " + AltPublicationRepository.tableName + " (" + AltPublicationRepository.idColumnName + ")\n "
+                    + altPublicationHashColumnName + " TEXT NOT NULL,\n "
+                    + " FOREIGN KEY (" + altPublicationHashColumnName + ")\n "
+                    + " REFERENCES " + AltPublicationRepository.tableName + " (" + AltPublicationRepository.altPublicationHash + ")\n "
                     + ");");
         }
         finally{
@@ -48,7 +48,6 @@ public class PoPTransactionsRepository {
             stmt.execute("PRAGMA journal_mode=WAL;");
         } finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
@@ -61,15 +60,14 @@ public class PoPTransactionsRepository {
         }
         finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
-    public void save(String txHash, String endoresedBlockHash, int altPublicationIndex) throws SQLException
+    public void save(String txHash, String endoresedBlockHash, String altPublicationIndex) throws SQLException
     {
         PreparedStatement stmt = null;
         try {
-            stmt = connectionSource.prepareStatement("REPLACE INTO " + tableName + " ('" + txHashColumnName + "', '" + endorsedBlockHashColumnName + "', '" + altPublicationIdColumnName + "') " +
+            stmt = connectionSource.prepareStatement("REPLACE INTO " + tableName + " ('" + txHashColumnName + "', '" + endorsedBlockHashColumnName + "', '" + altPublicationHashColumnName + "') " +
                     "VALUES(?, ?, ?)");
             int i = 0;
             stmt.setObject(++i, txHash);
@@ -78,7 +76,6 @@ public class PoPTransactionsRepository {
             stmt.execute();
         } finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 }

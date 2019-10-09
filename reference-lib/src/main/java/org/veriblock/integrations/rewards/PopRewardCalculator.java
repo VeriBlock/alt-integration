@@ -12,6 +12,7 @@ import org.veriblock.integrations.AltChainParametersConfig;
 import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
+import org.veriblock.sdk.AltChainBlock;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -143,6 +144,14 @@ public class PopRewardCalculator {
             // add everything to the totalScore
             totalScore = totalScore.add(score.multiply(new BigDecimal(blockEndorsements.size())));
         }
+
+        return totalScore;
+    }
+
+    public static BigDecimal calculatePopScoreForABlock(List<AltChainBlock> blocks) {
+        BigDecimal totalScore = BigDecimal.ZERO;
+
+
 
         return totalScore;
     }

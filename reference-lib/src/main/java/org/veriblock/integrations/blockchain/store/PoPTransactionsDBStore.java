@@ -77,15 +77,15 @@ public class PoPTransactionsDBStore {
 
     public void addPoPTransaction(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) throws SQLException
     {
-        int altPublicationIndex = altPublicationRepo.save(popTx.altPublication);
+        String altPublicationHash = altPublicationRepo.save(popTx.altPublication);
 
-        popTxRepo.save(popTx.txHash, endorsedBlock.getHash(), altPublicationIndex);
+        popTxRepo.save(popTx.txHash, endorsedBlock.getHash(), altPublicationHash);
         containRepo.save(popTx.txHash, containingBlock.getHash());
 
         for(VeriBlockPublication publication: popTx.veriBlockPublications)
         {
-            int veriBlockPublicationIndex = veriBlockPublicationRepo.save(publication);
-            popTxVeriBlockPublicationRefRepo.save(popTx.txHash, veriBlockPublicationIndex);
+            String veriBlockPublicationHash = veriBlockPublicationRepo.save(publication);
+            popTxVeriBlockPublicationRefRepo.save(popTx.txHash, veriBlockPublicationHash);
         }
     }
 
@@ -95,10 +95,10 @@ public class PoPTransactionsDBStore {
 
         PreparedStatement stmt = null;
         try{
-            StringBuilder sql = new StringBuilder("SELECT " +  AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationColumnName +
+            StringBuilder sql = new StringBuilder("SELECT DISTINCT " +  AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationDataColumnName +
                     " FROM " + PoPTransactionsRepository.tableName + " LEFT JOIN " + AltPublicationRepository.tableName +
-                    " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.altPublicationIdColumnName +
-                    " = " + AltPublicationRepository.tableName + "." + AltPublicationRepository.idColumnName +
+                    " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.altPublicationHashColumnName +
+                    " = " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationHash +
                     " LEFT JOIN " + ContainRepository.tableName +
                     " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.txHashColumnName +
                     " = " + ContainRepository.tableName + "." + ContainRepository.txHashColumnName +
@@ -119,12 +119,11 @@ public class PoPTransactionsDBStore {
             ResultSet resultSet = stmt.executeQuery();
             while(resultSet.next())
             {
-                resultData.add(SerializeDeserializeService.parseAltPublication(resultSet.getBytes(AltPublicationRepository.altPublicationColumnName)));
+                resultData.add(SerializeDeserializeService.parseAltPublication(resultSet.getBytes(AltPublicationRepository.altPublicationDataColumnName)));
             }
         }
         finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
 
         return resultData;
@@ -136,10 +135,10 @@ public class PoPTransactionsDBStore {
 
         PreparedStatement stmt = null;
         try{
-            stmt = connectionResource.prepareStatement( " SELECT " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationColumnName +
+            stmt = connectionResource.prepareStatement( " SELECT DISTINCT " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationDataColumnName +
                     " FROM " + PoPTransactionsRepository.tableName + " LEFT JOIN " + AltPublicationRepository.tableName +
-                    " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.altPublicationIdColumnName +
-                    " = " + AltPublicationRepository.tableName + "." + AltPublicationRepository.idColumnName +
+                    " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.altPublicationHashColumnName +
+                    " = " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationHash +
                     " LEFT JOIN " + ContainRepository.tableName +
                     " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.txHashColumnName +
                     " = " + ContainRepository.tableName + "." + ContainRepository.txHashColumnName +
@@ -148,12 +147,11 @@ public class PoPTransactionsDBStore {
             ResultSet resultSet = stmt.executeQuery();
             while(resultSet.next())
             {
-                resultData.add(SerializeDeserializeService.parseAltPublication(resultSet.getBytes(AltPublicationRepository.altPublicationColumnName)));
+                resultData.add(SerializeDeserializeService.parseAltPublication(resultSet.getBytes(AltPublicationRepository.altPublicationDataColumnName)));
             }
         }
         finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
 
         return resultData;
@@ -165,10 +163,10 @@ public class PoPTransactionsDBStore {
 
         PreparedStatement stmt = null;
         try{
-            stmt = connectionResource.prepareStatement( " SELECT " + VeriBlockPublicationRepository.tableName + "." + VeriBlockPublicationRepository.veriBlockPublicationColumnName +
+            stmt = connectionResource.prepareStatement( " SELECT DISTINCT " + VeriBlockPublicationRepository.tableName + "." + VeriBlockPublicationRepository.veriBlockPublicationDataColumnName +
                     " FROM " + VeriBlockPublicationRepository.tableName + " LEFT JOIN " + PoPTransactionsVeriblockPublicationRefRepository.tableName +
-                    " ON " + PoPTransactionsVeriblockPublicationRefRepository.tableName + "." + PoPTransactionsVeriblockPublicationRefRepository.veriBlockPublciationIdColumnName +
-                    " = " + VeriBlockPublicationRepository.tableName + "." + VeriBlockPublicationRepository.idColumnName +
+                    " ON " + PoPTransactionsVeriblockPublicationRefRepository.tableName + "." + PoPTransactionsVeriblockPublicationRefRepository.veriBlockPublciationHashColumnName +
+                    " = " + VeriBlockPublicationRepository.tableName + "." + VeriBlockPublicationRepository.veriBlockPublicationHashColumnName +
                     " LEFT JOIN " + ContainRepository.tableName +
                     " ON " + PoPTransactionsVeriblockPublicationRefRepository.tableName + "." + PoPTransactionsVeriblockPublicationRefRepository.txHashColumnName +
                     " = " + ContainRepository.tableName + "." + ContainRepository.txHashColumnName +
@@ -177,12 +175,11 @@ public class PoPTransactionsDBStore {
             ResultSet resultSet = stmt.executeQuery();
             while(resultSet.next())
             {
-                resultData.add(SerializeDeserializeService.parseVeriBlockPublication(resultSet.getBytes(VeriBlockPublicationRepository.veriBlockPublicationColumnName)));
+                resultData.add(SerializeDeserializeService.parseVeriBlockPublication(resultSet.getBytes(VeriBlockPublicationRepository.veriBlockPublicationDataColumnName)));
             }
         }
         finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
 
         return resultData;

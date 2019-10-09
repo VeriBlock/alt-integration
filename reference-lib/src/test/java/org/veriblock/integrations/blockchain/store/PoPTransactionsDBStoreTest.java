@@ -21,6 +21,7 @@ import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
 import java.nio.file.Paths;
+import java.rmi.ServerError;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -92,7 +93,7 @@ public class PoPTransactionsDBStoreTest {
     @After
     public void tearDown() throws SQLException
     {
-        popTxDBStore.clear();
+       //popTxDBStore.clear();
     }
 
     @Test
@@ -120,12 +121,9 @@ public class PoPTransactionsDBStoreTest {
 
         List<AltPublication> altPublications = popTxDBStore.getAltPublciationsEndorse(endorsedBlock, containBlocks);
 
-        Assert.assertEquals(altPublications.size(), N);
+        Assert.assertEquals(altPublications.size(), 1);
 
-        for(int i = 0; i < altPublications.size(); i++)
-        {
-            Assert.assertEquals(altPublication, altPublications.get(i));
-        }
+        Assert.assertEquals(altPublication, altPublications.get(0));
     }
 
     @Test
@@ -169,5 +167,4 @@ public class PoPTransactionsDBStoreTest {
 
         Assert.assertEquals(altPublicationList.get(0), veriBlockPublication);
     }
-
 }

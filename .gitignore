@@ -80,3 +80,8 @@ fabric.properties
 .settings
 .classpath
 .project
+
+# Sqlite files
+.sqlite
+.sqlite-shm
+.sqlite-wal

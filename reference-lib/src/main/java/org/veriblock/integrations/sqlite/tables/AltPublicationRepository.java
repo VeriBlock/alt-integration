@@ -10,7 +10,9 @@
 package org.veriblock.integrations.sqlite.tables;
 
 import org.veriblock.sdk.AltPublication;
+import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.util.Utils;
 
 import java.sql.*;
 
@@ -19,8 +21,8 @@ public class AltPublicationRepository {
     private Connection connectionSource;
 
     public final static String tableName = "AltPublication";
-    public final static String idColumnName = "id";
-    public final static String altPublicationColumnName = "altPublication";
+    public final static String altPublicationHash = "altPublicationHash";
+    public final static String altPublicationDataColumnName = "altPublicationData";
 
     public AltPublicationRepository(Connection connection) throws SQLException
     {
@@ -30,8 +32,8 @@ public class AltPublicationRepository {
             stmt = connectionSource.createStatement();
             stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName
                     + "(\n "
-                    + idColumnName + " INTEGER PRIMARY KEY,\n "
-                    + altPublicationColumnName + " BLOB NOT NULL\n "
+                    + altPublicationHash + " TEXT PRIMARY KEY,\n "
+                    + altPublicationDataColumnName + " BLOB NOT NULL\n "
                     + ");");
         }
         finally{
@@ -44,7 +46,6 @@ public class AltPublicationRepository {
             stmt.execute("PRAGMA journal_mode=WAL;");
         } finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
@@ -57,27 +58,25 @@ public class AltPublicationRepository {
         }
         finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
-    public int save(AltPublication publication) throws SQLException
+    public String save(AltPublication publication) throws SQLException
     {
-        int id = -1;
+        String hash = "";
         PreparedStatement stmt = null;
         try{
-            stmt = connectionSource.prepareStatement(" REPLACE INTO " + tableName + " ('" + altPublicationColumnName + "') " +
-                    "VALUES(?) ", Statement.RETURN_GENERATED_KEYS);
-            stmt.setBytes(1, SerializeDeserializeService.serialize(publication));
+            stmt = connectionSource.prepareStatement(" REPLACE INTO " + tableName + " ('" + altPublicationHash + "' , '" + altPublicationDataColumnName + "') " +
+                    "VALUES(?, ?) ", Statement.RETURN_GENERATED_KEYS);
+            byte[] bytes = SerializeDeserializeService.serialize(publication);
+            hash = Utils.encodeHex(Sha256Hash.hash(bytes));
+            stmt.setString(1, hash);
+            stmt.setBytes(2, bytes);
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if(rs.next())
-                id = rs.getInt(1);
         }
         finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
-        return id;
+        return hash;
     }
 }

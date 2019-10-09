@@ -19,7 +19,7 @@ public class PoPTransactionsVeriblockPublicationRefRepository {
 
     public static final String tableName = "PoPTransactionsVeriblockPublicationRef";
     public static final String txHashColumnName = "txHash";
-    public static final String veriBlockPublciationIdColumnName = "veriBlockPublicationId";
+    public static final String veriBlockPublciationHashColumnName = "veriBlockPublicationHash";
 
     public PoPTransactionsVeriblockPublicationRefRepository(Connection connection) throws SQLException
     {
@@ -31,12 +31,12 @@ public class PoPTransactionsVeriblockPublicationRefRepository {
             stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName
                     + "(\n "
                     + txHashColumnName + " TEXT NOT NULL,\n "
-                    + veriBlockPublciationIdColumnName + " INTEGER NOT NULL,\n "
-                    + " PRIMARY KEY (" + txHashColumnName + "," + veriBlockPublciationIdColumnName + ")\n "
+                    + veriBlockPublciationHashColumnName + " TEXT NOT NULL,\n "
+                    + " PRIMARY KEY (" + txHashColumnName + "," + veriBlockPublciationHashColumnName + ")\n "
                     + " FOREIGN KEY (" + txHashColumnName + ")\n "
                     + " REFERENCES " + PoPTransactionsRepository.tableName + " (" + PoPTransactionsRepository.txHashColumnName + ")\n "
-                    + " FOREIGN KEY (" + veriBlockPublciationIdColumnName + ")\n "
-                    + " REFERENCES " + VeriBlockPublicationRepository.tableName + " (" + VeriBlockPublicationRepository.idColumnName + ")\n "
+                    + " FOREIGN KEY (" + veriBlockPublciationHashColumnName + ")\n "
+                    + " REFERENCES " + VeriBlockPublicationRepository.tableName + " (" + VeriBlockPublicationRepository.veriBlockPublicationHashColumnName + ")\n "
                     + ");");
         }
         finally{
@@ -67,11 +67,11 @@ public class PoPTransactionsVeriblockPublicationRefRepository {
         }
     }
 
-    public void save(String txHash, int veriBlockPublicationId) throws SQLException
+    public void save(String txHash, String veriBlockPublicationId) throws SQLException
     {
         PreparedStatement stmt = null;
         try {
-            stmt = connectionSource.prepareStatement("REPLACE INTO " + tableName + " ('" + txHashColumnName + "', '" + veriBlockPublciationIdColumnName + "') " +
+            stmt = connectionSource.prepareStatement("REPLACE INTO " + tableName + " ('" + txHashColumnName + "', '" + veriBlockPublciationHashColumnName + "') " +
                     "VALUES(?, ?)");
             int i = 0;
             stmt.setObject(++i, txHash);

@@ -8,8 +8,10 @@
 
 package org.veriblock.integrations.sqlite.tables;
 
+import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.util.Utils;
 
 import java.sql.*;
 
@@ -19,8 +21,8 @@ public class VeriBlockPublicationRepository {
     private Connection connectionSource;
 
     public final static String tableName = "VeriBlockPublication";
-    public final static String idColumnName = "id";
-    public final static String veriBlockPublicationColumnName = "veriBlockPublication";
+    public final static String veriBlockPublicationHashColumnName = "veriBlockPublicationHash";
+    public final static String veriBlockPublicationDataColumnName = "veriBlockPublicationData";
 
     public VeriBlockPublicationRepository(Connection connection) throws SQLException
     {
@@ -30,8 +32,8 @@ public class VeriBlockPublicationRepository {
             stmt = connectionSource.createStatement();
             stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName
                     + "(\n "
-                    + idColumnName + " INTEGER PRIMARY KEY,\n "
-                    + veriBlockPublicationColumnName + " BLOB NOT NULL\n "
+                    + veriBlockPublicationHashColumnName + " TEXT PRIMARY KEY,\n "
+                    + veriBlockPublicationDataColumnName + " BLOB NOT NULL\n "
                     + ");");
         }
         finally{
@@ -44,7 +46,6 @@ public class VeriBlockPublicationRepository {
             stmt.execute("PRAGMA journal_mode=WAL;");
         } finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
@@ -57,27 +58,26 @@ public class VeriBlockPublicationRepository {
         }
         finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
-    public int save(VeriBlockPublication publication) throws SQLException
+    public String save(VeriBlockPublication publication) throws SQLException
     {
-        int id = -1;
+        String hash = "";
         PreparedStatement stmt = null;
         try{
-            stmt = connectionSource.prepareStatement(" REPLACE INTO " + tableName + " ('" + veriBlockPublicationColumnName + "') " +
-                    "VALUES(?) ", Statement.RETURN_GENERATED_KEYS);
-            stmt.setBytes(1, SerializeDeserializeService.serialize(publication));
+            stmt = connectionSource.prepareStatement(" REPLACE INTO " + tableName + " ('" + veriBlockPublicationHashColumnName + "', '" + veriBlockPublicationDataColumnName + "') " +
+                    "VALUES(?, ?) ", Statement.RETURN_GENERATED_KEYS);
+            byte[] bytes = SerializeDeserializeService.serialize(publication);
+            hash = Utils.encodeHex(Sha256Hash.hash(bytes));
+            stmt.setString(1, hash);
+            stmt.setBytes(2, bytes);
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if(rs.next())
-                id = rs.getInt(1);
         }
         finally {
             if(stmt != null) stmt.close();
-            stmt = null;
         }
-        return id;
+
+        return hash;
     }
 }
