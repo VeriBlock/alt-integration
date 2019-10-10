@@ -14,11 +14,11 @@ import java.util.List;
 
 import org.veriblock.integrations.rewards.PopPayoutRound;
 import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-import org.veriblock.integrations.rewards.PopRewardEndorsements;
 import org.veriblock.integrations.rewards.PopRewardOutput;
+import org.veriblock.protoconverters.AltChainBlockProtoConverter;
 import org.veriblock.protoconverters.CalculatorConfigProtoConverter;
-import org.veriblock.protoconverters.RewardEndorsementProtoConverter;
 import org.veriblock.protoconverters.RewardOutputProtoConverter;
+import org.veriblock.sdk.AltChainBlock;
 import org.veriblock.sdk.Pair;
 import org.veriblock.sdk.ValidationResult;
 
@@ -58,12 +58,15 @@ public class VeriBlockRewardsProtoClient {
         return VeriBlockServiceCommon.validationResultFromProto(reply);
     }
     
-    public Pair<ValidationResult, BigDecimal> rewardsCalculateScore(PopRewardEndorsements endorsements) {
-        List<VeriBlockMessages.RewardEndorsement> endorsementsProto = RewardEndorsementProtoConverter.toProto(endorsements);
+    public Pair<ValidationResult, BigDecimal> rewardsCalculateScore(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks) {
+        VeriBlockMessages.AltChainBlock endorsedBlockProto = AltChainBlockProtoConverter.toProto(endorsedBlock);
+        List<VeriBlockMessages.AltChainBlock> endorsementBlocksProto = AltChainBlockProtoConverter.toProto(endorsementBlocks);
+
         VeriBlockMessages.RewardsCalculateScoreRequest request = VeriBlockMessages.RewardsCalculateScoreRequest.newBuilder()
-                .addAllEndorsementsForBlock(endorsementsProto)
+                .setEndorsedBlock(endorsedBlockProto)
+                .addAllEndorsmentBlocks(endorsementBlocksProto)
                 .build();
-        
+
         VeriBlockMessages.RewardsCalculateScoreReply reply = service.rewardsCalculateScore(request);
         ValidationResult resultValid = VeriBlockServiceCommon.validationResultFromProto(reply.getResult());
         if(!resultValid.isValid()) return new Pair<>(resultValid, BigDecimal.ZERO);
@@ -72,11 +75,13 @@ public class VeriBlockRewardsProtoClient {
         return new Pair<>(resultValid, score);
     }
     
-    public Pair<ValidationResult, PopPayoutRound> rewardsCalculateOutputs(int blockNumber, PopRewardEndorsements endorsements, BigDecimal popDifficulty) {
-        List<VeriBlockMessages.RewardEndorsement> endorsementsProto = RewardEndorsementProtoConverter.toProto(endorsements);        
+    public Pair<ValidationResult, PopPayoutRound> rewardsCalculateOutputs(int blockNumber, AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks, BigDecimal popDifficulty) {
+        VeriBlockMessages.AltChainBlock endorsedBlockProto = AltChainBlockProtoConverter.toProto(endorsedBlock);
+        List<VeriBlockMessages.AltChainBlock> endorsementBlocksProto = AltChainBlockProtoConverter.toProto(endorsementBlocks);
         VeriBlockMessages.RewardsCalculateOutputsRequest request = VeriBlockMessages.RewardsCalculateOutputsRequest.newBuilder()
                 .setBlockAltHeight(blockNumber)
-                .addAllEndorsementsForBlock(endorsementsProto)
+                .setEndorsedBlock(endorsedBlockProto)
+                .addAllEndorsmentBlocks(endorsementBlocksProto)
                 .setDifficulty(popDifficulty.toPlainString())
                 .build();
         VeriBlockMessages.RewardsCalculateOutputsReply reply = service.rewardsCalculateOutputs(request);

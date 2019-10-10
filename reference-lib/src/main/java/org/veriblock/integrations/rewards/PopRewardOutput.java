@@ -9,16 +9,16 @@
 package org.veriblock.integrations.rewards;
 
 public class PopRewardOutput {
-    private String minerAddress;
+    private byte[] minerPayoutInfo;
     private long reward;
     
-    public PopRewardOutput(String minerAddress, long reward) {
-        this.minerAddress = minerAddress;
+    public PopRewardOutput(byte[] minerPayoutInfo, long reward) {
+        this.minerPayoutInfo = minerPayoutInfo;
         this.reward = reward;
     }
     
-    public String getPopMinerAddress() {
-        return minerAddress;
+    public byte[] getPopMinerPayoutInfo() {
+        return minerPayoutInfo;
     }
     
     public long getReward() {
