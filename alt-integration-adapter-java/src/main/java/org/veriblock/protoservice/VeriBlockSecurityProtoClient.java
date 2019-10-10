@@ -141,4 +141,26 @@ public class VeriBlockSecurityProtoClient implements IVeriBlockSecurity {
         VeriBlockMessages.GeneralReply reply = service.savePoPTransactionData(request);
         return VeriBlockServiceCommon.validationResultFromProto(reply);
     }
+
+    @Override
+    public Pair<ValidationResult, List<VBlakeHash>> getLastKnownVBKBlocks(int maxBlockCount) {
+        VeriBlockMessages.GetLastKnownBlocksRequest request = VeriBlockMessages.GetLastKnownBlocksRequest.newBuilder()
+                .setMaxBlockCount(maxBlockCount)
+                .build();
+        VeriBlockMessages.GetLastKnownVBKBlocksReply reply = service.getLastKnownVBKBlocks(request);
+        ValidationResult resultValid = VeriBlockServiceCommon.validationResultFromProto(reply.getResult());
+        List<VBlakeHash> blocks = VBlakeHashProtoConverter.fromProto(reply.getBlocksList());
+        return new Pair<>(resultValid, blocks);
+    }
+
+    @Override
+    public Pair<ValidationResult, List<Sha256Hash>> getLastKnownBTCBlocks(int maxBlockCount) {
+        VeriBlockMessages.GetLastKnownBlocksRequest request = VeriBlockMessages.GetLastKnownBlocksRequest.newBuilder()
+                .setMaxBlockCount(maxBlockCount)
+                .build();
+        VeriBlockMessages.GetLastKnownBTCBlocksReply reply = service.getLastKnownBTCBlocks(request);
+        ValidationResult resultValid = VeriBlockServiceCommon.validationResultFromProto(reply.getResult());
+        List<Sha256Hash> blocks = Sha256HashProtoConverter.fromProto(reply.getBlocksList());
+        return new Pair<>(resultValid, blocks);
+    }
 }

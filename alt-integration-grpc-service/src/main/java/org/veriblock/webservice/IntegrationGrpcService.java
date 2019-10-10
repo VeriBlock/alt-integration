@@ -123,4 +123,18 @@ public class IntegrationGrpcService extends IntegrationServiceImplBase {
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void getLastKnownVBKBlocks(VeriBlockMessages.GetLastKnownBlocksRequest request, StreamObserver<VeriBlockMessages.GetLastKnownVBKBlocksReply> responseObserver) {
+        VeriBlockMessages.GetLastKnownVBKBlocksReply reply = VeriBlockSecurityProtoService.getLastKnownVBKBlocks(request);
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getLastKnownBTCBlocks(VeriBlockMessages.GetLastKnownBlocksRequest request, StreamObserver<VeriBlockMessages.GetLastKnownBTCBlocksReply> responseObserver) {
+        VeriBlockMessages.GetLastKnownBTCBlocksReply reply = VeriBlockSecurityProtoService.getLastKnownBTCBlocks(request);
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
 }
