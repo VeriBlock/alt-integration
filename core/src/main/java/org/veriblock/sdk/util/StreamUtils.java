@@ -25,17 +25,23 @@ public class StreamUtils {
         stream.write(trimmed);
     }
 
+    public static void writeSingleByteLengthValueToStream(OutputStream stream, byte[] value) throws IOException {
+        stream.write((byte)value.length);
+        stream.write(value);
+    }
+    
+    public static void writeSingleIntLengthValueToStream(OutputStream stream, int value) throws IOException {
+    	byte[] valueBytes = Utils.toByteArray(value);
+        writeSingleByteLengthValueToStream(stream, valueBytes);
+    }
+    
     public static void writeVariableLengthValueToStream(OutputStream stream, byte[] value) throws IOException {
         byte[] dataSize = Utils.trimmedByteArrayFromInteger(value.length);
         stream.write((byte)dataSize.length);
         stream.write(dataSize);
         stream.write(value);
     }
-
-    public static void writeSingleByteLengthValueToStream(OutputStream stream, byte[] value) throws IOException {
-        stream.write((byte)value.length);
-        stream.write(value);
-    }
+    
 
     public static byte[] getSingleByteLengthValue(ByteBuffer buffer, int maxLength, int minLength) {
         int length = buffer.get();
@@ -49,6 +55,10 @@ public class StreamUtils {
     
     public static byte[] getSingleByteLengthValue(ByteBuffer buffer) {
         return getSingleByteLengthValue(buffer, 255, 0);
+    }
+    
+    public static int getSingleIntValue(ByteBuffer buffer) {
+        return Utils.toInt(getSingleByteLengthValue(buffer, 4, 4));
     }
 
     public static byte[] getVariableLengthValue(ByteBuffer buffer, int maxLength, int minLength) {

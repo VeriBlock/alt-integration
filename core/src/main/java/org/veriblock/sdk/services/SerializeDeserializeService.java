@@ -427,12 +427,9 @@ public class SerializeDeserializeService {
         byte[] merkleBytes = StreamUtils.getVariableLengthValue(buffer, Constants.MAX_MERKLE_BYTES, 0);
         ByteBuffer localBuffer = ByteBuffer.wrap(merkleBytes);
 
-        ///HACK: minimum and maximum limit is 4 cause the number was written with Utils.toByteArray
-        ///      Utils.toByteArray always creates an array of 4 bytes
-        int index = Utils.toInt(StreamUtils.getSingleByteLengthValue(localBuffer, 4, 4));
-        int numLayers = Utils.toInt(StreamUtils.getSingleByteLengthValue(localBuffer, 4, 4));
-
-        int sizeOfSizeBottomData = Utils.toInt(StreamUtils.getSingleByteLengthValue(localBuffer, 4, 4));
+        int index = StreamUtils.getSingleIntValue(localBuffer);
+        int numLayers = StreamUtils.getSingleIntValue(localBuffer);
+        int sizeOfSizeBottomData = StreamUtils.getSingleIntValue(localBuffer);
         byte[] sizeBottomData = new byte[sizeOfSizeBottomData];
         localBuffer.get(sizeBottomData);
 
@@ -483,18 +480,15 @@ public class SerializeDeserializeService {
 
     public static void serializeComponentsToStream(MerklePath merklePath, OutputStream stream) throws IOException {
         // Index
-        byte[] indexBytes = Utils.toByteArray(merklePath.getIndex());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, indexBytes);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, merklePath.getIndex());
 
         // Layer size
-        byte[] numLayerBytes = Utils.toByteArray(merklePath.getLayers().size());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, numLayerBytes);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, merklePath.getLayers().size());
 
         byte[] sizeBottomData = Utils.toByteArray(merklePath.getSubject().length);
 
         // Write size of the int describing the size of the bottom layer of data
-        byte[] sizeOfSizeBottomData = Utils.toByteArray(sizeBottomData.length);
-        StreamUtils.writeSingleByteLengthValueToStream(stream, sizeOfSizeBottomData);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, sizeBottomData.length);
 
         stream.write(sizeBottomData);
 
@@ -519,20 +513,18 @@ public class SerializeDeserializeService {
     }
 
     public static void serialize(VeriBlockMerklePath blockMerklePath, OutputStream stream) throws IOException {
-        byte[] treeIndexBytes = Utils.toByteArray(blockMerklePath.getTreeIndex());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, treeIndexBytes);
+    	// Tree index
+        StreamUtils.writeSingleIntLengthValueToStream(stream, blockMerklePath.getTreeIndex());
 
         // Index
-        byte[] indexBytes = Utils.toByteArray(blockMerklePath.getIndex());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, indexBytes);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, blockMerklePath.getIndex());
 
         // Subject
         byte[] subjectBytes = blockMerklePath.getSubject().getBytes();
         StreamUtils.writeSingleByteLengthValueToStream(stream, subjectBytes);
 
         // Layer size
-        byte[] numLayerBytes = Utils.toByteArray(blockMerklePath.getLayers().size());
-        StreamUtils.writeSingleByteLengthValueToStream(stream, numLayerBytes);
+        StreamUtils.writeSingleIntLengthValueToStream(stream, blockMerklePath.getLayers().size());
 
         // Layers
         for (Sha256Hash hash : blockMerklePath.getLayers()) {
@@ -542,12 +534,10 @@ public class SerializeDeserializeService {
     }
 
     public static VeriBlockMerklePath parseVeriBlockMerklePath(ByteBuffer buffer) {
-        ///HACK: minimum and maximum limit is 4 cause the number was written with Utils.toByteArray
-        ///      Utils.toByteArray always creates an array of 4 bytes
-        int treeIndex = Utils.toInt(StreamUtils.getSingleByteLengthValue(buffer, 4, 4));
-        int index = Utils.toInt(StreamUtils.getSingleByteLengthValue(buffer, 4, 4));
+        int treeIndex = StreamUtils.getSingleIntValue(buffer);
+        int index = StreamUtils.getSingleIntValue(buffer);
         Sha256Hash subject = Sha256Hash.wrap(StreamUtils.getSingleByteLengthValue(buffer, Sha256Hash.BITCOIN_LENGTH, Sha256Hash.BITCOIN_LENGTH));
-        int numLayers = Utils.toInt(StreamUtils.getSingleByteLengthValue(buffer, 4, 4));
+        int numLayers = StreamUtils.getSingleIntValue(buffer);
 
         if (numLayers < 0 || numLayers > Constants.MAX_LAYER_COUNT_MERKLE) {
             throw new IllegalArgumentException("Unexpected layer count: " + numLayers

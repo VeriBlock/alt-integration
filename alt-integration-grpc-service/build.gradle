@@ -12,7 +12,7 @@ repositories {
 dependencies {
     testCompile 'junit:junit:4.12'
     compile group: 'io.grpc', name: 'grpc-netty-shaded', version: '1.23.0'
-    implementation name: 'integration-grpc-java-1.0'
+    implementation name: 'alt-integration-proto-java-1.0-SNAPSHOT'
     compile project(':core')
     compile project(':reference-lib')
     compile project(':alt-integration-adapter-java')
