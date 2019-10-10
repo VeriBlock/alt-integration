@@ -25,7 +25,7 @@ public class SetBitcoinHeadChange extends Change {
     }
 
     public SetBitcoinHeadChange(StoredBitcoinBlock oldValue, StoredBitcoinBlock newValue) {
-        super(oldValue != null ? oldValue.getHash().getBytes() : new byte[]{},
-                newValue != null ? newValue.getHash().getBytes() : new byte[]{});
+        super(oldValue != null ? oldValue.serialize() : new byte[]{},
+                newValue != null ? newValue.serialize() : new byte[]{});
     }
 }
