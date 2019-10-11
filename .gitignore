@@ -85,3 +85,4 @@ fabric.properties
 .sqlite
 .sqlite-shm
 .sqlite-wal
+.scannerwork
