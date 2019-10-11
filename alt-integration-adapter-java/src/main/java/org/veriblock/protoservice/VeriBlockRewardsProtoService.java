@@ -89,7 +89,7 @@ public class VeriBlockRewardsProtoService {
         PopPayoutRound payout = null;
 
         try{
-            payout = PopRewardCalculator.calculatePoPPayoutRound(request.getBlockAltHeight(),
+            payout = PopRewardCalculator.calculatePopPayoutRound(request.getBlockAltHeight(),
                     endorsedBlock, endorsementBlocks,
                     new BigDecimal(request.getDifficulty()));
             outputsProto = RewardOutputProtoConverter.toProto(payout.getOutputsToPopMiners());

@@ -250,14 +250,14 @@ public class PopRewardCalculator {
         return calculateTotalPopBlockReward(blockNumber, difficulty, scoreForThisBlock);
     }
 
-    public static PopPayoutRound calculatePoPPayoutRound(int blockNumber, AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks, BigDecimal popDifficulty) throws SQLException {
+    public static PopPayoutRound calculatePopPayoutRound(int blockNumber, AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks, BigDecimal popDifficulty) throws SQLException {
 
         List<AltPublication> endorsements = popTxDBStore.getAltPublciationsEndorse(endorsedBlock, endorsementBlocks);
 
         int veriBlockLowestHeight = getBestPublicationHeight(endorsements);
         BigDecimal scoreForThisBlock = calculatePopScoreFromEndorsements(endorsements, veriBlockLowestHeight);
         // round down the reward to integer value
-        long popBlockReward = calculateTotalPopBlockReward(blockNumber, scoreForThisBlock, popDifficulty).longValue();
+        long popBlockReward = calculatePopRewardForBlock(blockNumber, scoreForThisBlock, popDifficulty).longValue();
 
         // we have the total reward per block in popBlockReward. Let's distribute it now.
 
