@@ -1,6 +1,6 @@
 name: Java CI
 
-on: 
+on:
   push:
     branches:
     - master
@@ -21,14 +21,17 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Build with Gradle
+    - name: Build
       run: ./gradlew build -x test
-    - name: Test with Gradle
+    - name: Test
       run: ./gradlew test
     - name: Collect Coverage
-      run: ./gradlew jacocoTestCoverage
+      run: ./gradlew jacocoTestReport
     - name: Run Sonarqube scanner
+      # run only on push to develop/master
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master'
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # has to be included to access other secrets
+        # has to be included to access other secrets
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew -Dsonar.login=$SONAR_TOKEN
+      run: ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN
