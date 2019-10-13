@@ -9,6 +9,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "org.sonarqube" version "2.8"
+}
+
 apply plugin: 'nebula.release'
 
 version = '0.1.2'
@@ -17,6 +21,13 @@ allprojects {
     repositories {
         mavenLocal()
         jcenter()
+    }
+
+    apply plugin: 'jacoco'
+
+    jacoco {
+        toolVersion = "0.8.4"
+        reportsDir = file("$buildDir/coverage")
     }
 }
 
@@ -35,4 +46,19 @@ task printTCBuildNumber() {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.10.2'
+}
+
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "vbk:alt-integration"
+        property "sonar.projectName", "Alt Integration Service"
+        property "sonar.host.url", "https://sonar.veriblock.org"
+        property "sonar.java.binaries", "${project.projectDir}/build/classes"
+        property "sonar.java.libraries", "${project.projectDir}/build/libs"
+        property "sonar.java.test.binaries", "${project.projectDir}/build/test-results/test/binary"
+        property "sonar.junit.reportsPaths", "${project.projectDir}/build/test-results/**/*.xml"
+        property "sonar.jacoco.reportPaths", "${project.projectDir}/build/jacoco/test.exec"
+        property "sonar.exclusions", "**/generated/*.java"
+    }
 }
