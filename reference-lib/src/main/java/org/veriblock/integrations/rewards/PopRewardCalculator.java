@@ -11,7 +11,6 @@ package org.veriblock.integrations.rewards;
 import org.veriblock.integrations.AltChainParametersConfig;
 import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
-import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
 import org.veriblock.sdk.*;
 
 import java.math.BigDecimal;
@@ -32,7 +31,7 @@ public class PopRewardCalculator {
     public static void setSecurity(VeriBlockSecurity security)
     {
         PopRewardCalculator.security = security;
-        PopRewardCalculator.popTxDBStore = security.getSecurityFiles().getPopTxDBRepo();
+        PopRewardCalculator.popTxDBStore = security.getSecurityFiles().getPopTxDBStore();
     }
 
     public static PopRewardCalculatorConfig getCalculatorConfig() {

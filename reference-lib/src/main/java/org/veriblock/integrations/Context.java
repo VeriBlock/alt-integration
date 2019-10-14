@@ -24,7 +24,7 @@ public class Context {
     private VeriBlockStore veriblockStore;
     private BitcoinStore bitcoinStore;
     private AuditorChangesStore changeStore;
-    private PoPTransactionsDBStore popTxDBRepo;
+    private PoPTransactionsDBStore popTxDBStore;
 
     public NetworkParameters getNetworkParameters() {
         return networkParameters;
@@ -42,7 +42,14 @@ public class Context {
         return changeStore;
     }
 
-    public PoPTransactionsDBStore getPopTxDBRepo() {return popTxDBRepo;}
+    public PoPTransactionsDBStore getPopTxDBStore() {return popTxDBStore;}
+
+    public void resetSecurity() throws SQLException {
+        veriblockStore.clear();
+        bitcoinStore.clear();
+        changeStore.clear();
+        popTxDBStore.clear();
+    }
 
     public Context(NetworkParameters networkParameters, VeriBlockStore veriblockStore,
             BitcoinStore bitcoinStore, AuditorChangesStore changeStore, PoPTransactionsDBStore popTxDBRepo) {
@@ -55,7 +62,7 @@ public class Context {
         this.veriblockStore = veriblockStore;
         this.bitcoinStore = bitcoinStore;
         this.changeStore = changeStore;
-        this.popTxDBRepo = popTxDBRepo;
+        this.popTxDBStore = popTxDBRepo;
     }
     
     public Context() throws BlockStoreException, SQLException {

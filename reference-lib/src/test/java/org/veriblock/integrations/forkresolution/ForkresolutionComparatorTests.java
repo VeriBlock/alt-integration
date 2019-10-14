@@ -260,7 +260,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void GetBestPublicationHeightSimpleTest() throws SQLException {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -290,7 +290,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void GetBestPublicationHeightWithOneBlockInFutureTest() throws SQLException {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -321,7 +321,7 @@ public class ForkresolutionComparatorTests {
     public void GetBestPublicationHeightWithFirstBlockIsNotKeystoneTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 49, timestamp);
@@ -352,7 +352,7 @@ public class ForkresolutionComparatorTests {
     public void GetBestPublicationHeightWithAllBlockInTheFutureTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -384,7 +384,7 @@ public class ForkresolutionComparatorTests {
     public void GetReducedPublciationViewSimpleTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -469,7 +469,7 @@ public class ForkresolutionComparatorTests {
     public void GetReducedPublciationViewWithFailFinalityDelayTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -553,7 +553,7 @@ public class ForkresolutionComparatorTests {
     public void SimpleCompareTwoBranchesLeftForkPriorityTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         // left branch
@@ -615,7 +615,7 @@ public class ForkresolutionComparatorTests {
     public void SimpleCompareTwoBranchesRightForkPriorityTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         // left branch
@@ -677,7 +677,7 @@ public class ForkresolutionComparatorTests {
     public void SimpleCompareTwoBranchesForksEqualTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         // left branch

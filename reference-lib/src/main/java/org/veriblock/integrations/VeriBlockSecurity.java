@@ -58,7 +58,7 @@ public class VeriBlockSecurity {
         context.getBitcoinStore().shutdown();
         context.getVeriblockStore().shutdown();
         context.getChangeStore().shutdown();
-        context.getPopTxDBRepo().shutdown();
+        context.getPopTxDBStore().shutdown();
     }
     
     public VeriBlockBlockchain getVeriBlockBlockchain() {

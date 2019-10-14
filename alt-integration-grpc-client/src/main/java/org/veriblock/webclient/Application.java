@@ -95,6 +95,8 @@ public final class Application {
         ValidationResult replySetAltChainConfig = client.setAltChainParametersConfig(altChainConfig);
         log.info("SetAltChainParametersConfig command success: " + replySetAltChainConfig.isValid());
 
+
+
         TestForkresolutionService();
 
         shutdown();

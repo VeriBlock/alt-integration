@@ -15,6 +15,7 @@ import integration.api.grpc.IntegrationServiceGrpc.IntegrationServiceImplBase;
 import integration.api.grpc.VeriBlockMessages;
 import integration.api.grpc.VeriBlockMessages.GeneralReply;
 import io.grpc.stub.StreamObserver;
+import org.veriblock.protoservice.VeriBlockServiceCommon;
 
 public class IntegrationGrpcService extends IntegrationServiceImplBase {
     
@@ -113,6 +114,13 @@ public class IntegrationGrpcService extends IntegrationServiceImplBase {
     @Override
     public void setAltChainParametersConfig(VeriBlockMessages.AltChainConfigRequest request, StreamObserver<GeneralReply> responseObserver) {
         VeriBlockMessages.GeneralReply reply = VeriBlockSecurityProtoService.setAltChainParametersConfig(request);
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void savePoPTransactionData(VeriBlockMessages.SavePoPTransactionDataRequest request, StreamObserver<GeneralReply> responseObserver) {
+        VeriBlockMessages.GeneralReply reply = VeriBlockSecurityProtoService.savePoPTransactionData(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }

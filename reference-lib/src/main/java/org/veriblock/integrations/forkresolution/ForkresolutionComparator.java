@@ -36,7 +36,7 @@ public class ForkresolutionComparator {
     public static void setSecurity(VeriBlockSecurity security)
     {
         ForkresolutionComparator.security = security;
-        ForkresolutionComparator.popTxDBStore = security.getSecurityFiles().getPopTxDBRepo();
+        ForkresolutionComparator.popTxDBStore = security.getSecurityFiles().getPopTxDBStore();
     }
 
     // return 1 if leftBranchScore > rightBranchScore

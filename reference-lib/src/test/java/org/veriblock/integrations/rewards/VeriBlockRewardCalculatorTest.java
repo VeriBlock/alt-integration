@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Paths;
-import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -27,7 +26,6 @@ import org.veriblock.integrations.auditor.store.AuditorChangesStore;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.forkresolution.ForkresolutionComparatorTests;
 import org.veriblock.integrations.params.MainNetParameters;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
@@ -210,7 +208,7 @@ public class VeriBlockRewardCalculatorTest {
     
     @Test
     public void ratiosForEndorsement() throws SQLException {
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
 
         // we store a single endorsed block in the first (relative to our calculator) VeriBlock block
         String payoutInfo = "payout1";
@@ -393,7 +391,7 @@ public class VeriBlockRewardCalculatorTest {
 
     @Test
     public void popRewardBlocks() throws SQLException {
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
 
         int blockNumber = 1;
         // let's start with hardcoded difficulty

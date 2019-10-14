@@ -44,7 +44,7 @@ public class VeriBlockIntegrationLibraryManager {
             securityFiles.getBitcoinStore().clear();
             securityFiles.getVeriblockStore().clear();
             securityFiles.getChangeStore().clear();
-            securityFiles.getPopTxDBRepo().clear();
+            securityFiles.getPopTxDBStore().clear();
         }
 
         security = new VeriBlockSecurity(securityFiles);
