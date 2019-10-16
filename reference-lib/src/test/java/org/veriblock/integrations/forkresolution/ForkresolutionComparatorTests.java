@@ -77,14 +77,15 @@ public class ForkresolutionComparatorTests {
 
         @Override
         public List<AltPublication> getAltPublciationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
-            Set<AltPublication> altPublications = new HashSet<AltPublication>();
+            Set<AltPublication> altPublications1 = new HashSet<AltPublication>();
             for (AltChainBlock block : containBlocks) {
-                altPublications.addAll(containingAltPublication.get(block.getHash()));
+                altPublications1.addAll(containingAltPublication.get(block.getHash()));
             }
 
-            altPublications.addAll(endoresedAltPublication.get(endorsedBlock.getHash()));
-
-            return new ArrayList<AltPublication>(altPublications);
+            Set<AltPublication> altPublications2 = new HashSet<AltPublication>();
+            altPublications2.addAll((endoresedAltPublication.get(endorsedBlock.getHash())));
+            altPublications2.retainAll(altPublications1);
+            return new ArrayList<AltPublication>(altPublications2);
         }
 
         @Override
@@ -111,7 +112,7 @@ public class ForkresolutionComparatorTests {
             } else {
                 altPublications = new ArrayList<AltPublication>();
                 altPublications.add(popTx.altPublication);
-                endoresedAltPublication.put(containingBlock.getHash(), altPublications);
+                endoresedAltPublication.put(endorsedBlock.getHash(), altPublications);
             }
         }
 
@@ -259,7 +260,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void GetBestPublicationHeightSimpleTest() throws SQLException {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -289,7 +290,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void GetBestPublicationHeightWithOneBlockInFutureTest() throws SQLException {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -320,7 +321,7 @@ public class ForkresolutionComparatorTests {
     public void GetBestPublicationHeightWithFirstBlockIsNotKeystoneTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 49, timestamp);
@@ -351,7 +352,7 @@ public class ForkresolutionComparatorTests {
     public void GetBestPublicationHeightWithAllBlockInTheFutureTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -383,7 +384,7 @@ public class ForkresolutionComparatorTests {
     public void GetReducedPublciationViewSimpleTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -468,7 +469,7 @@ public class ForkresolutionComparatorTests {
     public void GetReducedPublciationViewWithFailFinalityDelayTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -552,7 +553,7 @@ public class ForkresolutionComparatorTests {
     public void SimpleCompareTwoBranchesLeftForkPriorityTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         // left branch
@@ -614,7 +615,7 @@ public class ForkresolutionComparatorTests {
     public void SimpleCompareTwoBranchesRightForkPriorityTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         // left branch
@@ -676,7 +677,7 @@ public class ForkresolutionComparatorTests {
     public void SimpleCompareTwoBranchesForksEqualTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBRepo();
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
         int timestamp = 100;
 
         // left branch

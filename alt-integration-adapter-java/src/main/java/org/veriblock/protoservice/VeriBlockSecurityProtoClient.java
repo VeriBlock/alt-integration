@@ -12,14 +12,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
 import org.veriblock.protoconverters.*;
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.BlockIndex;
-import org.veriblock.sdk.Pair;
-import org.veriblock.sdk.ValidationResult;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockPublication;
+import org.veriblock.sdk.*;
 
 import integration.api.grpc.IntegrationServiceGrpc;
 import integration.api.grpc.IntegrationServiceGrpc.IntegrationServiceBlockingStub;
@@ -120,6 +115,16 @@ public class VeriBlockSecurityProtoClient {
     public ValidationResult setAltChainParametersConfig(AltChainParametersConfig config)
     {
         VeriBlockMessages.GeneralReply reply = service.setAltChainParametersConfig(AltChainParametresConfigProtoConverter.toProto(config));
+        return VeriBlockServiceCommon.validationResultFromProto(reply);
+    }
+
+    public ValidationResult savePoPTransactionData(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) {
+        VeriBlockMessages.SavePoPTransactionDataRequest request = VeriBlockMessages.SavePoPTransactionDataRequest.newBuilder()
+                .setPopTx(PoPTransactionDataProtoConverter.toProto(popTx))
+                .setContainingBlock(AltChainBlockProtoConverter.toProto(containingBlock))
+                .setEndorsedBlock(AltChainBlockProtoConverter.toProto(endorsedBlock))
+                .build();
+        VeriBlockMessages.GeneralReply reply = service.savePoPTransactionData(request);
         return VeriBlockServiceCommon.validationResultFromProto(reply);
     }
 }

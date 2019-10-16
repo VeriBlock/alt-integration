@@ -36,7 +36,7 @@ public class ForkresolutionComparator {
     public static void setSecurity(VeriBlockSecurity security)
     {
         ForkresolutionComparator.security = security;
-        ForkresolutionComparator.popTxDBStore = security.getSecurityFiles().getPopTxDBRepo();
+        ForkresolutionComparator.popTxDBStore = security.getSecurityFiles().getPopTxDBStore();
     }
 
     // return 1 if leftBranchScore > rightBranchScore
@@ -100,7 +100,7 @@ public class ForkresolutionComparator {
         {
             if(blocks.get(i).isKeystone(security.getAltChainParametersConfig().keystoneInterval))
             {
-                int bestPublication = getBestPublicationHeight(blocks.subList(i, blocks.size() - 1));
+                int bestPublication = getBestPublicationHeight(blocks.subList(i, blocks.size()));
 
                 if(reducedPublciationView.size() != 0)
                 {
@@ -134,7 +134,7 @@ public class ForkresolutionComparator {
             AltChainBlock workingBlock = blockSequence.get(i);
 
             if(workingBlock.getHeight() < keystoneBlock.getHeight() + security.getAltChainParametersConfig().keystoneInterval) {
-                List<AltPublication> publications = popTxDBStore.getAltPublciationsEndorse(workingBlock, blockSequence.subList(i, blockSequence.size() - 1));
+                List<AltPublication> publications = popTxDBStore.getAltPublciationsEndorse(workingBlock, blockSequence.subList(i, blockSequence.size()));
 
                 for(AltPublication publication: publications) {
                     ValidationResult fsuccess = security.checkATVAgainstView(publication);
