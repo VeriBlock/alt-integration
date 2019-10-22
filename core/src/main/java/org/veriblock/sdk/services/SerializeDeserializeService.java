@@ -288,10 +288,11 @@ public class SerializeDeserializeService {
         }
 
         long signatureIndex = Utils.toLong(StreamUtils.getSingleByteLengthValue(txBuffer, 0, 8));
-        byte[] data = StreamUtils.getVariableLengthValue(txBuffer, 0, MAX_SIZE_PUBLICATION_DATA);
+        byte[] publicationDataBytes = StreamUtils.getVariableLengthValue(txBuffer, 0, MAX_SIZE_PUBLICATION_DATA);
+        PublicationData publicationData = SerializeDeserializeService.parsePublicationData(publicationDataBytes);
 
         return new VeriBlockTransaction(typeId, sourceAddress, sourceAmount, outputs,
-                signatureIndex, data, signature, publicKey, networkByte);
+                signatureIndex, publicationData, signature, publicKey, networkByte);
     }
 
     public static void serialize(VeriBlockTransaction veriBlockTransaction, OutputStream stream) throws IOException {
@@ -329,8 +330,10 @@ public class SerializeDeserializeService {
             serialize(o, stream);
         }
 
+        byte[] publicationDataBytes = SerializeDeserializeService.serialize(veriBlockTransaction.getPublicationData());
+
         StreamUtils.writeSingleByteLengthValueToStream(stream, veriBlockTransaction.getSignatureIndex());
-        StreamUtils.writeVariableLengthValueToStream(stream, veriBlockTransaction.getData());
+        StreamUtils.writeVariableLengthValueToStream(stream, publicationDataBytes);
     }
 
     public static Sha256Hash getId(VeriBlockTransaction veriBlockTransaction) {
@@ -732,6 +735,8 @@ public class SerializeDeserializeService {
 
 // PublicationData
     public static byte[] serialize(PublicationData publicationData) {
+        if(publicationData == null)
+            return new byte [] {};
         try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
             serialize(publicationData, stream);
             return stream.toByteArray();
