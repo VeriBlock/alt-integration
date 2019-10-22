@@ -8,7 +8,6 @@
 
 package org.veriblock.sdk.services;
 
-import org.omg.CORBA.portable.ServantObject;
 import org.veriblock.sdk.Address;
 import org.veriblock.sdk.AltPublication;
 import org.veriblock.sdk.BitcoinBlock;
