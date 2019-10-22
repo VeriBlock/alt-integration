@@ -72,7 +72,7 @@ public final strictfp class Coin implements Comparable<Coin> {
     }
 
     public static Coin parse(ByteBuffer txBuffer) {
-        long atomicUnits = Utils.toLong(StreamUtils.getSingleByteLengthValue(txBuffer, 8, 0));
+        long atomicUnits = Utils.toLong(StreamUtils.getSingleByteLengthValue(txBuffer, 0, 8));
         return Coin.valueOf(atomicUnits);
     }
 }
