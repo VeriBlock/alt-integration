@@ -23,7 +23,6 @@ public class VeriBlockTransaction {
     private final Coin sourceAmount;
     private final List<Output> outputs;
     private final long signatureIndex;
-    private final byte[] data;
     private PublicationData publicationData;
     private final byte[] signature;
     private final byte[] publicKey;
@@ -58,10 +57,6 @@ public class VeriBlockTransaction {
         return signatureIndex;
     }
 
-    public byte[] getData() {
-        return data;
-    }
-
     public PublicationData getPublicationData() {
         return publicationData;
     }
@@ -83,7 +78,7 @@ public class VeriBlockTransaction {
                                 Coin sourceAmount,
                                 List<Output> outputs,
                                 long signatureIndex,
-                                byte[] data,
+                                PublicationData publicationData,
                                 byte[] signature,
                                 byte[] publicKey,
                                 Byte networkByte) {
@@ -98,12 +93,7 @@ public class VeriBlockTransaction {
         this.sourceAmount = sourceAmount;
         this.outputs = outputs != null ? outputs : Collections.emptyList();
         this.signatureIndex = signatureIndex;
-        this.data = data != null ? data : new byte[0];
-        this.publicationData = null;
-        try {
-            this.publicationData = SerializeDeserializeService.parsePublicationData(this.data);
-        } catch(Exception e) {
-        }
+        this.publicationData = publicationData;
         this.signature = signature;
         this.publicKey = publicKey;
         this.networkByte = networkByte;

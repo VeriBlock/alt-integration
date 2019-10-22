@@ -30,7 +30,7 @@ public class VeriBlockTransactionSigner {
                 unsignedTx.getSourceAmount(),
                 unsignedTx.getOutputs(),
                 unsignedTx.getSignatureIndex(),
-                unsignedTx.getData(),
+                unsignedTx.getPublicationData(),
                 signature,
                 unsignedTx.getPublicKey(),
                 unsignedTx.getNetworkByte());

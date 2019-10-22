@@ -26,6 +26,7 @@ import org.veriblock.sdk.util.BitcoinUtils;
 
 import io.grpc.ManagedChannel;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
+import org.veriblock.sdk.util.Utils;
 
 public final class Application {
 

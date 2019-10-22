@@ -32,7 +32,7 @@ public class VeriBlockTransactionsAtv {
     // forbid constructor
     private VeriBlockTransactionsAtv() {};
 
-    public static VeriBlockTransaction createAtv(byte[] altData) throws SignatureException {
+    public static VeriBlockTransaction createAtv(PublicationData pubData) throws SignatureException {
         String sender = VeriBlockSignatureKeys.getDefaultAddress();
         byte[] publicKey = VeriBlockSignatureKeys.getDefaultPublicKey();
 
@@ -42,7 +42,7 @@ public class VeriBlockTransactionsAtv {
                 Coin.valueOf(1000L),
                 Collections.emptyList(),
                 7L,
-                altData,
+                pubData,
                 new byte[] { 0 },
                 publicKey,
                 null);
@@ -51,13 +51,12 @@ public class VeriBlockTransactionsAtv {
         return tx;
     }
 
-    public static VeriBlockTransaction createAtv(PublicationData pubData) throws SignatureException {
-        VeriBlockTransaction tx = createAtv(SerializeDeserializeService.serialize(pubData));
-        return tx;
-    }
-
     public static VeriBlockTransaction createAtv() throws SignatureException {
-        VeriBlockTransaction tx = createAtv(Base64.getDecoder().decode("BP////8BEAARIjNEVWZ3iJmqu8zd7v8BAQABAf8="));
+        byte[] headerBytes = "header bytes".getBytes();
+        byte[] payoutInfo = "payout info".getBytes();
+        byte[] contextInfo = "context info".getBytes();
+        PublicationData defaultPublicationData = new PublicationData(0, headerBytes, payoutInfo, contextInfo);
+        VeriBlockTransaction tx = createAtv(defaultPublicationData);
         return tx;
     }
 
