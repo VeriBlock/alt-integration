@@ -109,12 +109,16 @@ public class BitcoinStore {
         StoredBitcoinBlock storedBlock = new StoredBitcoinBlock(block, data.work, data.height);
         return storedBlock;
     }
-    
-    ///HACK: it is actually a delete method. It deletes block with hash.
-    ///HACK: storedBlock is not being used.
-    public StoredBitcoinBlock replace(Sha256Hash hash, StoredBitcoinBlock storedBlock) throws BlockStoreException, SQLException {
-        StoredBitcoinBlock replaced = get(hash);
+
+    public StoredBitcoinBlock erase(Sha256Hash hash) throws BlockStoreException, SQLException {
+        StoredBitcoinBlock erased = get(hash);
         bitcoinRepository.getBlocksRepository().delete(Utils.encodeHex(hash.getBytes()));
+        return erased;
+    }
+
+    public StoredBitcoinBlock replace(Sha256Hash hash, StoredBitcoinBlock storedBlock) throws BlockStoreException, SQLException {
+        StoredBitcoinBlock replaced = erase(hash);
+        put(storedBlock);
         return replaced;
     }
 

@@ -165,4 +165,101 @@ public class BitcoinStoreTest {
             VeriBlockIntegrationLibraryManager.shutdown();
         }
     }
+
+    @Test
+    public void EraseTest() throws SQLException, IOException {
+        try {
+            VeriBlockIntegrationLibraryManager.init();
+            BitcoinStore store = VeriBlockIntegrationLibraryManager.getContext().getBitcoinStore();
+
+            byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
+            StoredBitcoinBlock expectedBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);
+
+            store.put(expectedBlock);
+            StoredBitcoinBlock storedBlock = store.get(expectedBlock.getHash());
+            Assert.assertEquals(expectedBlock, storedBlock);
+
+            StoredBitcoinBlock erasedBlock = store.erase(expectedBlock.getHash());
+            Assert.assertEquals(storedBlock, erasedBlock);
+
+            storedBlock = store.get(expectedBlock.getHash());
+            Assert.assertEquals(storedBlock, null);
+
+        } finally {
+            VeriBlockIntegrationLibraryManager.shutdown();
+        }
+    }
+
+    @Test
+    public void EraseNonexistentTest() throws SQLException, IOException {
+        try {
+            VeriBlockIntegrationLibraryManager.init();
+            BitcoinStore store = VeriBlockIntegrationLibraryManager.getContext().getBitcoinStore();
+
+            byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
+            StoredBitcoinBlock expectedBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);
+
+            StoredBitcoinBlock storedBlock = store.get(expectedBlock.getHash());
+            Assert.assertEquals(storedBlock, null);
+
+            StoredBitcoinBlock erasedBlock = store.erase(expectedBlock.getHash());
+            Assert.assertEquals(erasedBlock, null);
+
+        } finally {
+            VeriBlockIntegrationLibraryManager.shutdown();
+        }
+    }
+
+    // This test is mostly useless at this moment, as BTC blocks
+    // don't have any extra data(other than the header) associated
+    // with them. Thus, a replacement block that has the same hash
+    // also has identical data/metadata
+    @Test
+    public void ReplaceBlockTest() throws SQLException, IOException {
+        try {
+            VeriBlockIntegrationLibraryManager.init();
+            BitcoinStore store = VeriBlockIntegrationLibraryManager.getContext().getBitcoinStore();
+
+            byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
+            StoredBitcoinBlock newBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);
+            StoredBitcoinBlock oldBlock = newBlock;
+
+            store.put(oldBlock);
+            StoredBitcoinBlock storedBlock = store.get(oldBlock.getHash());
+            Assert.assertEquals(storedBlock, oldBlock);
+
+            StoredBitcoinBlock replacedBlock = store.replace(newBlock.getHash(), newBlock);
+            Assert.assertEquals(replacedBlock, oldBlock);
+
+            storedBlock = store.get(newBlock.getHash());
+            Assert.assertEquals(newBlock, storedBlock);
+
+        } finally {
+            VeriBlockIntegrationLibraryManager.shutdown();
+        }
+    }
+
+    @Test
+    public void ReplaceNonexistentTest() throws SQLException, IOException {
+        try {
+            VeriBlockIntegrationLibraryManager.init();
+            BitcoinStore store = VeriBlockIntegrationLibraryManager.getContext().getBitcoinStore();
+
+            byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
+            StoredBitcoinBlock newBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);
+            StoredBitcoinBlock oldBlock = null;
+
+            StoredBitcoinBlock storedBlock = store.get(newBlock.getHash());
+            Assert.assertEquals(storedBlock, oldBlock);
+
+            StoredBitcoinBlock replacedBlock = store.replace(newBlock.getHash(), newBlock);
+            Assert.assertEquals(replacedBlock, oldBlock);
+
+            storedBlock = store.get(newBlock.getHash());
+            Assert.assertEquals(newBlock, storedBlock);
+
+        } finally {
+            VeriBlockIntegrationLibraryManager.shutdown();
+        }
+    }
 }
