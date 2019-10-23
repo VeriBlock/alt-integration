@@ -87,5 +87,6 @@ public class VeriBlockBlockRepositoryTest {
 
     //FIXME: test getAll()
     //FIXME: test getEndsWithId() using trimmed VBlakeHash
+    //FIXME: test get() although it's unused
     //FIXME: test clear() explicitly
 }
