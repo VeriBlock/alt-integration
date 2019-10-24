@@ -15,7 +15,6 @@ import integration.api.grpc.IntegrationServiceGrpc.IntegrationServiceImplBase;
 import integration.api.grpc.VeriBlockMessages;
 import integration.api.grpc.VeriBlockMessages.GeneralReply;
 import io.grpc.stub.StreamObserver;
-import org.veriblock.protoservice.VeriBlockServiceCommon;
 
 public class IntegrationGrpcService extends IntegrationServiceImplBase {
     
