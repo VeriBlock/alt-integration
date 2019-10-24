@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Arrays;
 
 import org.veriblock.integrations.blockchain.store.StoredVeriBlockBlock;
+import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
@@ -33,15 +34,17 @@ public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriB
             stmt.setObject(++i, Utils.encodeHex(block.getBlock().getPreviousBlock().getBytes()));
             stmt.setObject(++i, block.getHeight());
             stmt.setObject(++i, block.getWork().toString());
+            stmt.setObject(++i, Utils.encodeHex(block.getBlockOfProof().getBytes()));
             stmt.setObject(++i, Utils.encodeHex(SerializeDeserializeService.serialize(block.getBlock())));
         }
 
         public StoredVeriBlockBlock fromResult(ResultSet result) throws SQLException {
             byte[] data = Utils.decodeHex(result.getString("data"));
             BigInteger work = new BigInteger(result.getString("work"));
+            Sha256Hash blockOfProof = Sha256Hash.wrap(Utils.decodeHex(result.getString("blockOfProof")));
 
             VeriBlockBlock block = SerializeDeserializeService.parseVeriBlockBlock(ByteBuffer.wrap(data));
-            StoredVeriBlockBlock storedBlock = new StoredVeriBlockBlock(block, work);
+            StoredVeriBlockBlock storedBlock = new StoredVeriBlockBlock(block, work, blockOfProof);
             return storedBlock;
         }
 
@@ -50,10 +53,11 @@ public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriB
                   + " previousId TEXT,"
                   + " height INTEGER,"
                   + " work TEXT,"
+                  + " blockOfProof TEXT,"
                   + " data TEXT";
         }
         public List<String> getColumns() {
-            return Arrays.asList("id", "previousId", "height", "work", "data");
+            return Arrays.asList("id", "previousId", "height", "work", "blockOfProof", "data");
         }
     };
 

@@ -13,6 +13,7 @@ import org.junit.*;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.tables.VeriBlockBlockRepository;
 import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.util.Utils;
 
 import java.io.IOException;
@@ -67,6 +68,17 @@ public class VeriBlockBlockRepositoryTest {
 
     @Test
     public void AddBlockTest() throws SQLException, IOException {
+        repo.save(newBlock);
+        List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(Utils.encodeHex(newBlock.getHash().getBytes()));
+        Assert.assertFalse(blocks.isEmpty());
+        Assert.assertEquals(blocks.get(0), newBlock);
+    }
+
+    @Test
+    public void AddBlockWithBlockOfProofTest() throws SQLException, IOException {
+        Sha256Hash blockOfProof = Sha256Hash.wrap("00000000000000b345b7bbf29bda1507a679b97967f99a10ab0088899529def7");
+        newBlock.setBlockOfProof(blockOfProof);
+
         repo.save(newBlock);
         List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(Utils.encodeHex(newBlock.getHash().getBytes()));
         Assert.assertFalse(blocks.isEmpty());
