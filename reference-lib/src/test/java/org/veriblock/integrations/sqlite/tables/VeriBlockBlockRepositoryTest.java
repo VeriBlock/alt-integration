@@ -48,28 +48,28 @@ public class VeriBlockBlockRepositoryTest {
     
     @Test
     public void GetNonexistentBlockTest() throws SQLException, IOException {
-        List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(Utils.encodeHex(newBlock.getHash().getBytes()));
+        List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(newBlock.getHash());
         Assert.assertTrue(blocks.isEmpty());
     }
 
     @Test
     public void DeleteNonexistentBlockTest() throws SQLException, IOException {
-        repo.delete(Utils.encodeHex(newBlock.getHash().getBytes()));
+        repo.delete(newBlock.getHash());
     }
 
     @Test
     public void DeleteBlockTest() throws SQLException, IOException {
         repo.save(newBlock);
-        repo.delete(Utils.encodeHex(newBlock.getHash().getBytes()));
+        repo.delete(newBlock.getHash());
 
-        List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(Utils.encodeHex(newBlock.getHash().getBytes()));
+        List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(newBlock.getHash());
         Assert.assertTrue(blocks.isEmpty());
     }
 
     @Test
     public void AddBlockTest() throws SQLException, IOException {
         repo.save(newBlock);
-        List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(Utils.encodeHex(newBlock.getHash().getBytes()));
+        List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(newBlock.getHash());
         Assert.assertFalse(blocks.isEmpty());
         Assert.assertEquals(blocks.get(0), newBlock);
     }
@@ -80,7 +80,7 @@ public class VeriBlockBlockRepositoryTest {
         newBlock.setBlockOfProof(blockOfProof);
 
         repo.save(newBlock);
-        List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(Utils.encodeHex(newBlock.getHash().getBytes()));
+        List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(newBlock.getHash());
         Assert.assertFalse(blocks.isEmpty());
         Assert.assertEquals(blocks.get(0), newBlock);
     }

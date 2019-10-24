@@ -19,12 +19,12 @@ import java.util.List;
 
 import org.veriblock.sdk.util.Utils;
 
-public class GenericBlockRepository<Block> {
+public class GenericBlockRepository<Block, Id> {
     protected Connection connectionSource;
     protected String tableBlocks;
-    protected BlockSQLSerializer<Block> serializer;
+    protected BlockSQLSerializer<Block, Id> serializer;
     
-    public GenericBlockRepository(Connection connection, String tableName, BlockSQLSerializer<Block> serializer) throws SQLException {
+    public GenericBlockRepository(Connection connection, String tableName, BlockSQLSerializer<Block, Id> serializer) throws SQLException {
         this.connectionSource = connection;
         this.tableBlocks = tableName;
         this.serializer = serializer;
@@ -97,13 +97,13 @@ public class GenericBlockRepository<Block> {
         }
     }
 
-    public Block get(String id) throws SQLException {
+    public Block get(Id id) throws SQLException {
         List<Block> values = new ArrayList<Block>();
         PreparedStatement stmt = null;
         try {
             stmt = connectionSource.prepareStatement("SELECT * FROM " + tableBlocks + " WHERE id = ?");
             int i = 0;
-            stmt.setObject(++i, id);
+            stmt.setObject(++i, serializer.idToString(id));
             ResultSet resultSet = stmt.executeQuery();
     
             while (resultSet.next())
@@ -119,13 +119,13 @@ public class GenericBlockRepository<Block> {
         return values.get(0);
     }
     
-    public List<Block> getEndsWithId(String id) throws SQLException {
+    public List<Block> getEndsWithId(Id id) throws SQLException {
         List<Block> values = new ArrayList<Block>();
         PreparedStatement stmt = null;
         try {
             stmt = connectionSource.prepareStatement("SELECT * FROM " + tableBlocks + " WHERE id LIKE ?");
             int i = 0;
-            stmt.setObject(++i, "%" + id);
+            stmt.setObject(++i, "%" + serializer.idToString(id));
             ResultSet resultSet = stmt.executeQuery();
     
             while (resultSet.next())
@@ -155,12 +155,12 @@ public class GenericBlockRepository<Block> {
         return values;
     }
     
-    public void delete(String id) throws SQLException {
+    public void delete(Id id) throws SQLException {
         PreparedStatement stmt = null;
         try {
             stmt = connectionSource.prepareStatement("DELETE FROM " + tableBlocks + " WHERE id = ?");
             int i = 0;
-            stmt.setObject(++i, id);
+            stmt.setObject(++i, serializer.idToString(id));
             stmt.execute();
         } finally {
             if(stmt != null) stmt.close();

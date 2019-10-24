@@ -19,14 +19,15 @@ import java.util.Arrays;
 
 import org.veriblock.integrations.blockchain.store.StoredVeriBlockBlock;
 import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
-public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriBlockBlock> {
+public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriBlockBlock, VBlakeHash> {
 
-    private final static BlockSQLSerializer<StoredVeriBlockBlock> serializer =
-                     new BlockSQLSerializer<StoredVeriBlockBlock>() {
+    private final static BlockSQLSerializer<StoredVeriBlockBlock, VBlakeHash> serializer =
+                     new BlockSQLSerializer<StoredVeriBlockBlock, VBlakeHash>() {
 
         public void toStmt(StoredVeriBlockBlock block, PreparedStatement stmt) throws SQLException {
             int i = 0;
@@ -56,8 +57,13 @@ public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriB
                   + " blockOfProof TEXT,"
                   + " data TEXT";
         }
+
         public List<String> getColumns() {
             return Arrays.asList("id", "previousId", "height", "work", "blockOfProof", "data");
+        }
+
+        public String idToString(VBlakeHash hash) {
+            return Utils.encodeHex(hash.getBytes());
         }
     };
 

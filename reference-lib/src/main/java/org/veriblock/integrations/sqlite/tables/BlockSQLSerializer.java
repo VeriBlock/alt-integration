@@ -13,9 +13,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface BlockSQLSerializer<Block> {
+public interface BlockSQLSerializer<Block, Id> {
     void toStmt(Block block, PreparedStatement stmt) throws SQLException;
     Block fromResult(ResultSet result)  throws SQLException;
     String getSchema();
     List<String> getColumns();
+    String idToString(Id id);
 }
