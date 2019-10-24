@@ -26,7 +26,7 @@ import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
 import org.veriblock.protoconverters.VeriBlockTransactionProtoConverter;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 
-public class SerializeProtoService {
+public class VeriBlockSerializeProtoService {
 
     public static VeriBlockMessages.BytesArrayReply serializeAltPublication(VeriBlockMessages.AltPublication request){
         byte[] array = SerializeDeserializeService.serialize(AltPublicationProtoConverter.fromProto(request));

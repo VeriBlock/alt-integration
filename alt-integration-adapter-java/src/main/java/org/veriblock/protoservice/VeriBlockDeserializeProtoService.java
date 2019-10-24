@@ -39,7 +39,7 @@ import org.veriblock.sdk.services.SerializeDeserializeService;
 import integration.api.grpc.VeriBlockMessages;
 import integration.api.grpc.VeriBlockMessages.GeneralReply;
 
-public class DeserializeProtoService {
+public class VeriBlockDeserializeProtoService {
     public static VeriBlockMessages.AltPublicationReply parseAltPublication(VeriBlockMessages.BytesArrayRequest request) {
         AltPublication publication = null;
         

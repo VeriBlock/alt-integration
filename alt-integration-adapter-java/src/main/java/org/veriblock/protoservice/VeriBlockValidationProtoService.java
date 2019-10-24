@@ -19,7 +19,7 @@ import org.veriblock.protoconverters.VeriBlockTransactionProtoConverter;
 import org.veriblock.sdk.VerificationException;
 import org.veriblock.sdk.services.ValidationService;
 
-public class ValidationProtoService extends ValidationServiceGrpc.ValidationServiceImplBase {
+public class VeriBlockValidationProtoService extends ValidationServiceGrpc.ValidationServiceImplBase {
 
     public static VeriBlockMessages.GeneralReply verifyVeriBlockPoPTx(VeriBlockMessages.VeriBlockPoPTransaction request) {
         try {

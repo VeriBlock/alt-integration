@@ -36,49 +36,72 @@ import org.veriblock.sdk.VeriBlockPoPTransaction;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VeriBlockTransaction;
 
-public class SerializeProtoClient {
+public class VeriBlockSerializeProtoClient implements IVeriBlockSerialize {
 
     private final SerializeServiceGrpc.SerializeServiceBlockingStub service;
 
-    public SerializeProtoClient(Channel channel) {
+    public VeriBlockSerializeProtoClient(Channel channel) {
         service = SerializeServiceGrpc.newBlockingStub(channel);
     }
 
-    public byte[] serializeAltPublication(AltPublication request){
+    @Override
+    public byte[] serializeAltPublication(AltPublication request) {
         return service.serializeAltPublication(AltPublicationProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializePublicationData(PublicationData request){
+    
+    @Override
+    public byte[] serializePublicationData(PublicationData request) {
         return service.serializePublicationData(PublicationDataProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializeBitcoinTransaction(BitcoinTransaction request){
+    
+    @Override
+    public byte[] serializeBitcoinTransaction(BitcoinTransaction request) {
         return service.serializeBitcoinTransaction(BitcoinTransactionProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializeVeriBlockBlock(VeriBlockBlock request){
+    
+    @Override
+    public byte[] serializeVeriBlockBlock(VeriBlockBlock request) {
         return service.serializeVeriBlockBlock(VeriBlockBlockProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializeVeriBlockTransaction(VeriBlockTransaction request){
+    
+    @Override
+    public byte[] serializeVeriBlockTransaction(VeriBlockTransaction request) {
         return service.serializeVeriBlockTransaction(VeriBlockTransactionProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializeVeriBlockPublication(VeriBlockPublication request){
+    
+    @Override
+    public byte[] serializeVeriBlockPublication(VeriBlockPublication request) {
         return service.serializeVeriBlockPublication(VeriBlockPublicationProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializeVeriBlockPopTx(VeriBlockPoPTransaction request){
+    
+    @Override
+    public byte[] serializeVeriBlockPopTx(VeriBlockPoPTransaction request) {
         return service.serializeVeriBlockPopTx(VeriBlockPoPTransactionProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializeOutput(Output request){
+    
+    @Override
+    public byte[] serializeOutput(Output request) {
         return service.serializeOutput(OutputsProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializeAddress(Address request){
+    
+    @Override
+    public byte[] serializeAddress(Address request) {
         return service.serializeAddress(AddressProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializeBitcoinBlock(BitcoinBlock request){
+    
+    @Override
+    public byte[] serializeBitcoinBlock(BitcoinBlock request) {
         return service.serializeBitcoinBlock(BitcoinBlockProtoConverter.toProto(request)).getData().toByteArray();
     }
-    public byte[] serializeVeriBlockMerklePath(VeriBlockMerklePath request){
+    
+    @Override
+    public byte[] serializeVeriBlockMerklePath(VeriBlockMerklePath request) {
         VeriBlockMessages.VeriBlockMerklePath veriBlockMerklePath = VeriBlockMerklePathProtoConverter.toProto(request);
         return service.serializeVeriBlockMerklePath(veriBlockMerklePath).getData().toByteArray();
     }
-    public byte[] serializeMerklePath(MerklePath request){
+    
+    @Override
+    public byte[] serializeMerklePath(MerklePath request) {
         VeriBlockMessages.MerklePath vMerklePath = MerklePathProtoConverter.toProto(request);
         return service.serializeMerklePath(vMerklePath).getData().toByteArray();
     }
