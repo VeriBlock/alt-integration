@@ -18,7 +18,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
-import org.veriblock.integrations.sqlite.tables.BitcoinBlocksRepository;
+import org.veriblock.integrations.sqlite.tables.BitcoinBlockRepository;
 import org.veriblock.integrations.sqlite.tables.BlockData;
 import org.veriblock.integrations.sqlite.tables.KeyValueData;
 import org.veriblock.integrations.sqlite.tables.KeyValueRepository;
@@ -34,20 +34,20 @@ public class BitcoinStore {
     
     // underlying database
     private final Connection databaseConnection;
-    private final BitcoinBlocksRepository bitcoinRepository;
+    private final BitcoinBlockRepository bitcoinRepository;
     private final KeyValueRepository keyValueRepository;
     
     private final String chainHeadRepositoryName = "chainHead";
     
     public BitcoinStore() throws SQLException {
         databaseConnection = ConnectionSelector.setConnectionDefault();
-        bitcoinRepository = new BitcoinBlocksRepository(databaseConnection);
+        bitcoinRepository = new BitcoinBlockRepository(databaseConnection);
         keyValueRepository = new KeyValueRepository(databaseConnection);
     }
     
     public BitcoinStore(String databasePath) throws SQLException {
         databaseConnection = ConnectionSelector.setConnection(databasePath);
-        bitcoinRepository = new BitcoinBlocksRepository(databaseConnection);
+        bitcoinRepository = new BitcoinBlockRepository(databaseConnection);
         keyValueRepository = new KeyValueRepository(databaseConnection);
     }
     
@@ -60,7 +60,7 @@ public class BitcoinStore {
     }
     
     public void clear() throws SQLException {
-        bitcoinRepository.getBlocksRepository().clear();
+        bitcoinRepository.clear();
         keyValueRepository.clear();
     }
     
@@ -90,29 +90,16 @@ public class BitcoinStore {
     }
 
     public void put(StoredBitcoinBlock storedBlock) throws BlockStoreException, SQLException {
-        byte[] serialized = SerializeDeserializeService.serialize(storedBlock.getBlock());
-        String id = Utils.encodeHex(storedBlock.getHash().getBytes());
-        BlockData data = new BlockData();
-        data.id = id;
-        data.previousId = Utils.encodeHex(storedBlock.getBlock().getPreviousBlock().getBytes());
-        data.height = storedBlock.getHeight();
-        data.work = storedBlock.getWork();
-        data.data = serialized;
-        bitcoinRepository.getBlocksRepository().save(data);
+        bitcoinRepository.save(storedBlock);
     }
     
     public StoredBitcoinBlock get(Sha256Hash hash) throws BlockStoreException, SQLException {
-        BlockData data = bitcoinRepository.getBlocksRepository().get(Utils.encodeHex(hash.getBytes()));
-        if(data == null) return null;
-
-        BitcoinBlock block = SerializeDeserializeService.parseBitcoinBlockWithLength(ByteBuffer.wrap(data.data));
-        StoredBitcoinBlock storedBlock = new StoredBitcoinBlock(block, data.work, data.height);
-        return storedBlock;
+        return bitcoinRepository.get(hash);
     }
 
     public StoredBitcoinBlock erase(Sha256Hash hash) throws BlockStoreException, SQLException {
         StoredBitcoinBlock erased = get(hash);
-        bitcoinRepository.getBlocksRepository().delete(Utils.encodeHex(hash.getBytes()));
+        bitcoinRepository.delete(hash);
         return erased;
     }
 
