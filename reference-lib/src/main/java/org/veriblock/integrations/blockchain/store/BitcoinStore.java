@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.tables.BitcoinBlockRepository;
-import org.veriblock.integrations.sqlite.tables.BlockData;
 import org.veriblock.integrations.sqlite.tables.KeyValueData;
 import org.veriblock.integrations.sqlite.tables.KeyValueRepository;
 import org.veriblock.sdk.BitcoinBlock;
