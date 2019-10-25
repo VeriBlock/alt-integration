@@ -171,4 +171,108 @@ public class VeriBlockStoreTest {
             VeriBlockIntegrationLibraryManager.shutdown();
         }
     }
+
+    @Test
+    public void EraseTest() throws SQLException, IOException {
+        try {
+            VeriBlockIntegrationLibraryManager.init();
+            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
+
+            byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
+            StoredVeriBlockBlock expectedBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
+
+            store.put(expectedBlock);
+            StoredVeriBlockBlock storedBlock = store.get(expectedBlock.getHash());
+            Assert.assertEquals(expectedBlock, storedBlock);
+
+            StoredVeriBlockBlock erasedBlock = store.erase(expectedBlock.getHash());
+            Assert.assertEquals(storedBlock, erasedBlock);
+
+            storedBlock = store.get(expectedBlock.getHash());
+            Assert.assertEquals(storedBlock, null);
+
+        } finally {
+            VeriBlockIntegrationLibraryManager.shutdown();
+        }
+    }
+
+    @Test
+    public void EraseNonexistentTest() throws SQLException, IOException {
+        try {
+            VeriBlockIntegrationLibraryManager.init();
+            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
+
+            byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
+            StoredVeriBlockBlock expectedBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
+
+            StoredVeriBlockBlock storedBlock = store.get(expectedBlock.getHash());
+            Assert.assertEquals(storedBlock, null);
+
+            StoredVeriBlockBlock erasedBlock = store.erase(expectedBlock.getHash());
+            Assert.assertEquals(erasedBlock, null);
+
+        } finally {
+            VeriBlockIntegrationLibraryManager.shutdown();
+        }
+    }
+
+    @Test
+    public void ReplaceBlockTest() throws SQLException, IOException {
+        try {
+            VeriBlockIntegrationLibraryManager.init();
+            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
+            byte[] rawBlockOfProof = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
+            StoredBitcoinBlock blockOfProof = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(rawBlockOfProof), BigInteger.TEN, 0);
+
+            byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
+
+            StoredVeriBlockBlock oldBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);;
+            Assert.assertEquals(oldBlock.getBlockOfProof(), Sha256Hash.ZERO_HASH);
+
+            StoredVeriBlockBlock newBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
+            newBlock.setBlockOfProof(blockOfProof.getHash());
+            Assert.assertEquals(newBlock.getBlockOfProof(), blockOfProof.getHash());
+
+            Assert.assertNotEquals(newBlock, oldBlock);
+
+            store.put(oldBlock);
+            StoredVeriBlockBlock storedBlock = store.get(oldBlock.getHash());
+            Assert.assertEquals(storedBlock, oldBlock);
+
+            StoredVeriBlockBlock replacedBlock = store.replace(newBlock.getHash(), newBlock);
+            Assert.assertEquals(replacedBlock, oldBlock);
+
+            storedBlock = store.get(newBlock.getHash());
+            System.out.println(storedBlock.getBlockOfProof().toString());
+            Assert.assertEquals(storedBlock.getBlockOfProof(), blockOfProof.getHash());
+            Assert.assertEquals(newBlock, storedBlock);
+
+        } finally {
+            VeriBlockIntegrationLibraryManager.shutdown();
+        }
+    }
+
+    @Test
+    public void ReplaceNonexistentTest() throws SQLException, IOException {
+        try {
+            VeriBlockIntegrationLibraryManager.init();
+            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
+
+            byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
+            StoredVeriBlockBlock newBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
+            StoredVeriBlockBlock oldBlock = null;
+
+            StoredVeriBlockBlock storedBlock = store.get(newBlock.getHash());
+            Assert.assertEquals(storedBlock, oldBlock);
+
+            StoredVeriBlockBlock replacedBlock = store.replace(newBlock.getHash(), newBlock);
+            Assert.assertEquals(replacedBlock, oldBlock);
+
+            storedBlock = store.get(newBlock.getHash());
+            Assert.assertEquals(newBlock, storedBlock);
+
+        } finally {
+            VeriBlockIntegrationLibraryManager.shutdown();
+        }
+    }
 }
