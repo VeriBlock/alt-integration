@@ -25,7 +25,6 @@ import org.veriblock.integrations.sqlite.tables.KeyValueData;
 import org.veriblock.integrations.sqlite.tables.BitcoinBlockRepository;
 import org.veriblock.integrations.sqlite.tables.KeyValueRepository;
 import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.Sha256Hash;
 
 //FIXME: split this into tests of BitcoinBlockRepository and KeyValueRepository
 public class SqliteBitcoinBlocksTableTest {
