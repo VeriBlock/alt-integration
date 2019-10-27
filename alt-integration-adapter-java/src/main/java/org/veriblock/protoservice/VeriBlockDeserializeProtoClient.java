@@ -42,14 +42,15 @@ import integration.api.grpc.DeserializeServiceGrpc;
 import integration.api.grpc.VeriBlockMessages;
 import io.grpc.Channel;
 
-public class DeserializeProtoClient {
+public class VeriBlockDeserializeProtoClient implements IVeriBlockDeserialize {
 
     private final DeserializeServiceGrpc.DeserializeServiceBlockingStub service;
 
-    public DeserializeProtoClient(Channel channel) {
+    public VeriBlockDeserializeProtoClient(Channel channel) {
         service = DeserializeServiceGrpc.newBlockingStub(channel);
     }
 
+    @Override
     public Pair<ValidationResult, AltPublication> parseAltPublication(byte[] data){        
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.AltPublicationReply reply = service.parseAltPublication(request);
@@ -60,6 +61,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultPublication);
     }
     
+    @Override
     public Pair<ValidationResult, PublicationData> parsePublicationData(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.PublicationDataReply reply = service.parsePublicationData(request);
@@ -70,6 +72,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultPublication);
     }
     
+    @Override
     public Pair<ValidationResult, BitcoinTransaction> parseBitcoinTransaction(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.BitcoinTransactionReply reply = service.parseBitcoinTransaction(request);
@@ -80,6 +83,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultTransaction);
     }
     
+    @Override
     public Pair<ValidationResult, VeriBlockBlock> parseVeriBlockBlock(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.VeriBlockBlockReply reply = service.parseVeriBlockBlock(request);
@@ -90,6 +94,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultBlock);
     }
     
+    @Override
     public Pair<ValidationResult, VeriBlockTransaction> parseVeriBlockTransaction(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.VeriBlockTransactionReply reply = service.parseVeriBlockTransaction(request);
@@ -100,6 +105,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultTransaction);
     }
     
+    @Override
     public Pair<ValidationResult, VeriBlockPublication> parseVeriBlockPublication(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.VeriBlockPublicationReply reply = service.parseVeriBlockPublication(request);
@@ -108,6 +114,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultPublication);
     }
     
+    @Override
     public Pair<ValidationResult, VeriBlockPoPTransaction> parseVeriBlockPopTx(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.VeriBlockPoPTransactionReply reply = service.parseVeriBlockPopTx(request);
@@ -118,6 +125,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultTransaction);
     }
     
+    @Override
     public Pair<ValidationResult, Output> parseOutput(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.OutputReply reply = service.parseOutput(request);
@@ -128,6 +136,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultOutput);
     }
     
+    @Override
     public Pair<ValidationResult, Address> parseAddress(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.AddressReply reply = service.parseAddress(request);
@@ -138,6 +147,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultAddress);
     }
     
+    @Override
     public Pair<ValidationResult, BitcoinBlock> parseBitcoinBlock(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.BitcoinBlockReply reply = service.parseBitcoinBlock(request);
@@ -148,6 +158,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultBlock);
     }
     
+    @Override
     public Pair<ValidationResult, VeriBlockMerklePath> parseVeriBlockMerklePath(byte[] data){
         VeriBlockMessages.BytesArrayRequest request = VeriBlockMessages.BytesArrayRequest.newBuilder().setData(ByteString.copyFrom(data)).build();
         VeriBlockMessages.VeriBlockMerklePathReply reply = service.parseVeriBlockMerklePath(request);
@@ -158,6 +169,7 @@ public class DeserializeProtoClient {
         return new Pair<>(resultValid, resultMerklePath);
     }
     
+    @Override
     public Pair<ValidationResult, MerklePath> parseMerklePath(byte[] data, Sha256Hash subject){
         VeriBlockMessages.MerklePathRequest request = VeriBlockMessages.MerklePathRequest.newBuilder().setData(ByteString.copyFrom(data)).setSubject(ByteString.copyFrom(subject.getBytes())).build();
         VeriBlockMessages.MerklePathReply reply = service.parseMerklePath(request);

@@ -16,9 +16,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.veriblock.protoservice.DeserializeProtoClient;
 import org.veriblock.integrations.AltChainParametersConfig;
 import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
+import org.veriblock.protoservice.VeriBlockDeserializeProtoClient;
 import org.veriblock.protoservice.VeriBlockForkresolutionProtoClient;
 import org.veriblock.protoservice.VeriBlockSecurityProtoClient;
 import org.veriblock.sdk.*;
@@ -26,7 +26,6 @@ import org.veriblock.sdk.util.BitcoinUtils;
 
 import io.grpc.ManagedChannel;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
-import org.veriblock.sdk.util.Utils;
 
 public final class Application {
 
@@ -88,7 +87,7 @@ public final class Application {
         ValidationResult replyAddPayloads = client.addPayloads(blockIndex, atvs, vtbPublications);
         log.info("AddPayloads command success: " + replyAddPayloads.isValid());
         
-        DeserializeProtoClient client2 = new DeserializeProtoClient(channel);
+        VeriBlockDeserializeProtoClient client2 = new VeriBlockDeserializeProtoClient(channel);
         client2.parseAltPublication("123".getBytes());
 
         AltChainParametersConfig altChainConfig = new AltChainParametersConfig();

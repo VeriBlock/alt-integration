@@ -8,92 +8,93 @@
 
 package org.veriblock.webservice;
 
+import org.veriblock.protoservice.VeriBlockSerializeProtoService;
+
 import integration.api.grpc.SerializeServiceGrpc;
 import integration.api.grpc.VeriBlockMessages;
 import io.grpc.stub.StreamObserver;
-import org.veriblock.protoservice.SerializeProtoService;
 
 public class GrpcSerializeService extends SerializeServiceGrpc.SerializeServiceImplBase {
     @Override
     public void serializeAltPublication(VeriBlockMessages.AltPublication request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeAltPublication(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeAltPublication(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializePublicationData(VeriBlockMessages.PublicationData request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializePublicationData(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializePublicationData(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeBitcoinTransaction(VeriBlockMessages.BitcoinTransaction request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeBitcoinTransaction(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeBitcoinTransaction(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeVeriBlockBlock(VeriBlockMessages.VeriBlockBlock request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeVeriBlockBlock(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeVeriBlockBlock(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeVeriBlockTransaction(VeriBlockMessages.VeriBlockTransaction request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeVeriBlockTransaction(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeVeriBlockTransaction(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeVeriBlockPublication(VeriBlockMessages.VeriBlockPublication request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeVeriBlockPublication(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeVeriBlockPublication(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeVeriBlockPopTx(VeriBlockMessages.VeriBlockPoPTransaction request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeVeriBlockPopTx(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeVeriBlockPopTx(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeOutput(VeriBlockMessages.Output request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeOutput(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeOutput(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeAddress(VeriBlockMessages.Address request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeAddress(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeAddress(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeBitcoinBlock(VeriBlockMessages.BitcoinBlock request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeBitcoinBlock(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeBitcoinBlock(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeVeriBlockMerklePath(VeriBlockMessages.VeriBlockMerklePath request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeVeriBlockMerklePath(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeVeriBlockMerklePath(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void serializeMerklePath(VeriBlockMessages.MerklePath request, StreamObserver<VeriBlockMessages.BytesArrayReply> responseObserver) {
-        VeriBlockMessages.BytesArrayReply reply = SerializeProtoService.serializeMerklePath(request);
+        VeriBlockMessages.BytesArrayReply reply = VeriBlockSerializeProtoService.serializeMerklePath(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }

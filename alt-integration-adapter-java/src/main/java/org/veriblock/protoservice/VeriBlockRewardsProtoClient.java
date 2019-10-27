@@ -29,18 +29,20 @@ import integration.api.grpc.VeriBlockMessages.GeneralReply;
 import integration.api.grpc.RewardsServiceGrpc.RewardsServiceBlockingStub;
 import io.grpc.Channel;
 
-public class VeriBlockRewardsProtoClient {    
+public class VeriBlockRewardsProtoClient implements IVeriBlockRewards {    
     private final RewardsServiceBlockingStub service;
     
     public VeriBlockRewardsProtoClient(Channel channel) {
         service = RewardsServiceGrpc.newBlockingStub(channel);
     }
     
+    @Override
     public ValidationResult resetRewards() {
         GeneralReply reply = service.resetRewards(EmptyRequest.newBuilder().build());
         return VeriBlockServiceCommon.validationResultFromProto(reply);
     }
     
+    @Override
     public Pair<ValidationResult, PopRewardCalculatorConfig> getCalculator() {
         VeriBlockMessages.GetCalculatorReply reply = service.getCalculator(EmptyRequest.newBuilder().build());
         ValidationResult resultValid = VeriBlockServiceCommon.validationResultFromProto(reply.getResult());
@@ -50,6 +52,7 @@ public class VeriBlockRewardsProtoClient {
         return new Pair<>(resultValid, config);
     }
     
+    @Override
     public ValidationResult setCalculator(PopRewardCalculatorConfig config) {
         VeriBlockMessages.SetCalculatorRequest request = VeriBlockMessages.SetCalculatorRequest.newBuilder()
                 .setCalculator(CalculatorConfigProtoConverter.toProto(config))
@@ -58,6 +61,7 @@ public class VeriBlockRewardsProtoClient {
         return VeriBlockServiceCommon.validationResultFromProto(reply);
     }
     
+    @Override
     public Pair<ValidationResult, BigDecimal> rewardsCalculateScore(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks) {
         VeriBlockMessages.AltChainBlock endorsedBlockProto = AltChainBlockProtoConverter.toProto(endorsedBlock);
         List<VeriBlockMessages.AltChainBlock> endorsementBlocksProto = AltChainBlockProtoConverter.toProto(endorsementBlocks);
@@ -75,6 +79,7 @@ public class VeriBlockRewardsProtoClient {
         return new Pair<>(resultValid, score);
     }
     
+    @Override
     public Pair<ValidationResult, PopPayoutRound> rewardsCalculateOutputs(int blockNumber, AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks, BigDecimal popDifficulty) {
         VeriBlockMessages.AltChainBlock endorsedBlockProto = AltChainBlockProtoConverter.toProto(endorsedBlock);
         List<VeriBlockMessages.AltChainBlock> endorsementBlocksProto = AltChainBlockProtoConverter.toProto(endorsementBlocks);

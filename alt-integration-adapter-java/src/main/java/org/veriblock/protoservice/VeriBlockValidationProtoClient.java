@@ -25,14 +25,15 @@ import org.veriblock.sdk.VeriBlockTransaction;
 import integration.api.grpc.ValidationServiceGrpc;
 import io.grpc.Channel;
 
-public class ValidationProtoClient {
+public class VeriBlockValidationProtoClient implements IVeriBlockValidation {
 
     private final ValidationServiceGrpc.ValidationServiceBlockingStub service;
 
-    public ValidationProtoClient(Channel channel) {
+    public VeriBlockValidationProtoClient(Channel channel) {
         service = ValidationServiceGrpc.newBlockingStub(channel);
     }
 
+    @Override
     public ValidationResult verifyVeriBlockPoPTx(VeriBlockPoPTransaction request) {
         return VeriBlockServiceCommon.validationResultFromProto(service.verifyVeriBlockPoPTx(VeriBlockPoPTransactionProtoConverter.toProto(request)));
     }
@@ -53,6 +54,7 @@ public class ValidationProtoClient {
         return VeriBlockServiceCommon.validationResultFromProto(service.checkBitcoinBlocksVeriBlockPoPTx(VeriBlockPoPTransactionProtoConverter.toProto(request)));
     }
 
+    @Override
     public ValidationResult verifyVeriBlockPublication(VeriBlockPublication request) {
         return VeriBlockServiceCommon.validationResultFromProto(service.verifyVeriBlockPublication(VeriBlockPublicationProtoConverter.toProto(request)));
     }
@@ -65,6 +67,7 @@ public class ValidationProtoClient {
         return VeriBlockServiceCommon.validationResultFromProto(service.checkMerklePathVeriBlockPublication(VeriBlockPublicationProtoConverter.toProto(request)));
     }
 
+    @Override
     public ValidationResult verifyVeriBlockTransaction(VeriBlockTransaction request) {
         return VeriBlockServiceCommon.validationResultFromProto(service.verifyVeriBlockTransaction(VeriBlockTransactionProtoConverter.toProto(request)));
     }
@@ -73,6 +76,7 @@ public class ValidationProtoClient {
         return VeriBlockServiceCommon.validationResultFromProto(service.checkSignatureVeriBlockTransaction(VeriBlockTransactionProtoConverter.toProto(request)));
     }
 
+    @Override
     public ValidationResult verifyVeriBlockBlock(VeriBlockBlock request) {
         return VeriBlockServiceCommon.validationResultFromProto(service.verifyVeriBlockBlock(VeriBlockBlockProtoConverter.toProto(request)));
     }
@@ -84,7 +88,8 @@ public class ValidationProtoClient {
     public ValidationResult checkMaximumDriftVeriBlockBlock(VeriBlockBlock request) {
         return VeriBlockServiceCommon.validationResultFromProto(service.checkMaximumDriftVeriBlockBlock(VeriBlockBlockProtoConverter.toProto(request)));
     }
-
+    
+    @Override
     public ValidationResult verifyBitcoinBlock(BitcoinBlock request) {
         return VeriBlockServiceCommon.validationResultFromProto(service.verifyBitcoinBlock(BitcoinBlockProtoConverter.toProto(request)));
     }
@@ -97,6 +102,7 @@ public class ValidationProtoClient {
         return VeriBlockServiceCommon.validationResultFromProto(service.checkMaximumDriftBitcoinBlock(BitcoinBlockProtoConverter.toProto(request)));
     }
 
+    @Override
     public ValidationResult verifyAltPublication(AltPublication request) {
         return VeriBlockServiceCommon.validationResultFromProto(service.verifyAltPublication(AltPublicationProtoConverter.toProto(request)));
     }
