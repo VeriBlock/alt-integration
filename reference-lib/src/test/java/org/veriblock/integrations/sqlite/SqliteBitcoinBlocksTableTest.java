@@ -13,54 +13,53 @@ import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.veriblock.integrations.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.integrations.sqlite.tables.KeyValueData;
-import org.veriblock.integrations.sqlite.tables.BitcoinBlocksRepository;
-import org.veriblock.integrations.sqlite.tables.BlockData;
+import org.veriblock.integrations.sqlite.tables.BitcoinBlockRepository;
 import org.veriblock.integrations.sqlite.tables.KeyValueRepository;
+import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.Sha256Hash;
 
+//FIXME: split this into tests of BitcoinBlockRepository and KeyValueRepository
 public class SqliteBitcoinBlocksTableTest {
     
     private static final String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
     private static Connection connection;
-    private static BitcoinBlocksRepository bitcoinBlocks;
+    private static BitcoinBlockRepository bitcoinBlocks;
     private static KeyValueRepository keyValue;
-    
+    private static final byte[] rawBlock = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
+    private static final StoredBitcoinBlock newBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(rawBlock), BigInteger.TEN, 0);
+
     @Before
     public void setUp() throws SQLException {
         connection = ConnectionSelector.setConnection(databasePath);
-        bitcoinBlocks = new BitcoinBlocksRepository(connection);
+        bitcoinBlocks = new BitcoinBlockRepository(connection);
         keyValue = new KeyValueRepository(connection);
     }
     
     @After
     public void tearDown() throws IOException, SQLException {
-        bitcoinBlocks.getBlocksRepository().clear();
+        bitcoinBlocks.clear();
         keyValue.clear();
         if(connection != null) connection.close();
     }
 
     @Test
     public void createBlockTest() throws IOException, SQLException {
-        bitcoinBlocks.getBlocksRepository().clear();
-        List<BlockData> blocks = bitcoinBlocks.getBlocksRepository().getAll();
-        Assert.assertTrue(blocks.size() == 0);
+        bitcoinBlocks.clear();
+        List<StoredBitcoinBlock> blocks = bitcoinBlocks.getAll();
+        Assert.assertEquals(blocks.size(), 0);
 
-        BlockData newBlock = new BlockData();
-        newBlock.height = 0;
-        newBlock.id = Sha256Hash.ZERO_HASH.toString();
-        newBlock.previousId = Sha256Hash.ZERO_HASH.toString();
-        newBlock.work = BigInteger.ZERO;
-        newBlock.data = new byte[0];
-        bitcoinBlocks.getBlocksRepository().save(newBlock);
-        blocks = bitcoinBlocks.getBlocksRepository().getAll();
-        Assert.assertTrue(blocks.size() == 1);
+        bitcoinBlocks.save(newBlock);
+        blocks = bitcoinBlocks.getAll();
+        Assert.assertEquals(blocks.size(), 1);
     }
     
     @Test
@@ -77,24 +76,18 @@ public class SqliteBitcoinBlocksTableTest {
     
     @Test
     public void deleteTest() throws IOException, SQLException {
-        bitcoinBlocks.getBlocksRepository().clear();
+        bitcoinBlocks.clear();
         
-        BlockData newBlock = new BlockData();
-        newBlock.height = 0;
-        newBlock.id = Sha256Hash.ZERO_HASH.toString();
-        newBlock.previousId = Sha256Hash.ZERO_HASH.toString();
-        newBlock.work = BigInteger.ZERO;
-        newBlock.data = new byte[0];
-        bitcoinBlocks.getBlocksRepository().save(newBlock);
+        bitcoinBlocks.save(newBlock);
         
-        List<BlockData> blocks = bitcoinBlocks.getBlocksRepository().getAll();
-        Assert.assertTrue(blocks.size() == 1);
+        List<StoredBitcoinBlock> blocks = bitcoinBlocks.getAll();
+        Assert.assertEquals(blocks.size(), 1);
         
-        bitcoinBlocks.getBlocksRepository().delete(newBlock.id);
-        blocks = bitcoinBlocks.getBlocksRepository().getAll();
-        Assert.assertTrue(blocks.size() == 0);
+        bitcoinBlocks.delete(newBlock.getHash());
+        blocks = bitcoinBlocks.getAll();
+        Assert.assertEquals(blocks.size(), 0);
         
-        // try to delete non existing recors. See that nothing happens.
-        bitcoinBlocks.getBlocksRepository().delete(newBlock.id);
+        // try to delete non existing recorss. See that nothing happens.
+        bitcoinBlocks.delete(newBlock.getHash());
     }
 }
