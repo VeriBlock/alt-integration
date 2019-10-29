@@ -30,9 +30,11 @@ allprojects {
         reportsDir = file("$buildDir/coverage")
     }
 
-    if (project.tasks.findByName('jacocoTestReport')) {
-        jacocoTestReport.reports.xml.enabled(true)
-        jacocoTestReport.dependsOn = [test]
+    project.afterEvaluate { Project p ->
+        if (p.tasks.findByName('jacocoTestReport')) {
+            jacocoTestReport.reports.xml.enabled(true)
+            jacocoTestReport.dependsOn = [test]
+        }
     }
 }
 
