@@ -6,22 +6,21 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.integrations.blockchain.store;
-
-import org.junit.*;
-
-import org.veriblock.integrations.sqlite.ConnectionSelector;
-import org.veriblock.integrations.sqlite.tables.BitcoinBlockRepository;
-import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.util.Utils;
+package org.veriblock.integrations.sqlite.tables;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Base64;
-import java.util.List;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.veriblock.integrations.blockchain.store.StoredBitcoinBlock;
+import org.veriblock.integrations.sqlite.ConnectionSelector;
+import org.veriblock.sdk.services.SerializeDeserializeService;
 
 public class BitcoinBlockRepositoryTest {
     private byte[] rawBlock;

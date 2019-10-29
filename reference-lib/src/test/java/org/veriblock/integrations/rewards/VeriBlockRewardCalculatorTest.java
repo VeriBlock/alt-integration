@@ -31,7 +31,6 @@ import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.*;
-import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
 public class VeriBlockRewardCalculatorTest {
@@ -406,8 +405,6 @@ public class VeriBlockRewardCalculatorTest {
         
         long reward1 = 0;
         long reward2 = 0;
-        long reward3 = 0;
-        long reward4 = 0;
 
         AltPublication altPublication1;
         AltPublication altPublication2;
@@ -525,7 +522,6 @@ public class VeriBlockRewardCalculatorTest {
         // assert that two endorsements from the block 31 get the same reward
         Assert.assertEquals(rewards.get(3), rewards.get(2));
         // assert that endorsement from the block 30 get higher reward than from the block 31
-        int result = rewards.get(0).compareTo(rewards.get(3));
         Assert.assertEquals(rewards.get(0).compareTo(rewards.get(3)), -1);
         
         BigDecimal scoreTotal = PopRewardCalculator.calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);

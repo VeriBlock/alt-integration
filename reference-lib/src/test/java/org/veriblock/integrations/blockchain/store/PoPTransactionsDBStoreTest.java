@@ -8,23 +8,37 @@
 
 package org.veriblock.integrations.blockchain.store;
 
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
-import org.veriblock.sdk.*;
+import org.veriblock.sdk.Address;
+import org.veriblock.sdk.AltChainBlock;
+import org.veriblock.sdk.AltPublication;
+import org.veriblock.sdk.BitcoinTransaction;
+import org.veriblock.sdk.Coin;
+import org.veriblock.sdk.MerklePath;
+import org.veriblock.sdk.PublicationData;
+import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
+import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.VeriBlockMerklePath;
+import org.veriblock.sdk.VeriBlockPoPTransaction;
+import org.veriblock.sdk.VeriBlockPublication;
+import org.veriblock.sdk.VeriBlockTransaction;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
-
-import java.nio.file.Paths;
-import java.rmi.ServerError;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
 
 public class PoPTransactionsDBStoreTest {
 
