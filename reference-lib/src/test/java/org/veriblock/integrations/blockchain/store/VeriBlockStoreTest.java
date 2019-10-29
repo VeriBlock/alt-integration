@@ -243,7 +243,6 @@ public class VeriBlockStoreTest {
             Assert.assertEquals(replacedBlock, oldBlock);
 
             storedBlock = store.get(newBlock.getHash());
-            System.out.println(storedBlock.getBlockOfProof().toString());
             Assert.assertEquals(storedBlock.getBlockOfProof(), blockOfProof.getHash());
             Assert.assertEquals(newBlock, storedBlock);
 
