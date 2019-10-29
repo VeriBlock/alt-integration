@@ -126,7 +126,7 @@ public class VeriBlockBlockchain {
 
         List<Change> changes = new ArrayList<>();
         store.put(storedBlock);
-        changes.add(new AddVeriBlockBlockChange(storedBlock, storedBlock));
+        changes.add(new AddVeriBlockBlockChange(null, storedBlock));
 
         // Try to update the prior keystone's proof
         Change keystoneChange = trySetBlockProof(storedBlock.getBlock().getEffectivePreviousKeystone(), blockOfProof);
@@ -257,8 +257,12 @@ public class VeriBlockBlockchain {
                 switch (change.getOperation()) {
                     case ADD_BLOCK:
                         StoredVeriBlockBlock newValue = StoredVeriBlockBlock.deserialize(change.getNewValue());
-                        StoredVeriBlockBlock oldValue = StoredVeriBlockBlock.deserialize(change.getOldValue());
-                        store.replace(newValue.getHash(), oldValue);
+                        if (change.getOldValue() != null && change.getOldValue().length > 0) {
+                            StoredVeriBlockBlock oldValue = StoredVeriBlockBlock.deserialize(change.getOldValue());
+                            store.replace(newValue.getHash(), oldValue);
+                       } else {
+                            store.erase(newValue.getHash());
+                        }
                         break;
                     case SET_HEAD:
                         StoredVeriBlockBlock priorHead = StoredVeriBlockBlock.deserialize(change.getOldValue());

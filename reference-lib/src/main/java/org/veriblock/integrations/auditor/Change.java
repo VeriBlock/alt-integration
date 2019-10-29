@@ -40,7 +40,6 @@ public abstract class Change {
     protected Change(byte[] oldValue, byte[] newValue) {
         Preconditions.argument(oldValue != null && oldValue.length <= MAX_HASH_SIZE, "New value must have a lenth of at least " + MAX_HASH_SIZE + " bytes");
         Preconditions.argument(newValue != null && newValue.length <= MAX_HASH_SIZE, "Old value must have a lenth of at least " + MAX_HASH_SIZE + " bytes");
-        Preconditions.state(oldValue.length == newValue.length, "New value and old value must have equal sizes");
 
         this.oldValue = oldValue;
         this.newValue = newValue;

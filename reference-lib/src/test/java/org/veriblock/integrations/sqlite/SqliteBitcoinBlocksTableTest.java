@@ -86,7 +86,7 @@ public class SqliteBitcoinBlocksTableTest {
         blocks = bitcoinBlocks.getAll();
         Assert.assertEquals(blocks.size(), 0);
         
-        // try to delete non existing recorss. See that nothing happens.
+        // try to delete non existing records. See that nothing happens.
         bitcoinBlocks.delete(newBlock.getHash());
     }
 }
