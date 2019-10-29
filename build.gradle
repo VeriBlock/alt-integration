@@ -29,6 +29,13 @@ allprojects {
         toolVersion = "0.8.4"
         reportsDir = file("$buildDir/coverage")
     }
+
+    project.afterEvaluate { Project p ->
+        if (p.tasks.findByName('jacocoTestReport')) {
+            jacocoTestReport.reports.xml.enabled(true)
+            jacocoTestReport.dependsOn = [test]
+        }
+    }
 }
 
 nebulaRelease {
