@@ -105,7 +105,7 @@ public class BitcoinBlockchain {
 
         List<Change> changes = new ArrayList<>();
         store.put(storedBlock);
-        changes.add(new AddBitcoinBlockChange(storedBlock, storedBlock));
+        changes.add(new AddBitcoinBlockChange(null, storedBlock));
 
         StoredBitcoinBlock chainHead = store.getChainHead();
         if (chainHead == null || storedBlock.getWork().compareTo(chainHead.getWork()) > 0) {
@@ -176,8 +176,12 @@ public class BitcoinBlockchain {
                 switch (change.getOperation()) {
                     case ADD_BLOCK:
                         StoredBitcoinBlock newValue = StoredBitcoinBlock.deserialize(change.getNewValue());
-                        StoredBitcoinBlock oldValue = StoredBitcoinBlock.deserialize(change.getOldValue());
-                        store.replace(newValue.getHash(), oldValue);
+                        if (change.getOldValue() != null && change.getOldValue().length > 0) {
+                            StoredBitcoinBlock oldValue = StoredBitcoinBlock.deserialize(change.getOldValue());
+                            store.replace(newValue.getHash(), oldValue);
+                        } else {
+                            store.erase(newValue.getHash());
+                        }
                         break;
                     case SET_HEAD:
                         StoredBitcoinBlock priorHead = StoredBitcoinBlock.deserialize(change.getOldValue());
