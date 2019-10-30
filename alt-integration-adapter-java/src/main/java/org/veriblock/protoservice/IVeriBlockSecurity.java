@@ -17,7 +17,9 @@ import org.veriblock.sdk.AltPublication;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.BlockIndex;
 import org.veriblock.sdk.Pair;
+import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.ValidationResult;
+import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockPublication;
 
@@ -50,4 +52,8 @@ public interface IVeriBlockSecurity {
     public ValidationResult setAltChainParametersConfig(AltChainParametersConfig config);
 
     public ValidationResult savePoPTransactionData(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock);
+
+    public Pair<ValidationResult, List<VBlakeHash>> getLastKnownVBKBlocks(int maxBlockCount);
+
+    public Pair<ValidationResult, List<Sha256Hash>> getLastKnownBTCBlocks(int maxBlockCount);
 }
