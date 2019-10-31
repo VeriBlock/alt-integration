@@ -49,7 +49,9 @@ public final class RewardDefaults {
     public static final double WIDTH_OF_DECREASING_LINE_REWARD_PERIOD_NORMAL   = 100.0;
     ///HACK: keystone reward curve is more steep even with 2x larger width
     public static final double WIDTH_OF_DECREASING_LINE_REWARD_PERIOD_KEYSTONE = 200.0;
-    
+    // average 50 blocks before the endorsed block to calculate it's difficulty
+    public static final double POP_DIFFICULTY_AVERAGING_INTERVAL_NXT_BLOCKS = 50;
+
     // reward score table
     // we score each VeriBlock and lower the reward for late blocks
     public static final double[] popRelativeScoreLookupTable = {

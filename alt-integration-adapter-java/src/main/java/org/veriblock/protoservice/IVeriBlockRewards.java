@@ -28,4 +28,6 @@ public interface IVeriBlockRewards {
     public Pair<ValidationResult, BigDecimal> rewardsCalculateScore(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks);
     
     public Pair<ValidationResult, PopPayoutRound> rewardsCalculateOutputs(int blockNumber, AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks, BigDecimal popDifficulty);
+
+    public Pair<ValidationResult, BigDecimal> rewardsCalculatePopDifficulty(List<AltChainBlock> blocks);
 }
