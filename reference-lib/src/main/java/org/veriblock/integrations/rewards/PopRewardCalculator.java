@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PopRewardCalculator {    
@@ -139,6 +140,26 @@ public class PopRewardCalculator {
         return bestPublication;
     }
 
+    public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException
+    {
+        BigDecimal difficulty = BigDecimal.ZERO;
+
+        Collections.sort(blocksInterval);  // make the ascending order for the blocks in the collection, it needs for the correct calculation of the pop score
+
+        for(int i = 0; i < blocksInterval.size(); ++i)
+        {
+            BigDecimal score = calculatePopScoreFromEndorsements(blocksInterval.get(i), blocksInterval.subList(i , blocksInterval.size()));
+            if(score.compareTo(BigDecimal.ZERO) == 0)
+            {
+                score = BigDecimal.ONE;
+            }
+
+            difficulty = difficulty.add(score);
+        }
+
+        return difficulty.divide(new BigDecimal(config.popDifficultyAveragingIntervalNxtBlocks));
+    }
+
     public static BigDecimal calculatePopScoreFromEndorsements(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks) throws SQLException {
         BigDecimal totalScore = BigDecimal.ZERO;
 
@@ -182,8 +203,8 @@ public class PopRewardCalculator {
 
     public static BigDecimal calculateTotalPopBlockReward(int blockNumber, BigDecimal difficulty, BigDecimal score) {
         if (difficulty.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("calculateTotalReward cannot be called with a negative or" +
-                    " zero difficulty (called with " + difficulty + ")!");
+            throw new IllegalArgumentException("calculateTotalReward cannot be called with a negative difficulty" +
+                    " (called with " + difficulty + ")!");
         }
         if (score.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("calculateTotalReward cannot be called with a negative score" +

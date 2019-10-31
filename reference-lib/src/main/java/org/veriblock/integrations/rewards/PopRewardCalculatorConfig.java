@@ -24,6 +24,7 @@ public class PopRewardCalculatorConfig {
     public boolean flatScoreRoundUse;
     public PopRewardCurveConfig curveConfig;
     public List<BigDecimal> relativeScoreLookupTable;
+    public int popDifficultyAveragingIntervalNxtBlocks;
     
     public PopRewardCalculatorConfig() {
         basicReward = new BigInteger(Long.toString(RewardDefaults.POP_DEFAULT_REWARD_PER_BLOCK));
@@ -41,6 +42,7 @@ public class PopRewardCalculatorConfig {
         flatScoreRoundUse = true;
         curveConfig = new PopRewardCurveConfig();
         relativeScoreLookupTable = new ArrayList<>();
+        popDifficultyAveragingIntervalNxtBlocks = RewardDefaults.POP_DIFFICULTY_AVERAGING_INTERVALBLOCKS;
         for(double value : RewardDefaults.popRelativeScoreLookupTable) {
             relativeScoreLookupTable.add(new BigDecimal(value));
         }
