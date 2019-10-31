@@ -101,4 +101,19 @@ public class VeriBlockRewardsProtoClient implements IVeriBlockRewards {
                 outputsToPopMiners);
         return new Pair<>(resultValid, payout);
     }
+
+    @Override
+    public Pair<ValidationResult, BigDecimal> rewardsCalculatePopDifficulty(List<AltChainBlock> blocks) {
+        VeriBlockMessages.RewardsCalculatePopDifficultyRequest request = VeriBlockMessages.RewardsCalculatePopDifficultyRequest.newBuilder()
+                .addAllBlocks(AltChainBlockProtoConverter.toProto(blocks))
+                .build();
+
+        VeriBlockMessages.RewardsCalculateScoreReply reply = service.rewardsCalculatePopDifficulty(request);
+
+        ValidationResult resultValid = VeriBlockServiceCommon.validationResultFromProto(reply.getResult());
+        if(!resultValid.isValid()) return new Pair<>(resultValid, BigDecimal.ONE);
+
+        BigDecimal difficulty = new BigDecimal(reply.getScore());
+        return new Pair<>(resultValid, difficulty);
+    }
 }

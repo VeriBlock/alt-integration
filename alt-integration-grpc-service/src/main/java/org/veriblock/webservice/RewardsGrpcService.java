@@ -51,4 +51,11 @@ public class RewardsGrpcService extends RewardsServiceImplBase {
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void rewardsCalculatePopDifficulty(VeriBlockMessages.RewardsCalculatePopDifficultyRequest request, StreamObserver<VeriBlockMessages.RewardsCalculateScoreReply> responseObserver) {
+        VeriBlockMessages.RewardsCalculateScoreReply reply = VeriBlockRewardsProtoService.rewardsCalculatePopDifficulty(request);
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
 }

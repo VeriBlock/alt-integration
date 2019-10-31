@@ -46,6 +46,7 @@ public final class CalculatorConfigProtoConverter {
         for(String r : protoData.getRelativeScoreLookupTable().getScoreList()) {
             config.relativeScoreLookupTable.add(new BigDecimal(r));
         }
+        config.popDifficultyAveragingInterval = protoData.getPopDifficultyAveragingInterval();
 
         return config;
     }
@@ -84,7 +85,8 @@ public final class CalculatorConfigProtoConverter {
                 .setMaxRewardThresholdKeystone(data.maxRewardThresholdKeystone.toPlainString())
                 .setFlatScoreRound(flatScoreConfig.build())
                 .setRewardCurve(curveConfig.build())
-                .setRelativeScoreLookupTable(relativeScoreConfig.build());
+                .setRelativeScoreLookupTable(relativeScoreConfig.build())
+                .setPopDifficultyAveragingInterval(data.popDifficultyAveragingInterval);
         return result.build();
     }
 }
