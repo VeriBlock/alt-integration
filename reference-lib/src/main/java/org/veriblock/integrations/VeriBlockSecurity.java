@@ -117,6 +117,9 @@ public class VeriBlockSecurity {
                     if (veriBlockBlocks.contains(publication.getTransaction().getPublishedBlock())) {
                         // The published block is part of this publication's supplied context, add the blocks individually
                         for (VeriBlockBlock block : veriBlockBlocks) {
+                            if (context.isBootstrapBlock(block)) {
+                                continue;
+                            }
                             if (block.equals(publication.getTransaction().getPublishedBlock())) {
                                 changeset.addChanges(veriblockBlockchain.addWithProof(block, publication.getTransaction().getBlockOfProof().getHash()));
                             } else {
@@ -178,6 +181,9 @@ public class VeriBlockSecurity {
                     if (veriBlockBlocks.contains(publication.getTransaction().getPublishedBlock())) {
                         // The published block is part of this publication's supplied context, add the blocks individually
                         for (VeriBlockBlock block : veriBlockBlocks) {
+                            if (context.isBootstrapBlock(block)) {
+                                continue;
+                            }
                             if (block.equals(publication.getTransaction().getPublishedBlock())) {
                                 veriblockBlockchain.addTemporarily(block, publication.getTransaction().getBlockOfProof().getHash());
                             } else {
@@ -279,6 +285,10 @@ public class VeriBlockSecurity {
             throw new VerificationException("Publication does not have any VeriBlock blocks");
         }
 
+        if (context.isBootstrapBlock(firstBlock)) {
+            return;
+        }
+
         VeriBlockBlock previous = veriblockBlockchain.searchBestChain(firstBlock.getPreviousBlock());
         if (previous == null) {
             throw new VerificationException("Publication does not connect to VeriBlock blockchain");
@@ -288,6 +298,10 @@ public class VeriBlockSecurity {
     private void checkBitcoinContextually(BitcoinBlock firstBlock) throws BlockStoreException, SQLException {
         if (firstBlock == null) {
             throw new VerificationException("Publication does not have any Bitcoin blocks");
+        }
+
+        if (context.isBootstrapBlock(firstBlock)) {
+            return;
         }
 
         BitcoinBlock previous = bitcoinBlockchain.searchBestChain(firstBlock.getPreviousBlock());
