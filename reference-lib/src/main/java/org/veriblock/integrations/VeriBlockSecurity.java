@@ -20,7 +20,9 @@ import org.veriblock.sdk.AltPublication;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.BlockIndex;
 import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.ValidationResult;
+import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VerificationException;
@@ -28,6 +30,7 @@ import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.Utils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -230,6 +233,36 @@ public class VeriBlockSecurity {
     public int getMainVBKHeightOfATV(AltPublication publication) throws BlockStoreException, SQLException {
         VeriBlockBlock block = veriblockBlockchain.searchBestChain(publication.getContainingBlock().getHash());
         return block != null ? block.getHeight() : Integer.MAX_VALUE;
+    }
+
+    public List<VBlakeHash> getLastKnownVBKBlocks(int maxBlockCount) throws SQLException {
+        List<VBlakeHash> result = new ArrayList<>(maxBlockCount);
+
+        VeriBlockBlock block = veriblockBlockchain.getChainHead();
+        for (int count = 0; block != null && count < maxBlockCount; ++count) {
+            result.add(block.getHash());
+
+            VBlakeHash prevBlockHash = block.getPreviousBlock();
+            block = prevBlockHash == null ? null
+                                          : veriblockBlockchain.get(prevBlockHash);
+        }
+
+        return result;
+    }
+
+    public List<Sha256Hash> getLastKnownBTCBlocks(int maxBlockCount) throws SQLException {
+        List<Sha256Hash> result = new ArrayList<>(maxBlockCount);
+
+        BitcoinBlock block = bitcoinBlockchain.getChainHead();
+        for (int count = 0; block != null && count < maxBlockCount; ++count) {
+            result.add(block.getHash());
+
+            Sha256Hash prevBlockHash = block.getPreviousBlock();
+            block = prevBlockHash == null ? null
+                                          : bitcoinBlockchain.get(prevBlockHash);
+        }
+
+        return result;
     }
 
     private void verifyPublicationContextually(VeriBlockPublication publication) throws VerificationException, BlockStoreException, SQLException {

@@ -277,6 +277,12 @@ public class VeriBlockBlockchain {
         }
     }
 
+    public VeriBlockBlock getChainHead() throws SQLException {
+        StoredVeriBlockBlock chainHead = store.getChainHead();
+
+        return chainHead == null ? null : chainHead.getBlock();
+    }
+
     private StoredVeriBlockBlock getInternal(VBlakeHash hash) throws BlockStoreException, SQLException {
         VBlakeHash trimmed = hash.trimToPreviousKeystoneSize();
         if (temporalStore.containsKey(trimmed)) {
