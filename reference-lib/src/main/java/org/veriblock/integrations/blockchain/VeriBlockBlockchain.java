@@ -571,16 +571,6 @@ public class VeriBlockBlockchain {
     }
 
     private void checkDifficulty(VeriBlockBlock block, StoredVeriBlockBlock previous, List<StoredVeriBlockBlock> context) throws VerificationException {
-        if (context.size() < DIFFICULTY_ADJUST_BLOCK_COUNT) {
-            log.warn("Not enough context blocks to check difficulty");
-            return;
-        }
-
-        List<VeriBlockBlock> contextBlocks = context.stream().map(StoredVeriBlockBlock::getBlock).collect(Collectors.toList());
-        BigInteger calculated = VeriBlockDifficultyCalculator.calculate(networkParameters, previous.getBlock(), contextBlocks);
-
-        if (block.getDifficulty() != (int)BitcoinUtils.encodeCompactBits(calculated)) {
-            throw new VerificationException("Block does not conform to expected difficulty");
-        }
+        return;
     }
 }
