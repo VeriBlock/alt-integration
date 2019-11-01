@@ -289,49 +289,6 @@ public class BitcoinBlockchain {
     }
 
     private void checkDifficulty(BitcoinBlock block, StoredBitcoinBlock previous) throws VerificationException, BlockStoreException, SQLException {
-        // Previous + 1 = height of block
-        if ((previous.getHeight() + 1) % 2016 > 0) {
-            // Difficulty should be same as previous
-            if (block.getBits() != previous.getBlock().getBits()) {
-                throw new VerificationException("Block does not match difficulty of previous block");
-            }
-        } else {
-            // Difficulty needs to adjust
-
-            List<StoredBitcoinBlock> tempBlocks = getTemporaryBlocks(previous.getHash(), DIFFICULTY_ADJUST_BLOCK_COUNT);
-
-            StoredBitcoinBlock cycleStart;
-            if (tempBlocks.size() == DIFFICULTY_ADJUST_BLOCK_COUNT) {
-                cycleStart = tempBlocks.get(tempBlocks.size() - 1);
-            } else if (tempBlocks.size() > 0) {
-                StoredBitcoinBlock last = tempBlocks.get(tempBlocks.size() - 1);
-                cycleStart = store.getFromChain(last.getBlock().getPreviousBlock(), DIFFICULTY_ADJUST_BLOCK_COUNT - tempBlocks.size());
-            } else {
-                cycleStart = store.getFromChain(previous.getHash(), DIFFICULTY_ADJUST_BLOCK_COUNT);
-            }
-
-            if (cycleStart == null) {
-                // Because there will just be some Bitcoin block from whence accounting begins, it's likely
-                // that the first adjustment period will not have sufficient blocks to compute correctly
-                return;
-            }
-
-            BigInteger newTarget = BitcoinUtils.calculateNewTarget(
-                    BitcoinUtils.decodeCompactBits(previous.getBlock().getBits()),
-                    cycleStart.getBlock().getTimestamp(),
-                    previous.getBlock().getTimestamp());
-
-            int accuracyBytes = (block.getBits() >>> 24) - 3;
-            long receivedTargetCompact = block.getBits();
-
-            // The calculated difficulty is to a higher precision than received, so reduce here.
-            BigInteger mask = BigInteger.valueOf(0xFFFFFFL).shiftLeft(accuracyBytes * 8);
-            newTarget = newTarget.and(mask);
-            long newTargetCompact = BitcoinUtils.encodeCompactBits(newTarget);
-
-            if (newTargetCompact != receivedTargetCompact) {
-                throw new VerificationException("Block does not match computed difficulty adjustment");
-            }
-        }
+        return;
     }
 }
