@@ -194,6 +194,12 @@ public class BitcoinBlockchain {
         }
     }
 
+    public BitcoinBlock getChainHead() throws SQLException {
+        StoredBitcoinBlock chainHead = store.getChainHead();
+
+        return chainHead == null ? null : chainHead.getBlock();
+    }
+
     private StoredBitcoinBlock getInternal(Sha256Hash hash) throws BlockStoreException, SQLException {
         if (temporalStore.containsKey(hash)) {
             return temporalStore.get(hash);

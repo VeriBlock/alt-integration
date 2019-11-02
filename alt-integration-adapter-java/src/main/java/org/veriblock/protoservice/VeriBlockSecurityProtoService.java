@@ -22,6 +22,8 @@ import org.veriblock.sdk.*;
 import integration.api.grpc.VeriBlockMessages;
 import integration.api.grpc.VeriBlockMessages.GeneralReply;
 
+import com.google.protobuf.ByteString;
+
 public class VeriBlockSecurityProtoService {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockSecurityProtoService.class);
     private static VeriBlockSecurity security = null;
@@ -234,5 +236,47 @@ public class VeriBlockSecurityProtoService {
         }
 
         return VeriBlockServiceCommon.validationResultToProto(result);
+    }
+
+    public static VeriBlockMessages.GetLastKnownVBKBlocksReply getLastKnownVBKBlocks(VeriBlockMessages.GetLastKnownBlocksRequest request) {
+        ValidationResult result = null;
+        List<VBlakeHash> blocks = new ArrayList<>();
+        try {
+            blocks = security.getLastKnownVBKBlocks(request.getMaxBlockCount());
+            result = ValidationResult.success();
+        } catch (BlockStoreException | SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        GeneralReply replyResult = VeriBlockServiceCommon.validationResultToProto(result);
+        List<ByteString> protoBlocks = VBlakeHashProtoConverter.toProto(blocks);
+
+        VeriBlockMessages.GetLastKnownVBKBlocksReply reply = VeriBlockMessages.GetLastKnownVBKBlocksReply.newBuilder()
+                .addAllBlocks(protoBlocks)
+                .setResult(replyResult)
+                .build();
+        return reply;
+    }
+
+    public static VeriBlockMessages.GetLastKnownBTCBlocksReply getLastKnownBTCBlocks(VeriBlockMessages.GetLastKnownBlocksRequest request) {
+        ValidationResult result = null;
+        List<Sha256Hash> blocks = new ArrayList<>();
+        try {
+            blocks = security.getLastKnownBTCBlocks(request.getMaxBlockCount());
+            result = ValidationResult.success();
+        } catch (BlockStoreException | SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        GeneralReply replyResult = VeriBlockServiceCommon.validationResultToProto(result);
+        List<ByteString> protoBlocks = Sha256HashProtoConverter.toProto(blocks);
+
+        VeriBlockMessages.GetLastKnownBTCBlocksReply reply = VeriBlockMessages.GetLastKnownBTCBlocksReply.newBuilder()
+                .addAllBlocks(protoBlocks)
+                .setResult(replyResult)
+                .build();
+        return reply;
     }
 }
