@@ -118,7 +118,7 @@ public class GenericBlockRepository<Block, Id> {
         if(values.size() == 0) return null;
         return values.get(0);
     }
-    
+
     public List<Block> getEndsWithId(Id id) throws SQLException {
         List<Block> values = new ArrayList<Block>();
         PreparedStatement stmt = null;
@@ -136,6 +136,18 @@ public class GenericBlockRepository<Block, Id> {
             stmt = null;
         }
         return values;
+    }
+
+    public boolean isInUse(Id id) throws SQLException {
+        boolean result;
+        String statement = "SELECT * FROM " + tableBlocks + " WHERE previousId = ?";
+        try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
+            int i = 0;
+            stmt.setObject(++i, serializer.idToString(id));
+
+            result = stmt.executeQuery().next();
+        }
+        return result;
     }
 
     public List<Block> getAll() throws SQLException {
