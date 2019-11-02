@@ -139,15 +139,13 @@ public class GenericBlockRepository<Block, Id> {
     }
 
     public boolean isInUse(Id id) throws SQLException {
-        boolean result;
         String statement = "SELECT * FROM " + tableBlocks + " WHERE previousId = ?";
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
             stmt.setObject(++i, serializer.idToString(id));
 
-            result = stmt.executeQuery().next();
+            return stmt.executeQuery().next();
         }
-        return result;
     }
 
     public List<Block> getAll() throws SQLException {
