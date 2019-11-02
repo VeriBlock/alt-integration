@@ -16,6 +16,7 @@ import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.util.Utils;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -24,7 +25,40 @@ import java.util.Base64;
 import java.util.List;
 
 public class VeriBlockStoreTest {
-    
+
+    @Test
+    public void EraseCantSplitBlockchainTest() throws SQLException, IOException {
+        try {
+            VeriBlockIntegrationLibraryManager.init();
+            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
+            byte[] raw1 =  Utils.decodeHex("0001998300029690ACA425987B8B529BEC04654A16FCCE708F3F0DEED25E1D2513D05A3B17C49D8B3BCFEFC10CB2E9C4D473B2E25DB7F1BD040098960DE0E313");
+            VeriBlockBlock block1 = SerializeDeserializeService.parseVeriBlockBlock(raw1);
+            StoredVeriBlockBlock storedBlock1 = new StoredVeriBlockBlock(block1, BigInteger.TEN);
+
+            byte[] raw2 = Utils.decodeHex("000199840002A69BF9FE9B06E641B61699A9654A16FCCE708F3F0DEED25E1D2513D05A3B7D7F80EB5E94D01C6B3796DDE5647F135DB7F1DD040098960EA12045");
+            VeriBlockBlock block2 = SerializeDeserializeService.parseVeriBlockBlock(raw2);
+            StoredVeriBlockBlock storedBlock2 = new StoredVeriBlockBlock(block2, BigInteger.ONE);
+
+            Assert.assertEquals(block2.getPreviousBlock(), block1.getHash().trimToPreviousBlockSize());
+
+            store.put(storedBlock2);
+            store.put(storedBlock1);
+
+            try {
+                store.erase(block1.getHash());
+                Assert.fail("Expected BlockStoreException");
+            } catch(BlockStoreException e) {
+                Assert.assertTrue(e.getMessage().startsWith("Cannot erase a block"));
+            }
+
+            Assert.assertEquals(store.erase(block2.getHash()), storedBlock2);
+            Assert.assertEquals(store.erase(block1.getHash()), storedBlock1);
+
+        } finally {
+            VeriBlockIntegrationLibraryManager.shutdown();
+        }
+    }
+
     @Test
     public void nonexistingBlockStoreTest() throws SQLException, IOException {
         try {

@@ -98,9 +98,14 @@ public class VeriBlockStore {
     }
 
     public StoredVeriBlockBlock erase(VBlakeHash hash) throws BlockStoreException, SQLException {
-         StoredVeriBlockBlock erased = get(hash);
-         veriBlockRepository.delete(hash);
-         return erased;
+        StoredVeriBlockBlock erased = get(hash);
+
+        if(erased != null && veriBlockRepository.isInUse(hash.trimToPreviousBlockSize())) {
+            throw new BlockStoreException("Cannot erase a block referenced by another block");
+        }
+
+        veriBlockRepository.delete(hash);
+        return erased;
      }
 
     public StoredVeriBlockBlock replace(VBlakeHash hash, StoredVeriBlockBlock storedBlock) throws BlockStoreException, SQLException {
