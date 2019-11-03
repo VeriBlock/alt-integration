@@ -128,7 +128,7 @@ public class ForkresolutionComparator {
         if(!keystoneBlock.isKeystone(security.getAltChainParametersConfig().keystoneInterval))
             return bestPublication;
 
-        AltChainBlock tip = blockSequence.get(blockSequence.size() - 1);
+        //AltChainBlock tip = blockSequence.get(blockSequence.size() - 1);
 
         for(int i = blockSequence.size() - 1; i >= 0; i--) {
             AltChainBlock workingBlock = blockSequence.get(i);

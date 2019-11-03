@@ -145,6 +145,7 @@ public class VeriBlockRewardCalculatorTest {
             super(context);
         }
 
+        ///TODO: unused
         public VeriBlockSecurityMock(VeriBlockSecurity security) throws SQLException {
             super(security.getSecurityFiles());
         }
