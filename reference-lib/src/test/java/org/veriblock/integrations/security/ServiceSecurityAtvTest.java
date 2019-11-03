@@ -28,6 +28,7 @@ import org.veriblock.integrations.transactions.VeriBlockTransactionsVtb;
 import org.veriblock.sdk.AltPublication;
 import org.veriblock.sdk.BlockIndex;
 import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VeriBlockTransaction;
@@ -129,5 +130,39 @@ public class ServiceSecurityAtvTest {
         altPublications.add(publication2);
         success = security.addTemporaryPayloads(null, altPublications);
         Assert.assertFalse(success);
+    }
+    
+    @Test
+    public void addRemovePayloadTest() throws SignatureException, VerificationException, BlockStoreException, SQLException, InvalidKeyException, NoSuchAlgorithmException {
+        VeriBlockBlock veriGenesisBlock = IntegrationLibraryGenesis.addVeriBlockGenesisBlock(security);
+
+        VeriBlockTransaction tx = VeriBlockTransactionsAtv.createAtv();
+        AltPublication publication = VeriBlockTransactionsAtv.createAtvPublicationAttached(veriGenesisBlock, tx);
+
+        ValidationService.verify(publication);
+
+        List<AltPublication> altPublications = new ArrayList<>();
+        altPublications.add(publication);
+
+        long blockHeight = 1L;
+        String blockHash = "01";
+        BlockIndex blockIndex = new BlockIndex(blockHeight, blockHash);
+        
+        // only genesis block should exist
+        List<VBlakeHash> vbkBlocks = security.getLastKnownVBKBlocks(5);
+        Assert.assertTrue(vbkBlocks.size() == 1);
+
+        boolean success = security.addPayloads(blockIndex, null, altPublications);
+        Assert.assertTrue(success);
+        
+        vbkBlocks = security.getLastKnownVBKBlocks(5);
+        // and now two blocks exist
+        Assert.assertTrue(vbkBlocks.size() == 2);
+        
+        security.removePayloads(blockIndex);
+        
+        vbkBlocks = security.getLastKnownVBKBlocks(5);
+        // blocks are rewinded with removePayloads so just genesis block stays
+        Assert.assertTrue(vbkBlocks.size() == 1);
     }
 }

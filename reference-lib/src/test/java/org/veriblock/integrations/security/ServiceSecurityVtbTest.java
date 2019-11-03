@@ -27,6 +27,7 @@ import org.veriblock.integrations.transactions.VeriBlockTransactionsVtb;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.BlockIndex;
 import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockPoPTransaction;
 import org.veriblock.sdk.VeriBlockPublication;
@@ -105,5 +106,39 @@ public class ServiceSecurityVtbTest {
         
         success = security.addTemporaryPayloads(vtbPublications, null);
         Assert.assertTrue(success);
+    }
+    
+    @Test
+    public void addRemovePayloadTest() throws SignatureException, VerificationException, BlockStoreException, SQLException, InvalidKeyException, NoSuchAlgorithmException {
+        VeriBlockBlock veriGenesisBlock = IntegrationLibraryGenesis.addVeriBlockGenesisBlock(security);
+        BitcoinBlock bitcoinGenesisBlock = IntegrationLibraryGenesis.addBitcoinGenesisBlock(security);
+
+        ///HACK: bits value is hardcoded in createVtbAttachedToBitcoinBlock()
+        VeriBlockPoPTransaction tx = VeriBlockTransactionsVtb.createVtbAttachedToBitcoinBlock(bitcoinGenesisBlock.getHash());
+        
+        VeriBlockPublication vtbPublication = VeriBlockTransactionsVtb.createVtbPublicationAttached(veriGenesisBlock, tx);
+        List<VeriBlockPublication> vtbPublications = new ArrayList<>();
+        vtbPublications.add(vtbPublication);
+        
+        long blockHeight = 1L;
+        String blockHash = "01";
+        BlockIndex blockIndex = new BlockIndex(blockHeight, blockHash);
+        
+        // only genesis block should exist
+        List<Sha256Hash> btcBlocks = security.getLastKnownBTCBlocks(5);
+        Assert.assertTrue(btcBlocks.size() == 1);
+
+        boolean success = security.addPayloads(blockIndex, vtbPublications, null);
+        Assert.assertTrue(success);
+        
+        btcBlocks = security.getLastKnownBTCBlocks(5);
+        // and now two blocks exist
+        Assert.assertTrue(btcBlocks.size() == 2);
+        
+        security.removePayloads(blockIndex);
+        
+        btcBlocks = security.getLastKnownBTCBlocks(5);
+        // blocks are rewinded with removePayloads so just genesis block stays
+        Assert.assertTrue(btcBlocks.size() == 1);
     }
 }
