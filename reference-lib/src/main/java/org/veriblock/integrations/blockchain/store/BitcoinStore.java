@@ -98,6 +98,11 @@ public class BitcoinStore {
 
     public StoredBitcoinBlock erase(Sha256Hash hash) throws BlockStoreException, SQLException {
         StoredBitcoinBlock erased = get(hash);
+
+        if(erased != null && bitcoinRepository.isInUse(hash)) {
+            throw new BlockStoreException("Cannot erase a block referenced by another block");
+        }
+
         bitcoinRepository.delete(hash);
         return erased;
     }
