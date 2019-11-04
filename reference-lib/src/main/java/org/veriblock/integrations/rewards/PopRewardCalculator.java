@@ -142,14 +142,17 @@ public class PopRewardCalculator {
 
     public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException
     {
+        if(blocksInterval.size() != config.popRewardSettlementInterval + config.popDifficultyAveragingInterval)
+            throw new IllegalArgumentException("The amount of blocks must be equal to popRewardSettlementInterval + popDifficultyAveragingInterval");
+
         BigDecimal difficulty = BigDecimal.ZERO;
 
         Collections.sort(blocksInterval);  // make the ascending order for the blocks in the collection, it needs for the correct calculation of the pop score
 
-        for(int i = 0; i < blocksInterval.size(); ++i)
+        for(int i = 0; i < config.popDifficultyAveragingInterval; ++i)
         {
-            BigDecimal score = calculatePopScoreFromEndorsements(blocksInterval.get(i), blocksInterval.subList(i , blocksInterval.size()));
-            if(score.compareTo(BigDecimal.ZERO) == 0)
+            BigDecimal score = calculatePopScoreFromEndorsements(blocksInterval.get(i), blocksInterval.subList(i + 1 , i  + 1 + config.popRewardSettlementInterval));
+            if(score.compareTo(BigDecimal.ZERO) < 1) // less or equal to ZERO
             {
                 score = BigDecimal.ONE;
             }
@@ -271,6 +274,9 @@ public class PopRewardCalculator {
     }
 
     public static PopPayoutRound calculatePopPayoutRound(int blockNumber, AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks, BigDecimal popDifficulty) throws SQLException {
+
+        if(endorsementBlocks.size() != config.popRewardSettlementInterval)
+            throw new IllegalArgumentException("The amount of endorsementBlocks must be equal to popRewardSettlementInterval");
 
         List<AltPublication> endorsements = popTxDBStore.getAltPublciationsEndorse(endorsedBlock, endorsementBlocks);
 

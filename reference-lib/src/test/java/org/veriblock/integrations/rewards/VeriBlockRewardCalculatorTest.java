@@ -298,7 +298,7 @@ public class VeriBlockRewardCalculatorTest {
     }
 
     @Test
-    public void popDifficultyCalculateTest() throws SQLException {
+    public void popDifficultyCalculateTest() throws SQLException, IllegalArgumentException {
         PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
 
         // simple case where we don't have any publication for this sequence of blocks
@@ -314,7 +314,8 @@ public class VeriBlockRewardCalculatorTest {
         blocks.add(block4);
 
         // set Difficult Averaging Interval to the blocks size
-        PopRewardCalculator.getCalculatorConfig().popDifficultyAveragingInterval = blocks.size();
+        PopRewardCalculator.getCalculatorConfig().popDifficultyAveragingInterval = blocks.size() - 2;
+        PopRewardCalculator.getCalculatorConfig().popRewardSettlementInterval = blocks.size() - 2;
 
         BigDecimal difficulty = PopRewardCalculator.calculatePopDifficultyForBlock(blocks);
 
@@ -345,8 +346,8 @@ public class VeriBlockRewardCalculatorTest {
         BigDecimal block1_score = PopRewardCalculator.calculatePopScoreFromEndorsements(publications1, bestPublication1);
         BigDecimal block2_score = PopRewardCalculator.calculatePopScoreFromEndorsements(publications2, bestPublication2);
 
-        BigDecimal expected_difficult = new BigDecimal(2);
-        expected_difficult = expected_difficult.add(block1_score).add(block2_score).divide(new BigDecimal(blocks.size()));
+        BigDecimal expected_difficult;
+        expected_difficult = block1_score.add(block2_score).divide(new BigDecimal(PopRewardCalculator.getCalculatorConfig().popDifficultyAveragingInterval));
 
         difficulty = PopRewardCalculator.calculatePopDifficultyForBlock(blocks);
 
@@ -373,8 +374,7 @@ public class VeriBlockRewardCalculatorTest {
         block1_score = PopRewardCalculator.calculatePopScoreFromEndorsements(publications1, bestPublication1);
         block2_score = PopRewardCalculator.calculatePopScoreFromEndorsements(publications2, bestPublication2);
 
-        expected_difficult = new BigDecimal(2);
-        expected_difficult = expected_difficult.add(block1_score).add(block2_score).divide(new BigDecimal(blocks.size()));
+        expected_difficult = block1_score.add(block2_score).divide(new BigDecimal(PopRewardCalculator.getCalculatorConfig().popDifficultyAveragingInterval));
 
         difficulty = PopRewardCalculator.calculatePopDifficultyForBlock(blocks);
         Assert.assertTrue(expected_difficult.compareTo(difficulty) == 0);
@@ -382,7 +382,7 @@ public class VeriBlockRewardCalculatorTest {
     
     ///HACK: there is no difference if we change difficulty or score so we fix the difficulty and test score only
     @Test
-    public void popRewardBasic() {
+    public void popRewardBasic() throws IllegalArgumentException {
         // blockNumber is used to detect current round only. Let's start with ROUND_1.
         int blockNumber = 1;
         // round 1 ratio is 0.97
@@ -439,7 +439,7 @@ public class VeriBlockRewardCalculatorTest {
     }
     
     @Test
-    public void popRewardSpecialCase() {
+    public void popRewardSpecialCase() throws IllegalArgumentException{
         // blockNumber is used to detect current round and ROUND3 special case so we can mostly use any number here
         int blockNumber = 1;
         
@@ -512,7 +512,8 @@ public class VeriBlockRewardCalculatorTest {
         endorsementBlocks.add(containingBlock);
 
         popTxStore.addPoPTransaction(poptx1, containingBlock, endorsedBlock);
-        
+
+        PopRewardCalculator.getCalculatorConfig().popRewardSettlementInterval = endorsementBlocks.size();
         PopPayoutRound payout1 = PopRewardCalculator.calculatePopPayoutRound(blockNumber, endorsedBlock, endorsementBlocks, defaultDifficulty);
 
         reward1 = payout1.getOutputsToPopMiners().get(0).getReward();

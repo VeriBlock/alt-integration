@@ -18,6 +18,8 @@ public final class RewardDefaults {
 
     // average 50 blocks before the endorsed block to calculate it's difficulty
     public static final int POP_DIFFICULTY_AVERAGING_INTERVAL = 50;
+    // the interval for calculating score for the block
+    public static final int POP_REWARD_SETTLEMENT_INTERVAL = 400;
     // we only store 50 values in relativeScoreLookupTable and do not want to search more blocks
     public static final int POP_SEARCH_UP_TO_VBK_BLOCKS = 50;
     

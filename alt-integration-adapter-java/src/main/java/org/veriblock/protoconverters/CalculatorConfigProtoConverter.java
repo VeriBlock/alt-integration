@@ -47,6 +47,7 @@ public final class CalculatorConfigProtoConverter {
             config.relativeScoreLookupTable.add(new BigDecimal(r));
         }
         config.popDifficultyAveragingInterval = protoData.getPopDifficultyAveragingInterval();
+        config.popRewardSettlementInterval = protoData.getPopRewardSettlementInterval();
 
         return config;
     }
@@ -86,7 +87,8 @@ public final class CalculatorConfigProtoConverter {
                 .setFlatScoreRound(flatScoreConfig.build())
                 .setRewardCurve(curveConfig.build())
                 .setRelativeScoreLookupTable(relativeScoreConfig.build())
-                .setPopDifficultyAveragingInterval(data.popDifficultyAveragingInterval);
+                .setPopDifficultyAveragingInterval(data.popDifficultyAveragingInterval)
+                .setPopRewardSettlementInterval(data.popRewardSettlementInterval);
         return result.build();
     }
 }
