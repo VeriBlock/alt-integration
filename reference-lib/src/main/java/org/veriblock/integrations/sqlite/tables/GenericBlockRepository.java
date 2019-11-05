@@ -29,36 +29,22 @@ public class GenericBlockRepository<Block, Id> {
         this.tableBlocks = tableName;
         this.serializer = serializer;
         
-        Statement stmt = null;
-        try {
-            stmt = connectionSource.createStatement();
+        try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS "
                     + tableBlocks
                     + " (\n"
                     + serializer.getSchema()
                     + ");");
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
         }
 
-        try {
-            stmt = connectionSource.createStatement();
+        try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("PRAGMA journal_mode=WAL;");
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
     
     public void clear() throws SQLException {
-        Statement stmt = null;
-        try {
-            stmt = connectionSource.createStatement();
+        try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("DELETE FROM " + tableBlocks);
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
@@ -72,70 +58,56 @@ public class GenericBlockRepository<Block, Id> {
     }
 
     private String getValuesString() {
-      int columnCount = serializer.getColumns().size();
+        int columnCount = serializer.getColumns().size();
 
-      String values = columnCount == 0 ? "" : "?";
-      for(int i = 1; i < columnCount; i++)
-          values += ", ?";
+        String values = columnCount == 0 ? "" : "?";
+        for(int i = 1; i < columnCount; i++)
+            values += ", ?";
 
-      return values;
+        return values;
     }
 
     public void save(Block block) throws SQLException {
-        PreparedStatement stmt = null;
-        try {
-            stmt = connectionSource.prepareStatement(
-                "REPLACE INTO "
-                        + tableBlocks
-                        + " (" + getColumnsString() + ") "
-                        + "VALUES(" + getValuesString() + ")");
+        String statement = "REPLACE INTO "
+                         +  tableBlocks
+                         + " (" + getColumnsString() + ") "
+                         + "VALUES(" + getValuesString() + ")";
+        try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             serializer.toStmt(block, stmt);
             stmt.execute();
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
     public Block get(Id id) throws SQLException {
-        List<Block> values = new ArrayList<Block>();
-        PreparedStatement stmt = null;
-        try {
-            stmt = connectionSource.prepareStatement("SELECT * FROM " + tableBlocks + " WHERE id = ?");
+        String statement = "SELECT * FROM " + tableBlocks + " WHERE id = ?";
+        try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
             stmt.setObject(++i, serializer.idToString(id));
             ResultSet resultSet = stmt.executeQuery();
     
+            List<Block> values = new ArrayList<Block>();
             while (resultSet.next())
                 values.add(serializer.fromResult(resultSet));
 
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
-        }
+            if(values.size() > 1) throw new SQLException("Not an unique id: " + id);
 
-        if(values.size() > 1) throw new SQLException("Not an unique id: " + id);
-        if(values.size() == 0) return null;
-        return values.get(0);
+            return values.size() == 0 ? null : values.get(0);
+        }
     }
 
     public List<Block> getEndsWithId(Id id) throws SQLException {
-        List<Block> values = new ArrayList<Block>();
-        PreparedStatement stmt = null;
-        try {
-            stmt = connectionSource.prepareStatement("SELECT * FROM " + tableBlocks + " WHERE id LIKE ?");
+        String statement = "SELECT * FROM " + tableBlocks + " WHERE id LIKE ?";
+        try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
             stmt.setObject(++i, "%" + serializer.idToString(id));
             ResultSet resultSet = stmt.executeQuery();
-    
+
+            List<Block> values = new ArrayList<Block>();
             while (resultSet.next())
                 values.add(serializer.fromResult(resultSet));
 
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
+            return values;
         }
-        return values;
     }
 
     public boolean isInUse(Id id) throws SQLException {
@@ -149,32 +121,23 @@ public class GenericBlockRepository<Block, Id> {
     }
 
     public List<Block> getAll() throws SQLException {
-        List<Block> values = new ArrayList<Block>();
-        Statement stmt = null;
-        try {
-            stmt = connectionSource.createStatement();
+        try (Statement stmt = connectionSource.createStatement()) {
             ResultSet resultSet = stmt.executeQuery("SELECT * FROM " + tableBlocks);
-    
+
+            List<Block> values = new ArrayList<Block>();
             while (resultSet.next())
                 values.add(serializer.fromResult(resultSet));
 
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
+            return values;
         }
-        return values;
     }
     
     public void delete(Id id) throws SQLException {
-        PreparedStatement stmt = null;
-        try {
-            stmt = connectionSource.prepareStatement("DELETE FROM " + tableBlocks + " WHERE id = ?");
+        String statement = "DELETE FROM " + tableBlocks + " WHERE id = ?";
+        try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
             stmt.setObject(++i, serializer.idToString(id));
             stmt.execute();
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 }
