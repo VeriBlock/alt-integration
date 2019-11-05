@@ -152,15 +152,15 @@ public class PopRewardCalculator {
         for(int i = 0; i < config.popDifficultyAveragingInterval; ++i)
         {
             BigDecimal score = calculatePopScoreFromEndorsements(blocksInterval.get(i), blocksInterval.subList(i + 1 , i  + 1 + config.popRewardSettlementInterval));
-            if(score.compareTo(BigDecimal.ZERO) < 1) // less or equal to ZERO
-            {
-                score = BigDecimal.ONE;
-            }
-
             difficulty = difficulty.add(score);
         }
 
-        return difficulty.divide(new BigDecimal(config.popDifficultyAveragingInterval));
+        difficulty = difficulty.divide(new BigDecimal(config.popDifficultyAveragingInterval), RoundingMode.FLOOR);
+
+        if (difficulty.compareTo(BigDecimal.ONE) < 0) {
+            difficulty = BigDecimal.ONE; // Minimum difficulty
+        }
+        return difficulty;
     }
 
     public static BigDecimal calculatePopScoreFromEndorsements(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks) throws SQLException {
