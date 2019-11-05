@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Base64;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -20,19 +22,43 @@ import org.junit.Before;
 import org.junit.Test;
 import org.veriblock.integrations.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
-import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.BitcoinBlock;
+import org.veriblock.sdk.Sha256Hash;
 
 public class BitcoinBlockRepositoryTest {
     private byte[] rawBlock;
     private StoredBitcoinBlock newBlock;
+    private StoredBitcoinBlock newBlock2;
+    private StoredBitcoinBlock newBlock3;
 
     private Connection connection;
     private BitcoinBlockRepository repo;
 
     @Before
     public void init() throws SQLException {
-        rawBlock = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
-        newBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(rawBlock), BigInteger.TEN, 0);
+        BitcoinBlock block  = new BitcoinBlock(766099456,
+                                    Sha256Hash.wrap("00000000000000000004dc9c42c22f489ade54a9349e3a47aee5b55069062afd"),
+                                    Sha256Hash.wrap("87839c0e4c6771557ef02a5076c8b46a7157e5532eff7153293791ca852d2e58"),
+                                    1572336145, 0x17148edf, 790109764);
+        Assert.assertEquals(block.getHash(),
+                            Sha256Hash.wrap("0000000000000000000faad7ae177b313ee4e3f1da519dbbf5b3ab58ccff6338"));
+
+        BitcoinBlock block2 = new BitcoinBlock(1073733632,
+                                    Sha256Hash.wrap("0000000000000000000faad7ae177b313ee4e3f1da519dbbf5b3ab58ccff6338"),
+                                    Sha256Hash.wrap("902e5a70c8fa99fb9ba6d0f855f5e84b8ffc3fe56b694889d07031d8adb6a0f8"),
+                                    1572336708, 0x17148edf, 344118374);
+        Assert.assertEquals(block2.getHash(),
+                            Sha256Hash.wrap("00000000000000000001163c9e1130c26984d831cb16c16f994945a197550897"));
+
+        BitcoinBlock block3 = new BitcoinBlock(536870912,
+                                    Sha256Hash.wrap("00000000000000000001163c9e1130c26984d831cb16c16f994945a197550897"),
+                                    Sha256Hash.wrap("2dfad61070eeea30ee035cc58ac20a325292802f9445851d14f23b4e71ddee61"),1572337243, 0x17148edf, 2111493782);
+        Assert.assertEquals(block3.getHash(),
+                            Sha256Hash.wrap("0000000000000000000e008052ab86a7b0c20e46b29c54658b066d471022503f"));
+
+        newBlock = new StoredBitcoinBlock(block, BigInteger.TEN, 0);
+        newBlock2 = new StoredBitcoinBlock(block2, BigInteger.ONE, 0);
+        newBlock3 = new StoredBitcoinBlock(block3, BigInteger.ZERO, 0);
 
         connection = ConnectionSelector.setConnectionDefault();
         repo = new BitcoinBlockRepository(connection);
@@ -66,14 +92,68 @@ public class BitcoinBlockRepositoryTest {
     }
 
     @Test
-    public void AddBlockTest() throws SQLException, IOException {
+    public void AddGetBlockTest() throws SQLException, IOException {
         repo.save(newBlock);
-
         StoredBitcoinBlock block = repo.get(newBlock.getHash());
         Assert.assertEquals(block, newBlock);
     }
 
-    //FIXME: test getAll()
-    //FIXME: test both get() and getEndsWithId()
-    //FIXME: test clear() explicitly
+    @Test
+    public void AddGetEndsWithIdBlockTest() throws SQLException, IOException {
+        repo.save(newBlock);
+        List<StoredBitcoinBlock> blocks = repo.getEndsWithId(newBlock.getHash());
+        Assert.assertFalse(blocks.isEmpty());
+        Assert.assertEquals(blocks.get(0), newBlock);
+    }
+
+    @Test
+    public void ClearTest() throws SQLException, IOException {
+        repo.save(newBlock);
+        repo.save(newBlock2);
+        repo.save(newBlock3);
+
+        repo.clear();
+
+        List<StoredBitcoinBlock> blocks = repo.getAll();
+        Assert.assertTrue(blocks.isEmpty());
+    }
+
+    @Test
+    public void GetAllEmptyRepoTest() throws SQLException, IOException {
+        List<StoredBitcoinBlock> blocks = repo.getAll();
+        Assert.assertTrue(blocks.isEmpty());
+    }
+
+    @Test
+    public void GetAllTest() throws SQLException, IOException {
+        Comparator<StoredBitcoinBlock> comparator = (b1, b2) -> b1.getHash().toString().compareTo(b2.getHash().toString());
+
+        repo.save(newBlock);
+        repo.save(newBlock2);
+        repo.save(newBlock3);
+
+        List<StoredBitcoinBlock> expectedBlocks = new ArrayList<StoredBitcoinBlock>();
+        expectedBlocks.add(newBlock);
+        expectedBlocks.add(newBlock2);
+        expectedBlocks.add(newBlock3);
+        expectedBlocks.sort(comparator);
+
+        List<StoredBitcoinBlock> blocks = repo.getAll();
+        blocks.sort(comparator);
+
+        Assert.assertEquals(blocks, expectedBlocks);
+    }
+
+    @Test
+    public void IsInUseTest() throws SQLException, IOException {
+        repo.save(newBlock2);
+        repo.save(newBlock3);
+
+        Assert.assertFalse(repo.isInUse(newBlock3.getHash()));
+        Assert.assertTrue(repo.isInUse(newBlock.getHash()));
+        Assert.assertTrue(repo.isInUse(newBlock2.getHash()));
+
+    }
+
+    //NOTE: can't test getEndsWithId() with a trimmed hash, as there's no trimming support in Sha256Hash
 }
