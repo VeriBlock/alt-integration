@@ -17,7 +17,7 @@ import java.util.Arrays;
 
 public class Address {
     public final static int SIZE = 30;
-    private static final char STARTING_CHAR = 'V';
+    public static final char STARTING_CHAR = 'V';
     private static final char MULTISIG_ENDING_CHAR = '0';
 
     private static final int MULTISIG_ADDRESS_M_VALUE = 1;

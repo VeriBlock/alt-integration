@@ -143,6 +143,7 @@ public class ForkresolutionComparatorTests {
             super(context);
         }
 
+        ///TODO: unused
         public VeriBlockSecurityMock(VeriBlockSecurity security) throws SQLException {
             super(security.getSecurityFiles());
         }
@@ -610,6 +611,7 @@ public class ForkresolutionComparatorTests {
         rigthFork.add(block7);
         rigthFork.add(block8);
 
+        ///TODO: should use static method calls eg ForkresolutionComparator.compareTwoBranches
         Assert.assertEquals(1, comparatorTest.compareTwoBranches(leftFork, rigthFork));
     }
 

@@ -15,8 +15,6 @@ import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.Utils;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collections;
 
 public class VeriBlockTransactionTests {

@@ -13,8 +13,8 @@ public class ForkresolutionDefaults {
     private ForkresolutionDefaults() {}
 
     /**
-     * The maximum number of Veriblock blocks that can occur without
-     * a publication of an additional AltChain keystone before “continuity”.
+     * The maximum number of VeriBlock blocks that can occur without
+     * a publication of an additional AltChain keystone before 'continuity'.
      */
     static final int KEYSTONE_FINALITY_DELAY = 60;
 

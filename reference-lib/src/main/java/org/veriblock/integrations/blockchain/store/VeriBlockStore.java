@@ -9,7 +9,6 @@
 package org.veriblock.integrations.blockchain.store;
 
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,8 +22,6 @@ import org.veriblock.integrations.sqlite.tables.KeyValueRepository;
 import org.veriblock.integrations.sqlite.tables.VeriBlockBlockRepository;
 import org.veriblock.sdk.BlockStoreException;
 import org.veriblock.sdk.VBlakeHash;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
 public class VeriBlockStore {

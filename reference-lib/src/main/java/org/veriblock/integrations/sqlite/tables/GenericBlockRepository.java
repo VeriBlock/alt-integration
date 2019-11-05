@@ -8,7 +8,6 @@
 
 package org.veriblock.integrations.sqlite.tables;
 
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,8 +15,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.veriblock.sdk.util.Utils;
 
 public class GenericBlockRepository<Block, Id> {
     protected Connection connectionSource;

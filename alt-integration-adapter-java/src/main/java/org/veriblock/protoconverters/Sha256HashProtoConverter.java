@@ -13,8 +13,6 @@ import java.util.List;
 
 import org.veriblock.sdk.Sha256Hash;
 
-import integration.api.grpc.VeriBlockMessages;
-
 import com.google.protobuf.ByteString;
 
 public final class Sha256HashProtoConverter {

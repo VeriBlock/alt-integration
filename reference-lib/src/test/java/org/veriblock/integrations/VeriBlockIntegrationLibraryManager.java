@@ -20,6 +20,7 @@ import org.veriblock.integrations.params.MainNetParameters;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
 
+///TODO: this is not a test - move to helpers package
 public class VeriBlockIntegrationLibraryManager {
     
     private static Context securityFiles = null;

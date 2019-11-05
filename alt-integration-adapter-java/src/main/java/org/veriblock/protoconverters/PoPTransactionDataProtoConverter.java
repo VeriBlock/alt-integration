@@ -1,6 +1,5 @@
 package org.veriblock.protoconverters;
 
-import com.google.type.PostalAddressProto;
 import integration.api.grpc.VeriBlockMessages;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.AltPublication;

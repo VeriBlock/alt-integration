@@ -8,26 +8,24 @@
 
 package org.veriblock.integrations.blockchain;
 
-import org.junit.*;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Iterator;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
 import org.veriblock.integrations.auditor.BlockIdentifier;
 import org.veriblock.integrations.auditor.Change;
 import org.veriblock.integrations.auditor.Changeset;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
-import org.veriblock.sdk.BlockStoreException;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.sql.SQLException;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 public class VeriBlockBlockchainTest {
     private VeriBlockBlockchain blockchain;
