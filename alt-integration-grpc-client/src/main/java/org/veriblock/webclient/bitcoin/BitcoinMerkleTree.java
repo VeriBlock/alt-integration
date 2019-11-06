@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.bind.DatatypeConverter;
-
+import org.veriblock.sdk.util.Utils;
 import org.veriblock.webclient.signature.Utility;
 
 /**
@@ -68,7 +67,7 @@ public class BitcoinMerkleTree
         /* Convert all of the TxIDs to byte[]s, flip them for the correct endianness */
         for (int i = 0; i < txIDs.size(); i++)
         {
-            floorData[i] = Utility.flip(DatatypeConverter.parseHexBinary(txIDs.get(i)));
+            floorData[i] = Utility.flip(Utils.decodeHex(txIDs.get(i)));
         }
 
         /* Create, at a minimum, the bottom floor */
@@ -103,7 +102,7 @@ public class BitcoinMerkleTree
         }
 
         /* Get the (only) element from the top layer, flip it, convert to hex */
-        return DatatypeConverter.printHexBinary(Utility.flip(layers.get(layers.size() - 1).getElement(0)));
+        return Utils.encodeHex(Utility.flip(layers.get(layers.size() - 1).getElement(0)));
     }
 
     /**
@@ -117,7 +116,7 @@ public class BitcoinMerkleTree
         int foundIndex = 0;
 
         /* The stored TxID will be in reversed-byte-order from the network-byte-order used by Bitcoin-RPC */
-        byte[] txIDBytes = Utility.flip(DatatypeConverter.parseHexBinary(txID));
+        byte[] txIDBytes = Utility.flip(Utils.decodeHex(txID));
 
         MerkleLayer bottomLayer = layers.get(0);
         for (; foundIndex < bottomLayer.numElementsInLayer(); foundIndex++)

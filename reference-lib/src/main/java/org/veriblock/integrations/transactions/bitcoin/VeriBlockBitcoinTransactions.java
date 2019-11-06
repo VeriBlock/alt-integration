@@ -10,25 +10,24 @@ package org.veriblock.integrations.transactions.bitcoin;
 
 import java.nio.ByteBuffer;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.veriblock.integrations.transactions.signature.Utility;
 import org.veriblock.sdk.Address;
 import org.veriblock.sdk.BitcoinTransaction;
 import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.util.Utils;
 
 public class VeriBlockBitcoinTransactions {
 
     private VeriBlockBitcoinTransactions() { }
     
     public static String bitcoinTransactionGetId(BitcoinTransaction tx) {
-        return DatatypeConverter.printHexBinary(Utility.flip(Sha256Hash.twiceOf(tx.getRawBytes()).getBytes()));
+        return Utils.encodeHex(Utility.flip(Sha256Hash.twiceOf(tx.getRawBytes()).getBytes()));
     }
     
     public static Sha256Hash merkleTreeRootHash(BitcoinMerkleTree tree) {
-        return Sha256Hash.wrap(DatatypeConverter.parseHexBinary(tree.getMerkleRoot()));
+        return Sha256Hash.wrap(Utils.decodeHex(tree.getMerkleRoot()));
     }
     
     public static byte[] publicationDataToBitcoinHeader(VeriBlockBlock publishedBlock, Address sender) {
