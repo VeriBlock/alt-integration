@@ -8,8 +8,7 @@
 
 package org.veriblock.webclient.bitcoin;
 
-import javax.xml.bind.DatatypeConverter;
-
+import org.veriblock.sdk.util.Utils;
 import org.veriblock.webclient.signature.Crypto;
 import org.veriblock.webclient.signature.Utility;
 
@@ -76,12 +75,12 @@ public class BitcoinMerklePath
         }
 
         this.bottomDataIndex = Integer.parseInt(parts[0]);
-        this.bottomData = DatatypeConverter.parseHexBinary(parts[1]);
+        this.bottomData = Utils.decodeHex(parts[1]);
         this.layers = new byte[parts.length - 2][];
 
         for (int i = 2; i < parts.length; i++)
         {
-            this.layers[i - 2] = DatatypeConverter.parseHexBinary(parts[i]);
+            this.layers[i - 2] = Utils.decodeHex(parts[i]);
         }
     }
 
@@ -109,7 +108,7 @@ public class BitcoinMerklePath
             layerIndex /= 2;
         }
 
-        return DatatypeConverter.printHexBinary(Utility.flip(movingHash));
+        return Utils.encodeHex(Utility.flip(movingHash));
     }
 
     /**
@@ -119,11 +118,11 @@ public class BitcoinMerklePath
      */
     public String getCompactFormat()
     {
-        String path = this.bottomDataIndex + ":" + DatatypeConverter.printHexBinary(this.bottomData);
+        String path = this.bottomDataIndex + ":" + Utils.encodeHex(this.bottomData);
 
         for (int i = 0; i < layers.length; i++)
         {
-            path += ":" + DatatypeConverter.printHexBinary(layers[i]);
+            path += ":" + Utils.encodeHex(layers[i]);
         }
 
         return path;
