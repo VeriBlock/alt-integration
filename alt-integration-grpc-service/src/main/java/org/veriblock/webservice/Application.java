@@ -20,7 +20,6 @@ import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
-import org.veriblock.integrations.params.MainNetParameters;
 import org.veriblock.integrations.rewards.PopRewardCalculator;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
@@ -55,7 +54,7 @@ public final class Application {
             BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
             AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
             PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
-            Context securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+            Context securityFiles = new Context(config.getVeriblockNetworkParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
             security = new VeriBlockSecurity(securityFiles);
 
             ForkresolutionComparator.setSecurity(security);
