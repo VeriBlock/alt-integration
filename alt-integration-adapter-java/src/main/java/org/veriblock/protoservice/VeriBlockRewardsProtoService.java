@@ -109,4 +109,25 @@ public class VeriBlockRewardsProtoService {
                 .build();
         return reply;
     }
+
+    public static VeriBlockMessages.RewardsCalculateScoreReply rewardsCalculatePopDifficulty(VeriBlockMessages.RewardsCalculatePopDifficultyRequest request) {
+        List<AltChainBlock> blocks = AltChainBlockProtoConverter.fromProto(request.getBlocksList());
+        ValidationResult result = null;
+        BigDecimal difficulty = BigDecimal.ONE;
+
+        try{
+            difficulty = PopRewardCalculator.calculatePopDifficultyForBlock(blocks);
+            result = ValidationResult.success();
+        } catch (SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call RewardsCalculate service", e);
+        }
+
+        GeneralReply replyResult = VeriBlockServiceCommon.validationResultToProto(result);
+        VeriBlockMessages.RewardsCalculateScoreReply reply = VeriBlockMessages.RewardsCalculateScoreReply.newBuilder()
+                .setResult(replyResult)
+                .setScore(difficulty.toPlainString())
+                .build();
+        return reply;
+    }
 }

@@ -33,6 +33,8 @@ import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.*;
 import org.veriblock.sdk.util.Utils;
 
+import static org.veriblock.integrations.rewards.PopRewardCalculator.calculatePopScoreFromEndorsements;
+
 public class VeriBlockRewardCalculatorTest {
 
     private static AltPublication generateATV(int containingBlockHeight, String payoutInfo) {
@@ -83,11 +85,15 @@ public class VeriBlockRewardCalculatorTest {
         public List<AltPublication> getAltPublciationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
             Set<AltPublication> altPublications1 = new HashSet<AltPublication>();
             for (AltChainBlock block : containBlocks) {
-                altPublications1.addAll(containingAltPublication.get(block.getHash()));
+                if(containingAltPublication.get(block.getHash()) != null) {
+                    altPublications1.addAll(containingAltPublication.get(block.getHash()));
+                }
             }
 
             Set<AltPublication> altPublications2 = new HashSet<AltPublication>();
-            altPublications2.addAll(endoresedAltPublication.get(endorsedBlock.getHash()));
+            if(endoresedAltPublication.get(endorsedBlock.getHash()) != null) {
+                altPublications2.addAll(endoresedAltPublication.get(endorsedBlock.getHash()));
+            }
             altPublications2.retainAll(altPublications1);
             return new ArrayList<AltPublication>(altPublications2);
         }
@@ -226,7 +232,7 @@ public class VeriBlockRewardCalculatorTest {
         List<AltChainBlock> endorsementBlocks = new ArrayList<AltChainBlock>();
         endorsementBlocks.add(containingBlock);
 
-        BigDecimal totalScore = PopRewardCalculator.calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
+        BigDecimal totalScore = calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
         Assert.assertTrue(totalScore.compareTo(BigDecimal.ONE) == 0);
 
         popTxStore.clear();
@@ -242,7 +248,7 @@ public class VeriBlockRewardCalculatorTest {
         popTxStore.addPoPTransaction(popTx1, containingBlock, endorsedBlock);
         popTxStore.addPoPTransaction(popTx2, containingBlock, endorsedBlock);
 
-        BigDecimal totalScore2 = PopRewardCalculator.calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
+        BigDecimal totalScore2 = calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
         Assert.assertTrue(totalScore2.compareTo(new BigDecimal(2)) == 0);
 
         popTxStore.clear();
@@ -251,7 +257,7 @@ public class VeriBlockRewardCalculatorTest {
             PoPTransactionData poptx = new PoPTransactionData("hash" + i, generateATV(i, payoutInfo), new ArrayList<VeriBlockPublication>());
             popTxStore.addPoPTransaction(poptx, containingBlock, endorsedBlock);
         }
-        BigDecimal totalScore3 = PopRewardCalculator.calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
+        BigDecimal totalScore3 = calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
         Assert.assertTrue(totalScore3.compareTo(new BigDecimal(15)) < 0);
 
         popTxStore.clear();
@@ -263,7 +269,7 @@ public class VeriBlockRewardCalculatorTest {
             PoPTransactionData poptx = new PoPTransactionData("hash" + i, generateATV(i, payoutInfo), new ArrayList<VeriBlockPublication>());
             popTxStore.addPoPTransaction(poptx, containingBlock, endorsedBlock);
         }
-        BigDecimal totalScore4 = PopRewardCalculator.calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
+        BigDecimal totalScore4 = calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
         // make sure the last position is not filled yet
 
         {
@@ -271,7 +277,7 @@ public class VeriBlockRewardCalculatorTest {
             popTxStore.addPoPTransaction(poptx, containingBlock, endorsedBlock);
         }
         
-        BigDecimal totalScore5 = PopRewardCalculator.calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
+        BigDecimal totalScore5 = calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
         // assert the score is no longer growing
         Assert.assertTrue(totalScore4.compareTo(totalScore5) == 0);
 
@@ -287,14 +293,97 @@ public class VeriBlockRewardCalculatorTest {
         popTxStore.addPoPTransaction(popTx1, containingBlock, endorsedBlock);
         popTxStore.addPoPTransaction(popTx2, containingBlock, endorsedBlock);
 
-        BigDecimal totalScore6 = PopRewardCalculator.calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
+        BigDecimal totalScore6 = calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
         // so many endorsements simply increase score proportionally to endorsements count
         Assert.assertTrue(totalScore6.compareTo(new BigDecimal(2)) == 0);
+    }
+
+    @Test
+    public void popDifficultyCalculateTest() throws SQLException, IllegalArgumentException {
+        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+
+        // simple case where we don't have any publication for this sequence of blocks
+        AltChainBlock block1 = new AltChainBlock("blockHash1", 10, 100);
+        AltChainBlock block2 = new AltChainBlock("blockHash2", 11, 100);
+        AltChainBlock block3 = new AltChainBlock("blockHash3", 12, 100);
+        AltChainBlock block4 = new AltChainBlock("blockHash4", 13, 100);
+
+        List<AltChainBlock> blocks = new ArrayList<>(4);
+        blocks.add(block1);
+        blocks.add(block2);
+        blocks.add(block3);
+        blocks.add(block4);
+
+        // set Difficult Averaging Interval to the blocks size
+        PopRewardCalculator.getCalculatorConfig().popDifficultyAveragingInterval = blocks.size() - 2;
+        PopRewardCalculator.getCalculatorConfig().popRewardSettlementInterval = blocks.size() - 2;
+
+        BigDecimal difficulty = PopRewardCalculator.calculatePopDifficultyForBlock(blocks);
+
+        Assert.assertTrue(difficulty.compareTo(BigDecimal.ONE) == 0);
+
+        // test case with the publications
+
+        int bestPublication1 = 50;
+        List<AltPublication> publications1 = new ArrayList<>();
+        publications1.add(generateATV(bestPublication1, ""));
+        publications1.add(generateATV(bestPublication1 + 5, ""));
+
+        int bestPublication2 = 60;
+        List<AltPublication> publications2 = new ArrayList<>();
+        publications2.add(generateATV(bestPublication2, ""));
+        publications2.add(generateATV(bestPublication2 + 5, ""));
+
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", publications1.get(0), new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", publications1.get(1), new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", publications2.get(0), new ArrayList<>());
+        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", publications2.get(1), new ArrayList<>());
+
+        popTxStore.addPoPTransaction(popTx1, block2, block1);
+        popTxStore.addPoPTransaction(popTx2, block2, block1);
+        popTxStore.addPoPTransaction(popTx3, block3, block2);
+        popTxStore.addPoPTransaction(popTx4, block3, block2);
+
+        BigDecimal block1_score = PopRewardCalculator.calculatePopScoreFromEndorsements(publications1, bestPublication1);
+        BigDecimal block2_score = PopRewardCalculator.calculatePopScoreFromEndorsements(publications2, bestPublication2);
+
+        BigDecimal expected_difficult;
+        expected_difficult = block1_score.add(block2_score).divide(new BigDecimal(PopRewardCalculator.getCalculatorConfig().popDifficultyAveragingInterval));
+
+        difficulty = PopRewardCalculator.calculatePopDifficultyForBlock(blocks);
+
+        Assert.assertTrue(expected_difficult.compareTo(difficulty) == 0);
+
+        // test case with more altPublications
+        publications1.add(generateATV(bestPublication1 + PopRewardCalculator.getCalculatorConfig().relativeScoreLookupTable.size() - 10, ""));
+        publications1.add(generateATV(bestPublication1 + PopRewardCalculator.getCalculatorConfig().relativeScoreLookupTable.size() - 5, ""));
+
+        publications2.add(generateATV(bestPublication2 + PopRewardCalculator.getCalculatorConfig().relativeScoreLookupTable.size() - 12, ""));
+        publications2.add(generateATV(bestPublication2 + PopRewardCalculator.getCalculatorConfig().relativeScoreLookupTable.size() - 6, ""));
+
+        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", publications1.get(2), new ArrayList<>());
+        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", publications1.get(3), new ArrayList<>());
+
+        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", publications2.get(2), new ArrayList<>());
+        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", publications2.get(3), new ArrayList<>());
+
+        popTxStore.addPoPTransaction(popTx5, block2, block1);
+        popTxStore.addPoPTransaction(popTx6, block2, block1);
+        popTxStore.addPoPTransaction(popTx7, block3, block2);
+        popTxStore.addPoPTransaction(popTx8, block3, block2);
+
+        block1_score = PopRewardCalculator.calculatePopScoreFromEndorsements(publications1, bestPublication1);
+        block2_score = PopRewardCalculator.calculatePopScoreFromEndorsements(publications2, bestPublication2);
+
+        expected_difficult = block1_score.add(block2_score).divide(new BigDecimal(PopRewardCalculator.getCalculatorConfig().popDifficultyAveragingInterval));
+
+        difficulty = PopRewardCalculator.calculatePopDifficultyForBlock(blocks);
+        Assert.assertTrue(expected_difficult.compareTo(difficulty) == 0);
     }
     
     ///HACK: there is no difference if we change difficulty or score so we fix the difficulty and test score only
     @Test
-    public void popRewardBasic() {
+    public void popRewardBasic() throws IllegalArgumentException {
         // blockNumber is used to detect current round only. Let's start with ROUND_1.
         int blockNumber = 1;
         // round 1 ratio is 0.97
@@ -351,7 +440,7 @@ public class VeriBlockRewardCalculatorTest {
     }
     
     @Test
-    public void popRewardSpecialCase() {
+    public void popRewardSpecialCase() throws IllegalArgumentException{
         // blockNumber is used to detect current round and ROUND3 special case so we can mostly use any number here
         int blockNumber = 1;
         
@@ -424,7 +513,8 @@ public class VeriBlockRewardCalculatorTest {
         endorsementBlocks.add(containingBlock);
 
         popTxStore.addPoPTransaction(poptx1, containingBlock, endorsedBlock);
-        
+
+        PopRewardCalculator.getCalculatorConfig().popRewardSettlementInterval = endorsementBlocks.size();
         PopPayoutRound payout1 = PopRewardCalculator.calculatePopPayoutRound(blockNumber, endorsedBlock, endorsementBlocks, defaultDifficulty);
 
         reward1 = payout1.getOutputsToPopMiners().get(0).getReward();
@@ -525,7 +615,7 @@ public class VeriBlockRewardCalculatorTest {
         // assert that endorsement from the block 30 get higher reward than from the block 31
         Assert.assertEquals(rewards.get(0).compareTo(rewards.get(3)), -1);
         
-        BigDecimal scoreTotal = PopRewardCalculator.calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
+        BigDecimal scoreTotal = calculatePopScoreFromEndorsements(endorsedBlock, endorsementBlocks);
         long rewardTotal = PopRewardCalculator.calculatePopRewardForBlock(blockNumber, scoreTotal, defaultDifficulty).longValue();
         // getTotalRewardPaidOut should be equal to rewardTotal but some rounding errors occur so we compare with some margin
         Assert.assertTrue(payout4.getTotalRewardPaidOut() <= rewardTotal);

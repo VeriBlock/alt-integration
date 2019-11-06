@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PopRewardCalculator {    
@@ -139,6 +140,29 @@ public class PopRewardCalculator {
         return bestPublication;
     }
 
+    public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException
+    {
+        if(blocksInterval.size() != config.popRewardSettlementInterval + config.popDifficultyAveragingInterval)
+            throw new IllegalArgumentException("The amount of blocks must be equal to popRewardSettlementInterval + popDifficultyAveragingInterval");
+
+        BigDecimal difficulty = BigDecimal.ZERO;
+
+        Collections.sort(blocksInterval);  // make the ascending order for the blocks in the collection, it needs for the correct calculation of the pop score
+
+        for(int i = 0; i < config.popDifficultyAveragingInterval; ++i)
+        {
+            BigDecimal score = calculatePopScoreFromEndorsements(blocksInterval.get(i), blocksInterval.subList(i + 1 , i  + 1 + config.popRewardSettlementInterval));
+            difficulty = difficulty.add(score);
+        }
+
+        difficulty = difficulty.divide(new BigDecimal(config.popDifficultyAveragingInterval), RoundingMode.FLOOR);
+
+        if (difficulty.compareTo(BigDecimal.ONE) < 0) {
+            difficulty = BigDecimal.ONE; // Minimum difficulty
+        }
+        return difficulty;
+    }
+
     public static BigDecimal calculatePopScoreFromEndorsements(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks) throws SQLException {
         BigDecimal totalScore = BigDecimal.ZERO;
 
@@ -182,8 +206,8 @@ public class PopRewardCalculator {
 
     public static BigDecimal calculateTotalPopBlockReward(int blockNumber, BigDecimal difficulty, BigDecimal score) {
         if (difficulty.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("calculateTotalReward cannot be called with a negative or" +
-                    " zero difficulty (called with " + difficulty + ")!");
+            throw new IllegalArgumentException("calculateTotalReward cannot be called with a negative difficulty" +
+                    " (called with " + difficulty + ")!");
         }
         if (score.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("calculateTotalReward cannot be called with a negative score" +
@@ -250,6 +274,9 @@ public class PopRewardCalculator {
     }
 
     public static PopPayoutRound calculatePopPayoutRound(int blockNumber, AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks, BigDecimal popDifficulty) throws SQLException {
+
+        if(endorsementBlocks.size() != config.popRewardSettlementInterval)
+            throw new IllegalArgumentException("The amount of endorsementBlocks must be equal to popRewardSettlementInterval");
 
         List<AltPublication> endorsements = popTxDBStore.getAltPublciationsEndorse(endorsedBlock, endorsementBlocks);
 
