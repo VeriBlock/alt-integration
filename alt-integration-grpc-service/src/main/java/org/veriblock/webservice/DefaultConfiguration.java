@@ -16,6 +16,11 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.veriblock.integrations.params.AlphaNetParameters;
+import org.veriblock.integrations.params.MainNetParameters;
+import org.veriblock.integrations.params.NetworkParameters;
+import org.veriblock.integrations.params.TestNetParameters;
+
 public class DefaultConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(DefaultConfiguration.class);
     
@@ -58,7 +63,20 @@ public class DefaultConfiguration {
         Integer port = Integer.valueOf(getPropertyOverrideOrDefault("apiPort"));
         return port;
     }
-    
+
+    public NetworkParameters getVeriblockNetworkParameters() {
+        String network = getPropertyOverrideOrDefault("veriblockNetwork");
+        if (network == "main") {
+            return new MainNetParameters();
+        } else if (network == "test") {
+            return new TestNetParameters();
+        } else if (network == "alpha") {
+            return new TestNetParameters();
+        } else  {
+            throw new IllegalArgumentException("Unknown Veriblock network name");
+        }
+    }
+
     private String getPropertyOverrideOrDefault(final String name) {
         String value = properties.getProperty(name);
         if (value == null)
