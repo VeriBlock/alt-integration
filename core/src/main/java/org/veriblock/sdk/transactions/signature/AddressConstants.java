@@ -6,7 +6,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.integrations.transactions.signature;
+package org.veriblock.sdk.transactions.signature;
 
 public final class AddressConstants {
     private AddressConstants(){}

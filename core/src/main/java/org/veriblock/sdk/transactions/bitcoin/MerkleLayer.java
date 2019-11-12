@@ -6,10 +6,10 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.webclient.bitcoin;
+package org.veriblock.sdk.transactions.bitcoin;
 
-import org.veriblock.webclient.signature.Crypto;
-import org.veriblock.webclient.signature.Utility;
+import org.veriblock.sdk.util.Crypto;
+import org.veriblock.sdk.util.Utils;
 
 /**
  * A BitcoinMerkleLayer represents a layer in a BitcoinMerkleTree, and enables the access of elements (byte[] in
@@ -44,7 +44,7 @@ public class MerkleLayer
         for (int i = 0; i < newData.length; i++)
         {
             /* Element i of newData is SHA256D of the two corresponding elements beneath it. If only one element is left, use it as both leaves. */
-            newData[i] = new Crypto().SHA256D(Utility.concat(data[i * 2], ((data.length != i * 2 + 1) ? data[i * 2 + 1] : data[i * 2])));
+            newData[i] = new Crypto().SHA256D(Utils.concat(data[i * 2], ((data.length != i * 2 + 1) ? data[i * 2 + 1] : data[i * 2])));
         }
 
         return new MerkleLayer(newData);

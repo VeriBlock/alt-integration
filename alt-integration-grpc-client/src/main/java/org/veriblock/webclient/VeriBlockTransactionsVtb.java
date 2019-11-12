@@ -20,11 +20,11 @@ import org.veriblock.sdk.VeriBlockPoPTransaction;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.BitcoinUtils;
-import org.veriblock.webclient.bitcoin.BitcoinMerklePath;
-import org.veriblock.webclient.bitcoin.BitcoinMerkleTree;
-import org.veriblock.webclient.bitcoin.VeriBlockBitcoinTransactions;
-import org.veriblock.webclient.signature.VeriBlockSignatureKeys;
-import org.veriblock.webclient.signature.VeriBlockTransactionSigner;
+import org.veriblock.sdk.transactions.bitcoin.BitcoinMerklePath;
+import org.veriblock.sdk.transactions.bitcoin.BitcoinMerkleTree;
+import org.veriblock.sdk.transactions.bitcoin.VeriBlockBitcoinTransactions;
+import org.veriblock.sdk.transactions.signature.VeriBlockSignatureKeys;
+import org.veriblock.sdk.transactions.signature.VeriBlockTransactionSigner;
 
 import java.security.SignatureException;
 import java.util.ArrayList;

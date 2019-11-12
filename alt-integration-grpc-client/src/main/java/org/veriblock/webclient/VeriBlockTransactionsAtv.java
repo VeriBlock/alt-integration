@@ -23,8 +23,8 @@ import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockMerklePath;
 import org.veriblock.sdk.VeriBlockTransaction;
 import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.webclient.signature.VeriBlockSignatureKeys;
-import org.veriblock.webclient.signature.VeriBlockTransactionSigner;
+import org.veriblock.sdk.transactions.signature.VeriBlockSignatureKeys;
+import org.veriblock.sdk.transactions.signature.VeriBlockTransactionSigner;
 
 public class VeriBlockTransactionsAtv {
 

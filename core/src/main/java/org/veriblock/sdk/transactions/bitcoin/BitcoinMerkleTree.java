@@ -6,14 +6,13 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.webclient.bitcoin;
+package org.veriblock.sdk.transactions.bitcoin;
+
+import org.veriblock.sdk.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.veriblock.sdk.util.Utils;
-import org.veriblock.webclient.signature.Utility;
 
 /**
  * The BitcoinMerkleTree class provides a variety of ways to interact with Bitcoin transaction merkle trees.
@@ -67,7 +66,7 @@ public class BitcoinMerkleTree
         /* Convert all of the TxIDs to byte[]s, flip them for the correct endianness */
         for (int i = 0; i < txIDs.size(); i++)
         {
-            floorData[i] = Utility.flip(Utils.decodeHex(txIDs.get(i)));
+            floorData[i] = Utils.flip(Utils.decodeHex(txIDs.get(i)));
         }
 
         /* Create, at a minimum, the bottom floor */
@@ -102,7 +101,7 @@ public class BitcoinMerkleTree
         }
 
         /* Get the (only) element from the top layer, flip it, convert to hex */
-        return Utils.encodeHex(Utility.flip(layers.get(layers.size() - 1).getElement(0)));
+        return Utils.encodeHex(Utils.flip(layers.get(layers.size() - 1).getElement(0)));
     }
 
     /**
@@ -116,13 +115,13 @@ public class BitcoinMerkleTree
         int foundIndex = 0;
 
         /* The stored TxID will be in reversed-byte-order from the network-byte-order used by Bitcoin-RPC */
-        byte[] txIDBytes = Utility.flip(Utils.decodeHex(txID));
+        byte[] txIDBytes = Utils.flip(Utils.decodeHex(txID));
 
         MerkleLayer bottomLayer = layers.get(0);
         for (; foundIndex < bottomLayer.numElementsInLayer(); foundIndex++)
         {
             /* Found a matching TxID in the bottom layer of the tree, where all TxIDs are stored */
-            if (Utility.byteArraysAreEqual(bottomLayer.getElement(foundIndex), txIDBytes))
+            if (Utils.byteArraysAreEqual(bottomLayer.getElement(foundIndex), txIDBytes))
             {
                 break;
             }

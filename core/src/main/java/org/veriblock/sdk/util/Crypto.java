@@ -6,7 +6,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.integrations.transactions.signature;
+package org.veriblock.sdk.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +36,10 @@ public class Crypto {
         }
     }
 
+    public byte[] vBlakeReturnBytes(byte[] input) { return VBlake.hash(input); }
+
+    public String vBlakeReturnHex(byte[] input) { return Utils.bytesToHex(vBlakeReturnBytes(input)); }
+
     public byte[] SHA256D(byte[] input) {
         return SHA256ReturnBytes(SHA256ReturnBytes(input));
     }
@@ -49,18 +53,18 @@ public class Crypto {
     }
 
     public String SHA256ReturnHex(byte[] input) {
-        return Utility.bytesToHex(SHA256ReturnBytes(input));
+        return Utils.bytesToHex(SHA256ReturnBytes(input));
     }
 
     public String SHA256ReturnHex(String input) {
-        return Utility.bytesToHex(SHA256ReturnBytes(input));
+        return Utils.bytesToHex(SHA256ReturnBytes(input));
     }
 
     public String SHA256ReturnBase58(byte[] input) {
-        return Utility.bytesToBase58(SHA256ReturnBytes(input));
+        return Utils.bytesToBase58(SHA256ReturnBytes(input));
     }
 
     public String SHA256ReturnBase58(String input) {
-        return Utility.bytesToBase58(SHA256ReturnBytes(input));
+        return Utils.bytesToBase58(SHA256ReturnBytes(input));
     }
 }

@@ -6,11 +6,10 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.webclient.bitcoin;
+package org.veriblock.sdk.transactions.bitcoin;
 
+import org.veriblock.sdk.util.Crypto;
 import org.veriblock.sdk.util.Utils;
-import org.veriblock.webclient.signature.Crypto;
-import org.veriblock.webclient.signature.Utility;
 
 /**
  * A BitcoinMerklePath object represents the path, from a TxID to a Bitcoin merkle root.
@@ -61,14 +60,14 @@ public class BitcoinMerklePath
             throw new IllegalArgumentException("The compactFormat string must be in the format: \"bottomIndex:bottomData:layer0:...:layerN\"");
         }
 
-        if (!Utility.isPositiveInteger(parts[0]))
+        if (!Utils.isPositiveInteger(parts[0]))
         {
             throw new IllegalArgumentException("The compactFormat string must be in the format: \"bottomIndex:bottomData:layer0:...:layerN\"");
         }
 
         for (int i = 1; i < parts.length; i++)
         {
-            if (parts[i].length() != 64 || !Utility.isHex(parts[i]))
+            if (parts[i].length() != 64 || !Utils.isHex(parts[i]))
             {
                 throw new IllegalArgumentException("The compactFormat string must be in the format: \"bottomIndex:bottomData:layer0:...:layerN\"");
             }
@@ -102,13 +101,13 @@ public class BitcoinMerklePath
         for (int i = 0; i < layers.length; i++)
         {
             /* Climb one layer up the tree by concatenating the current state with the next layer in the right order */
-            movingHash = crypto.SHA256D(Utility.concat((layerIndex % 2 == 0) ? movingHash : layers[i], (layerIndex % 2 == 0) ? layers[i] : movingHash));
+            movingHash = crypto.SHA256D(Utils.concat((layerIndex % 2 == 0) ? movingHash : layers[i], (layerIndex % 2 == 0) ? layers[i] : movingHash));
 
             /* The position above on the tree will be floor(currentIndex / 2) */
             layerIndex /= 2;
         }
 
-        return Utils.encodeHex(Utility.flip(movingHash));
+        return Utils.encodeHex(Utils.flip(movingHash));
     }
 
     /**
