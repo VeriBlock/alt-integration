@@ -22,6 +22,8 @@ import org.veriblock.protoservice.VeriBlockDeserializeProtoClient;
 import org.veriblock.protoservice.VeriBlockForkresolutionProtoClient;
 import org.veriblock.protoservice.VeriBlockSecurityProtoClient;
 import org.veriblock.sdk.*;
+import org.veriblock.sdk.transactions.VeriBlockTransactionsAtv;
+import org.veriblock.sdk.transactions.VeriBlockTransactionsVtb;
 import org.veriblock.sdk.util.BitcoinUtils;
 
 import io.grpc.ManagedChannel;
