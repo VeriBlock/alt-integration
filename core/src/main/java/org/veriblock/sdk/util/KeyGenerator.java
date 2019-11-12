@@ -6,7 +6,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.integrations.transactions.signature;
+package org.veriblock.sdk.util;
+
+import org.veriblock.sdk.transactions.signature.AddressConstants;
+import org.veriblock.sdk.util.Crypto;
+import org.veriblock.sdk.transactions.SharedConstants;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
@@ -14,8 +18,6 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.ECGenParameterSpec;
-
-import org.veriblock.sdk.Address;
 
 public class KeyGenerator {
     
@@ -39,7 +41,7 @@ public class KeyGenerator {
         Crypto crypto = new Crypto();
 
         /* Calculate the SHA-256 of the public key, encode as base-58, take the first 24 characters, prepend a 'V' for VeriBlock */
-        String address = Address.STARTING_CHAR + crypto.SHA256ReturnBase58(pubKey).substring(ADDRESS_DATA_START, ADDRESS_DATA_END);
+        String address = SharedConstants.STARTING_CHAR + crypto.SHA256ReturnBase58(pubKey).substring(ADDRESS_DATA_START, ADDRESS_DATA_END);
 
         /* Append a five-character base-58 checksum */
         address += chopChecksumStandard(crypto.SHA256ReturnBase58(address));

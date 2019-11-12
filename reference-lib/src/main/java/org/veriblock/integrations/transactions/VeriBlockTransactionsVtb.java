@@ -8,19 +8,6 @@
 
 package org.veriblock.integrations.transactions;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
-
-import org.veriblock.integrations.transactions.bitcoin.BitcoinMerklePath;
-import org.veriblock.integrations.transactions.bitcoin.BitcoinMerkleTree;
-import org.veriblock.integrations.transactions.bitcoin.VeriBlockBitcoinTransactions;
-import org.veriblock.integrations.transactions.signature.VeriBlockSignatureKeys;
-import org.veriblock.integrations.transactions.signature.VeriBlockTransactionSigner;
 import org.veriblock.sdk.Address;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.BitcoinTransaction;
@@ -32,7 +19,20 @@ import org.veriblock.sdk.VeriBlockMerklePath;
 import org.veriblock.sdk.VeriBlockPoPTransaction;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.transactions.bitcoin.BitcoinMerklePath;
+import org.veriblock.sdk.transactions.bitcoin.BitcoinMerkleTree;
+import org.veriblock.sdk.transactions.bitcoin.VeriBlockBitcoinTransactions;
+import org.veriblock.sdk.transactions.signature.VeriBlockSignatureKeys;
+import org.veriblock.sdk.transactions.signature.VeriBlockTransactionSigner;
 import org.veriblock.sdk.util.BitcoinUtils;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 public class VeriBlockTransactionsVtb {
     

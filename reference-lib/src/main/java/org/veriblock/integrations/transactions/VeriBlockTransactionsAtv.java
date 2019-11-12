@@ -8,24 +8,16 @@
 
 package org.veriblock.integrations.transactions;
 
+import org.veriblock.sdk.*;
+import org.veriblock.sdk.transactions.signature.VeriBlockSignatureKeys;
+import org.veriblock.sdk.transactions.signature.VeriBlockTransactionSigner;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.veriblock.integrations.transactions.signature.VeriBlockSignatureKeys;
-import org.veriblock.integrations.transactions.signature.VeriBlockTransactionSigner;
-import org.veriblock.sdk.Address;
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.Coin;
-import org.veriblock.sdk.PublicationData;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VBlakeHash;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockMerklePath;
-import org.veriblock.sdk.VeriBlockTransaction;
 
 public class VeriBlockTransactionsAtv {
     

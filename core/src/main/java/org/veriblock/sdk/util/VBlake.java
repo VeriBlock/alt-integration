@@ -8,6 +8,18 @@
 
 package org.veriblock.sdk.util;
 
+/**
+ *
+ * This class is a modified implementation of BLAKE2b-512, designed to use
+ * exactly-64-byte inputs (the VeriBlock block header size) and not use keys.
+ *
+ * Based on the C reference implementation of Blake2b from the developers
+ * available at https://github.com/BLAKE2/BLAKE2
+ *
+ * VeriBlock uses a 24-byte/196-bit output rather than BLAKE2b's
+ * 64-byte-512-byte output.
+ *
+ */
 public class VBlake {
 
     // The modified for bias-free initialization vector for the blake2b algorithm

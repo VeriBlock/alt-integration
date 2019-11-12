@@ -6,11 +6,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.integrations.transactions.bitcoin;
+package org.veriblock.sdk.transactions.bitcoin;
 
-import java.nio.ByteBuffer;
-
-import org.veriblock.integrations.transactions.signature.Utility;
 import org.veriblock.sdk.Address;
 import org.veriblock.sdk.BitcoinTransaction;
 import org.veriblock.sdk.Sha256Hash;
@@ -18,12 +15,14 @@ import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
+import java.nio.ByteBuffer;
+
 public class VeriBlockBitcoinTransactions {
 
     private VeriBlockBitcoinTransactions() { }
     
     public static String bitcoinTransactionGetId(BitcoinTransaction tx) {
-        return Utils.encodeHex(Utility.flip(Sha256Hash.twiceOf(tx.getRawBytes()).getBytes()));
+        return Utils.encodeHex(Utils.flip(Sha256Hash.twiceOf(tx.getRawBytes()).getBytes()));
     }
     
     public static Sha256Hash merkleTreeRootHash(BitcoinMerkleTree tree) {
