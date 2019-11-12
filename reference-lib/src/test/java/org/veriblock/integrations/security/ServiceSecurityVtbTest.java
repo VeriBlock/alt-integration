@@ -8,14 +8,6 @@
 
 package org.veriblock.integrations.security;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,7 +15,6 @@ import org.junit.Test;
 import org.veriblock.integrations.IntegrationLibraryGenesis;
 import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
 import org.veriblock.integrations.VeriBlockSecurity;
-import org.veriblock.integrations.transactions.VeriBlockTransactionsVtb;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.BlockIndex;
 import org.veriblock.sdk.BlockStoreException;
@@ -33,6 +24,15 @@ import org.veriblock.sdk.VeriBlockPoPTransaction;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VerificationException;
 import org.veriblock.sdk.services.ValidationService;
+import org.veriblock.sdk.transactions.VeriBlockTransactionsVtb;
+
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServiceSecurityVtbTest {
     

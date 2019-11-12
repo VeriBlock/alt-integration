@@ -13,6 +13,7 @@ import org.veriblock.sdk.VeriBlockMerklePath;
 import org.veriblock.sdk.VeriBlockPoPTransaction;
 import org.veriblock.sdk.VeriBlockTransaction;
 import org.veriblock.sdk.VerificationException;
+import org.veriblock.sdk.transactions.BlockMetaPackage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
