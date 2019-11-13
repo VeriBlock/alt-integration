@@ -366,4 +366,9 @@ public class BitcoinBlockchain {
 
         return !bootstrapped;
     }
+
+    public boolean bootstrap(BitcoinBlockchainBootstrapConfig config) throws SQLException, VerificationException {
+        return bootstrap(config.blocks, config.firstBlockHeight);
+    }
+
 }
