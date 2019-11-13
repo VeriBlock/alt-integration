@@ -6,7 +6,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.webclient;
+package org.veriblock.sdk.transactions;
 
 import org.veriblock.sdk.Address;
 import org.veriblock.sdk.BitcoinBlock;

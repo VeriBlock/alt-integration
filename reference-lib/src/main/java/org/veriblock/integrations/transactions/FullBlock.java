@@ -10,6 +10,7 @@ package org.veriblock.integrations.transactions;
 
 import org.veriblock.sdk.*;
 import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.transactions.BlockMetaPackage;
 
 import java.util.Arrays;
 import java.util.List;
