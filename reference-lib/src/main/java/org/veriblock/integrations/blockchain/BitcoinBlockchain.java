@@ -334,4 +334,36 @@ public class BitcoinBlockchain {
             }
         }
     }
+
+    // Returns true if the store was empty and the bootstrap
+    // blocks were added to it successfully.
+    // Otherwise, returns false.
+    public boolean bootstrap(List<BitcoinBlock> blocks, int firstBlockHeight) throws SQLException, VerificationException {
+        assert(blocks.size() > 0);
+        assert(firstBlockHeight >= 0);
+
+        boolean bootstrapped = store.getChainHead() != null;
+
+        if (!bootstrapped) {
+            Sha256Hash prevHash = null;
+            for (BitcoinBlock block : blocks) {
+                if (prevHash != null && !block.getPreviousBlock().equals(prevHash) )
+                    throw new VerificationException("Bitcoin bootstrap blocks must be contiguous");
+
+                prevHash = block.getHash();
+            }
+
+            int blockHeight = firstBlockHeight;
+            for (BitcoinBlock block : blocks) {
+                BigInteger work = BitcoinUtils.decodeCompactBits(block.getBits());
+                StoredBitcoinBlock storedBlock = new StoredBitcoinBlock(
+                                                            block, work, blockHeight);
+                blockHeight++;
+                store.put(storedBlock);
+                store.setChainHead(storedBlock);
+            }
+        }
+
+        return !bootstrapped;
+    }
 }
