@@ -1,0 +1,31 @@
+package org.veriblock.sdk.conf;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+public class AppInjector extends AbstractModule {
+    private static final Logger logger = LoggerFactory.getLogger(AppInjector.class);
+    private DefaultConfiguration defaultConfiguration;
+
+    public AppInjector(String packageName) {
+        this.defaultConfiguration = new DefaultConfiguration(packageName);
+    }
+
+    @Override
+    protected void configure() {
+
+        Names.bindProperties(binder(), defaultConfiguration.getProperties());
+    }
+
+    @Provides
+    @Singleton
+    public DefaultConfiguration provideWallet() {
+        return defaultConfiguration;
+    }
+
+}

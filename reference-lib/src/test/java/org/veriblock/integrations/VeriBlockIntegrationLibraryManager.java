@@ -8,17 +8,18 @@
 
 package org.veriblock.integrations;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.sql.SQLException;
-
 import org.veriblock.integrations.auditor.store.AuditorChangesStore;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.params.MainNetParameters;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
+import org.veriblock.sdk.conf.DefaultConfiguration;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.Properties;
 
 ///TODO: this is not a test - move to helpers package
 public class VeriBlockIntegrationLibraryManager {
@@ -37,18 +38,13 @@ public class VeriBlockIntegrationLibraryManager {
         BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
         AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
         PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
-            
-        securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
-        
-        // erase database for testing determination
-        if(securityFiles != null) {            
-            securityFiles.getBitcoinStore().clear();
-            securityFiles.getVeriblockStore().clear();
-            securityFiles.getChangeStore().clear();
-            securityFiles.getPopTxDBStore().clear();
-        }
 
-        security = new VeriBlockSecurity(securityFiles);
+        Properties properties = new Properties();
+        properties.setProperty("veriblockNetwork", "main");
+        Context.init(new DefaultConfiguration(properties), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Context.resetSecurity();
+
+        security = new VeriBlockSecurity();
         return security;
     }
     

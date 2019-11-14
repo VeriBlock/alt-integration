@@ -8,67 +8,79 @@
 
 package org.veriblock.integrations;
 
-import java.sql.SQLException;
-
 import org.veriblock.integrations.auditor.store.AuditorChangesStore;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
-import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.params.MainNetParameters;
-import org.veriblock.integrations.params.NetworkParameters;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
-import org.veriblock.sdk.util.Preconditions;
+import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.conf.DefaultConfiguration;
+import org.veriblock.sdk.conf.NetworkParameters;
+import org.veriblock.sdk.util.Preconditions;
+
+import java.sql.SQLException;
+import java.util.Properties;
 
 public class Context {
-    private NetworkParameters networkParameters;
-    private VeriBlockStore veriblockStore;
-    private BitcoinStore bitcoinStore;
-    private AuditorChangesStore changeStore;
-    private PoPTransactionsDBStore popTxDBStore;
+    private static NetworkParameters networkParameters;
+    private static VeriBlockStore veriblockStore;
+    private static BitcoinStore bitcoinStore;
+    private static AuditorChangesStore changeStore;
+    private static PoPTransactionsDBStore popTxDBStore;
+    private static DefaultConfiguration configuration;
 
-    public NetworkParameters getNetworkParameters() {
+    private Context() {
+    }
+
+    public static NetworkParameters getNetworkParameters() {
         return networkParameters;
     }
 
-    public VeriBlockStore getVeriblockStore() {
+    public static VeriBlockStore getVeriblockStore() {
         return veriblockStore;
     }
 
-    public BitcoinStore getBitcoinStore() {
+    public static BitcoinStore getBitcoinStore() {
         return bitcoinStore;
     }
 
-    public AuditorChangesStore getChangeStore() {
+    public static AuditorChangesStore getChangeStore() {
         return changeStore;
     }
 
-    public PoPTransactionsDBStore getPopTxDBStore() {return popTxDBStore;}
+    public static DefaultConfiguration getConfiguration(){
+        return configuration;
+    }
 
-    public void resetSecurity() throws SQLException {
+    public static PoPTransactionsDBStore getPopTxDBStore() {return popTxDBStore;}
+
+    public static void resetSecurity() throws SQLException {
         veriblockStore.clear();
         bitcoinStore.clear();
         changeStore.clear();
         popTxDBStore.clear();
     }
 
-    public Context(NetworkParameters networkParameters, VeriBlockStore veriblockStore,
-            BitcoinStore bitcoinStore, AuditorChangesStore changeStore, PoPTransactionsDBStore popTxDBRepo) {
-        Preconditions.notNull(networkParameters, "Network parameters cannot be null");
-        Preconditions.notNull(veriblockStore, "VeriBlock store cannot be null");
-        Preconditions.notNull(bitcoinStore, "Bitcoin store cannot be null");
-        Preconditions.notNull(changeStore, "Change store cannot be null");
+    public static void init(DefaultConfiguration configurationArg, VeriBlockStore veriblockStoreArg,
+            BitcoinStore bitcoinStoreArg, AuditorChangesStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
+        Preconditions.notNull(configurationArg, "Network parameters cannot be null");
+        Preconditions.notNull(veriblockStoreArg, "VeriBlock store cannot be null");
+        Preconditions.notNull(bitcoinStoreArg, "Bitcoin store cannot be null");
+        Preconditions.notNull(changeStoreArg, "Change store cannot be null");
 
-        this.networkParameters = networkParameters;
-        this.veriblockStore = veriblockStore;
-        this.bitcoinStore = bitcoinStore;
-        this.changeStore = changeStore;
-        this.popTxDBStore = popTxDBRepo;
+        networkParameters = configurationArg.getVeriblockNetworkParameters();
+        veriblockStore = veriblockStoreArg;
+        bitcoinStore = bitcoinStoreArg;
+        changeStore = changeStoreArg;
+        popTxDBStore = popTxDBRepoArg;
+        configuration = configurationArg;
     }
-    
-    public Context() throws BlockStoreException, SQLException {
-        this(new MainNetParameters(),
-                new VeriBlockStore(),
-                new BitcoinStore(),
-                new AuditorChangesStore(), new PoPTransactionsDBStore());
+
+    public static void init() throws BlockStoreException, SQLException {
+        if(networkParameters == null) {
+            Properties properties = new Properties();
+            properties.setProperty("veriblockNetwork", "main");
+            init(new DefaultConfiguration(properties), new VeriBlockStore(), new BitcoinStore(),
+                    new AuditorChangesStore(), new PoPTransactionsDBStore());
+        }
     }
 }

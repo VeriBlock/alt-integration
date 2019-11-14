@@ -8,21 +8,37 @@
 
 package org.veriblock.protoservice;
 
+import com.google.protobuf.ByteString;
+import integration.api.grpc.VeriBlockMessages;
+import integration.api.grpc.VeriBlockMessages.GeneralReply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.veriblock.integrations.Context;
+import org.veriblock.integrations.VeriBlockSecurity;
+import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
+import org.veriblock.protoconverters.AltChainBlockProtoConverter;
+import org.veriblock.protoconverters.AltChainParametresConfigProtoConverter;
+import org.veriblock.protoconverters.AltPublicationProtoConverter;
+import org.veriblock.protoconverters.BitcoinBlockProtoConverter;
+import org.veriblock.protoconverters.BlockIndexProtoConverter;
+import org.veriblock.protoconverters.PoPTransactionDataProtoConverter;
+import org.veriblock.protoconverters.Sha256HashProtoConverter;
+import org.veriblock.protoconverters.VBlakeHashProtoConverter;
+import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
+import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
+import org.veriblock.sdk.AltChainBlock;
+import org.veriblock.sdk.AltPublication;
+import org.veriblock.sdk.BlockIndex;
+import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
+import org.veriblock.sdk.ValidationResult;
+import org.veriblock.sdk.VeriBlockPublication;
+import org.veriblock.sdk.VerificationException;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.veriblock.integrations.VeriBlockSecurity;
-import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
-import org.veriblock.protoconverters.*;
-import org.veriblock.sdk.*;
-
-import integration.api.grpc.VeriBlockMessages;
-import integration.api.grpc.VeriBlockMessages.GeneralReply;
-
-import com.google.protobuf.ByteString;
 
 public class VeriBlockSecurityProtoService {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockSecurityProtoService.class);
@@ -37,7 +53,7 @@ public class VeriBlockSecurityProtoService {
     public static GeneralReply resetSecurity() {
         ValidationResult result = null;
         try {
-            security.getSecurityFiles().resetSecurity();
+            Context.resetSecurity();
             result = ValidationResult.success();
         } catch (SQLException e) {
             result = ValidationResult.fail(e.getMessage());
@@ -227,7 +243,7 @@ public class VeriBlockSecurityProtoService {
             PoPTransactionData popTx = PoPTransactionDataProtoConverter.fromProto(request.getPopTx());
             AltChainBlock containingBlock = AltChainBlockProtoConverter.fromProto(request.getContainingBlock());
             AltChainBlock endorsedBlock = AltChainBlockProtoConverter.fromProto(request.getEndorsedBlock());
-            security.getSecurityFiles().getPopTxDBStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
+            Context.getPopTxDBStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
             result = ValidationResult.success();
         }
         catch (SQLException e) {

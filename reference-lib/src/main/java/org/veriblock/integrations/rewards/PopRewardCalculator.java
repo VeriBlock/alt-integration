@@ -9,9 +9,12 @@
 package org.veriblock.integrations.rewards;
 
 import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
-import org.veriblock.sdk.*;
+import org.veriblock.sdk.AltChainBlock;
+import org.veriblock.sdk.AltPublication;
+import org.veriblock.sdk.ValidationResult;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,7 +35,7 @@ public class PopRewardCalculator {
     public static void setSecurity(VeriBlockSecurity security)
     {
         PopRewardCalculator.security = security;
-        PopRewardCalculator.popTxDBStore = security.getSecurityFiles().getPopTxDBStore();
+        PopRewardCalculator.popTxDBStore = Context.getPopTxDBStore();
     }
 
     public static PopRewardCalculatorConfig getCalculatorConfig() {
@@ -140,10 +143,14 @@ public class PopRewardCalculator {
         return bestPublication;
     }
 
-    public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException
-    {
-        if(blocksInterval.size() != config.popRewardSettlementInterval + config.popDifficultyAveragingInterval)
+    public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException {
+        if(Context.getConfiguration().getBlockDifficultyValidation()){
+            return BigDecimal.ZERO;
+        }
+
+        if(blocksInterval.size() != config.popRewardSettlementInterval + config.popDifficultyAveragingInterval) {
             throw new IllegalArgumentException("The amount of blocks must be equal to popRewardSettlementInterval + popDifficultyAveragingInterval");
+        }
 
         BigDecimal difficulty = BigDecimal.ZERO;
 

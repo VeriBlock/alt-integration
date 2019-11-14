@@ -1,4 +1,4 @@
-// VeriBlock Blockchain Project
+package org.veriblock.sdk.conf;// VeriBlock Blockchain Project
 // Copyright 2017-2018 VeriBlock, Inc
 // Copyright 2018-2019 Xenios SEZC
 // All rights reserved.
@@ -6,12 +6,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.integrations.params;
 
 import java.math.BigInteger;
 
-public class MainNetParameters implements NetworkParameters {
-    private static final BigInteger MINIMUM_POW_DIFFICULTY = BigInteger.valueOf(900_000_000_000L);
+public class TestNetParameters implements NetworkParameters {
+    private static final BigInteger MINIMUM_POW_DIFFICULTY = BigInteger.valueOf(100_000_000L);
 
     @Override
     public BigInteger getMinimumDifficulty() {
@@ -20,6 +19,6 @@ public class MainNetParameters implements NetworkParameters {
 
     @Override
     public Byte getTransactionMagicByte() {
-        return null;
+        return (byte)0xAA;
     }
 }

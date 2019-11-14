@@ -6,46 +6,52 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.webservice;
+package org.veriblock.sdk.conf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.veriblock.integrations.params.AlphaNetParameters;
-import org.veriblock.integrations.params.MainNetParameters;
-import org.veriblock.integrations.params.NetworkParameters;
-import org.veriblock.integrations.params.TestNetParameters;
-
+@Singleton
 public class DefaultConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(DefaultConfiguration.class);
-    
-    private static final String packageName = Application.packageName;
-    
-    private static final String DEFAULT_PROPERTIES = packageName + "-default.properties";
-    private static final String MAIN_PROPERTIES = packageName + ".properties";
 
-    private final Properties defaultProperties = new Properties();
-    private final Properties properties;
+    private Properties defaultProperties = new Properties();
+    private Properties properties;
 
-    public DefaultConfiguration() {
+    private String packageName;
+    private String defaultPropertiesPath;
+    private String mainPropertiesPath;
+
+    public DefaultConfiguration(String packageName) {
+        this.packageName = packageName;
+        this.defaultPropertiesPath = packageName + "-default.properties";
+        this.mainPropertiesPath = packageName + ".properties";
         loadDefaults();
         properties = new Properties(defaultProperties);
         load();
     }
 
+    /**
+     * to mock tests.
+     */
+    public DefaultConfiguration(Properties properties) {
+        this.properties = properties;
+    }
+
     private void load() {
         try
         {
-            try (InputStream stream = ClassLoader.getSystemResourceAsStream(MAIN_PROPERTIES)) {
+            try (InputStream stream = ClassLoader.getSystemResourceAsStream(mainPropertiesPath)) {
                 load(stream);
             }
         } catch (FileNotFoundException e) {
-            logger.info("Unable to load custom properties file: File '{}' does not exist. Using default properties.", MAIN_PROPERTIES);
+            logger.info("Unable to load custom properties file: File '{}' does not exist. Using default properties.", mainPropertiesPath);
         } catch (IOException e) {
             logger.info("Unable to load custom properties file. Using default properties.", e);
         }
@@ -53,24 +59,38 @@ public class DefaultConfiguration {
 
     private void load(InputStream inputStream) {
         try {
-            properties.load(inputStream);            
+            properties.load(inputStream);
         } catch (Exception e) {
             logger.error("Unhandled exception in DefaultConfiguration.load", e);
         }
     }
 
     public int getApiPort() {
-        Integer port = Integer.valueOf(getPropertyOverrideOrDefault("apiPort"));
+        Integer port = Integer.valueOf(getPropertyOverrideOrDefault("app.api.port"));
         return port;
+    }
+
+    public String getApiHost() {
+        String host = getPropertyOverrideOrDefault("app.api.host");
+        return host;
+    }
+
+    public boolean getBlockDifficultyValidation() {
+        Boolean validation = Boolean.valueOf(getPropertyOverrideOrDefault("block.difficulty.validation"));
+        return validation;
+    }
+
+    public String getPackageName() {
+        return packageName;
     }
 
     public NetworkParameters getVeriblockNetworkParameters() {
         String network = getPropertyOverrideOrDefault("veriblockNetwork");
-        if (network == "main") {
+        if ( "main".equals(network)) {
             return new MainNetParameters();
-        } else if (network == "test") {
+        } else if ("test".equals(network)) {
             return new TestNetParameters();
-        } else if (network == "alpha") {
+        } else if ("alpha".equals(network)) {
             return new TestNetParameters();
         } else  {
             throw new IllegalArgumentException("Unknown Veriblock network name");
@@ -83,13 +103,13 @@ public class DefaultConfiguration {
             return "";
         return value;
     }
-    
+
     private void loadDefaults() {
         try
         {
             InputStream stream = DefaultConfiguration.class
                     .getClassLoader()
-                    .getResourceAsStream(DEFAULT_PROPERTIES);
+                    .getResourceAsStream(defaultPropertiesPath);
             try {
                 defaultProperties.load(stream);
             } finally {
@@ -98,5 +118,9 @@ public class DefaultConfiguration {
         } catch (IOException e) {
             logger.error("Unable to load default properties", e);
         }
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 }

@@ -21,8 +21,8 @@ import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.BlockIndex;
 import org.veriblock.sdk.BlockStoreException;
 import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.ValidationResult;
 import org.veriblock.sdk.VBlakeHash;
+import org.veriblock.sdk.ValidationResult;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VerificationException;
@@ -37,31 +37,25 @@ import java.util.List;
 
 public class VeriBlockSecurity {
 
-    private final Context context;
     private final VeriBlockBlockchain veriblockBlockchain;
     private final BitcoinBlockchain bitcoinBlockchain;
     private final AuditJournal journal;
     private final BitcoinStore bitcoinStore;
     private AltChainParametersConfig altChainParametersConfig;
 
-    public VeriBlockSecurity(Context context) {
-        veriblockBlockchain = new VeriBlockBlockchain(context.getNetworkParameters(), context.getVeriblockStore(), context.getBitcoinStore());
-        bitcoinBlockchain = new BitcoinBlockchain(context.getBitcoinStore());
-        journal = new AuditJournal(context.getChangeStore());
-        bitcoinStore = context.getBitcoinStore();
+    public VeriBlockSecurity() {
+        veriblockBlockchain = new VeriBlockBlockchain(Context.getNetworkParameters(), Context.getVeriblockStore(), Context.getBitcoinStore());
+        bitcoinBlockchain = new BitcoinBlockchain(Context.getBitcoinStore());
+        journal = new AuditJournal(Context.getChangeStore());
+        bitcoinStore = Context.getBitcoinStore();
         altChainParametersConfig = new AltChainParametersConfig();
-        this.context = context;
-    }
-    
-    public VeriBlockSecurity() throws BlockStoreException, SQLException {
-        this(new Context());
     }
     
     public void shutdown() {
-        context.getBitcoinStore().shutdown();
-        context.getVeriblockStore().shutdown();
-        context.getChangeStore().shutdown();
-        context.getPopTxDBStore().shutdown();
+        Context.getBitcoinStore().shutdown();
+        Context.getVeriblockStore().shutdown();
+        Context.getChangeStore().shutdown();
+        Context.getPopTxDBStore().shutdown();
     }
     
     public VeriBlockBlockchain getVeriBlockBlockchain() {
@@ -72,10 +66,6 @@ public class VeriBlockSecurity {
         return bitcoinBlockchain;
     }
     
-    public Context getSecurityFiles() {
-        return context;
-    }
-
     public void setAltChainParametersConfig(AltChainParametersConfig config) { this.altChainParametersConfig = config; }
 
     public AltChainParametersConfig getAltChainParametersConfig() { return this.altChainParametersConfig; }

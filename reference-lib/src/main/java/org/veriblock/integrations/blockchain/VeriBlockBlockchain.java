@@ -8,17 +8,6 @@
 
 package org.veriblock.integrations.blockchain;
 
-import java.math.BigInteger;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.auditor.Change;
@@ -29,16 +18,27 @@ import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.integrations.blockchain.store.StoredVeriBlockBlock;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.params.NetworkParameters;
 import org.veriblock.sdk.BlockStoreException;
 import org.veriblock.sdk.Constants;
 import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VerificationException;
+import org.veriblock.sdk.conf.NetworkParameters;
 import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.BitcoinUtils;
 import org.veriblock.sdk.util.Preconditions;
+
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class VeriBlockBlockchain {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockBlockchain.class);
