@@ -10,6 +10,7 @@ package org.veriblock.integrations.blockchain;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.auditor.Change;
 import org.veriblock.integrations.blockchain.changes.AddVeriBlockBlockChange;
 import org.veriblock.integrations.blockchain.changes.SetVeriBlockHeadChange;
@@ -571,6 +572,10 @@ public class VeriBlockBlockchain {
     }
 
     private void checkDifficulty(VeriBlockBlock block, StoredVeriBlockBlock previous, List<StoredVeriBlockBlock> context) throws VerificationException {
+        if(!Context.getConfiguration().isVBBlockDifficultyValidate()){
+            return;
+        }
+
         if (context.size() < DIFFICULTY_ADJUST_BLOCK_COUNT) {
             log.warn("Not enough context blocks to check difficulty");
             return;

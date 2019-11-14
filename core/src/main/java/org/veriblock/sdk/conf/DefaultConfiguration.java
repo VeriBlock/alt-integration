@@ -75,7 +75,7 @@ public class DefaultConfiguration {
         return host;
     }
 
-    public boolean getBlockDifficultyValidation() {
+    public boolean isVBBlockDifficultyValidate() {
         Boolean validation = Boolean.valueOf(getPropertyOverrideOrDefault("block.difficulty.validation"));
         return validation;
     }
