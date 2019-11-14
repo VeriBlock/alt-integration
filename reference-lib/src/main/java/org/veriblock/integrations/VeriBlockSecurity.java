@@ -101,8 +101,7 @@ public class VeriBlockSecurity {
     }
 
     // TODO: Exception when blockIndex.height is less than or equal to highest known
-    // TODO: Exception when publications are not valid
-    public boolean addPayloads(BlockIndex blockIndex, List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
+    public void addPayloads(BlockIndex blockIndex, List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws VerificationException, BlockStoreException, SQLException {
         Changeset changeset = new Changeset(BlockIdentifier.wrap(Utils.decodeHex(blockIndex.getHash())));
 
         try {
@@ -144,7 +143,6 @@ public class VeriBlockSecurity {
 
             journal.record(changeset);
 
-            return true;
         } catch (VerificationException e) {
             Iterator<Change> changeIterator = changeset.reverseIterator();
             while (changeIterator.hasNext()) {
@@ -152,7 +150,7 @@ public class VeriBlockSecurity {
                 bitcoinBlockchain.rewind(Collections.singletonList(change));
                 veriblockBlockchain.rewind(Collections.singletonList(change));
             }
-            return false;
+            throw e;
         }
     }
 
@@ -164,7 +162,7 @@ public class VeriBlockSecurity {
         bitcoinBlockchain.rewind(changes);
     }
 
-    public boolean addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
+    public void addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws VerificationException, BlockStoreException, SQLException {
         try {
             if (veriblockPublications != null && veriblockPublications.size() > 0) {
                 for (VeriBlockPublication publication : veriblockPublications) {
@@ -203,10 +201,9 @@ public class VeriBlockSecurity {
                 }
             }
 
-            return true;
         } catch (VerificationException e) {
             clearTemporaryPayloads();
-            return false;
+            throw e;
         }
     }
 
