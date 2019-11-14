@@ -144,7 +144,7 @@ public class PopRewardCalculator {
     }
 
     public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException {
-        if(Context.getConfiguration().getBlockDifficultyValidation()){
+        if(!Context.getConfiguration().getBlockDifficultyValidation()){
             return BigDecimal.ZERO;
         }
 
