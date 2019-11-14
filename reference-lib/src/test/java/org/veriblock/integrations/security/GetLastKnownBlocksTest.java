@@ -8,28 +8,29 @@
 
 package org.veriblock.integrations.security;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Comparator;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.veriblock.integrations.Context;
+import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
+import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.integrations.blockchain.store.StoredVeriBlockBlock;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
-import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public class GetLastKnownBlocksTest {
     
@@ -56,7 +57,7 @@ public class GetLastKnownBlocksTest {
         byte[] raw3 = Utils.decodeHex("000199850002461DB458CD6258D3571D4A2A654A16FCCE708F3F0DEED25E1D2513D05A3BB0B8A658CBFFCFBE9185AFDE789841EC5DB7F2360400989610B1662B");
         StoredVeriBlockBlock newBlock3 = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw3), BigInteger.ZERO);
 
-        VeriBlockStore store = security.getSecurityFiles().getVeriblockStore();
+        VeriBlockStore store = Context.getVeriblockStore();
 
         store.put(newBlock1);
         store.put(newBlock2);
@@ -99,7 +100,7 @@ public class GetLastKnownBlocksTest {
         StoredBitcoinBlock newBlock3 = new StoredBitcoinBlock(block3, BigInteger.ZERO, 0);
 
 
-        BitcoinStore store = security.getSecurityFiles().getBitcoinStore();
+        BitcoinStore store = Context.getBitcoinStore();
 
         store.put(newBlock1);
         store.put(newBlock2);

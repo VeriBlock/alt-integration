@@ -9,6 +9,7 @@
 
 package org.veriblock.integrations.forkresolution;
 
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.AltChainBlock;
@@ -17,7 +18,9 @@ import org.veriblock.sdk.ValidationResult;
 import org.veriblock.sdk.VeriBlockPublication;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ForkresolutionComparator {
 
@@ -36,7 +39,7 @@ public class ForkresolutionComparator {
     public static void setSecurity(VeriBlockSecurity security)
     {
         ForkresolutionComparator.security = security;
-        ForkresolutionComparator.popTxDBStore = security.getSecurityFiles().getPopTxDBStore();
+        ForkresolutionComparator.popTxDBStore = Context.getPopTxDBStore();
     }
 
     // return 1 if leftBranchScore > rightBranchScore

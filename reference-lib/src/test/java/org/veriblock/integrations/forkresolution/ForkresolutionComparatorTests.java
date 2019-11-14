@@ -19,17 +19,36 @@ import org.veriblock.integrations.auditor.store.AuditorChangesStore;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.params.MainNetParameters;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
-import org.veriblock.sdk.*;
+import org.veriblock.sdk.Address;
+import org.veriblock.sdk.AltChainBlock;
+import org.veriblock.sdk.AltPublication;
+import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.Coin;
+import org.veriblock.sdk.PublicationData;
+import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
+import org.veriblock.sdk.ValidationResult;
+import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.VeriBlockMerklePath;
+import org.veriblock.sdk.VeriBlockPublication;
+import org.veriblock.sdk.VeriBlockTransaction;
+import org.veriblock.sdk.conf.DefaultConfiguration;
 import org.veriblock.sdk.util.Utils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class ForkresolutionComparatorTests {
 
@@ -139,15 +158,6 @@ public class ForkresolutionComparatorTests {
 
     private class VeriBlockSecurityMock extends VeriBlockSecurity {
 
-        public VeriBlockSecurityMock(Context context) throws SQLException {
-            super(context);
-        }
-
-        ///TODO: unused
-        public VeriBlockSecurityMock(VeriBlockSecurity security) throws SQLException {
-            super(security.getSecurityFiles());
-        }
-
         @Override
         public void clearTemporaryPayloads() {
         }
@@ -188,9 +198,11 @@ public class ForkresolutionComparatorTests {
         AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
         PoPTransactionsDBStoreMock popTxDBStore = new PoPTransactionsDBStoreMock();
 
-        Context securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Properties properties = new Properties();
+        properties.setProperty("veriblockNetwork", "main");
+        Context.init(new DefaultConfiguration(properties), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
-        securityMock = new VeriBlockSecurityMock(securityFiles);
+        securityMock = new VeriBlockSecurityMock();
         ForkresolutionComparator.setSecurity(securityMock);
     }
 
@@ -263,7 +275,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void GetBestPublicationHeightSimpleTest() throws SQLException {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -293,7 +305,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void GetBestPublicationHeightWithOneBlockInFutureTest() throws SQLException {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -324,7 +336,7 @@ public class ForkresolutionComparatorTests {
     public void GetBestPublicationHeightWithFirstBlockIsNotKeystoneTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 49, timestamp);
@@ -355,7 +367,7 @@ public class ForkresolutionComparatorTests {
     public void GetBestPublicationHeightWithAllBlockInTheFutureTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -387,7 +399,7 @@ public class ForkresolutionComparatorTests {
     public void GetReducedPublciationViewSimpleTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -472,7 +484,7 @@ public class ForkresolutionComparatorTests {
     public void GetReducedPublciationViewWithFailFinalityDelayTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -556,7 +568,7 @@ public class ForkresolutionComparatorTests {
     public void SimpleCompareTwoBranchesLeftForkPriorityTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
         // left branch
@@ -619,7 +631,7 @@ public class ForkresolutionComparatorTests {
     public void SimpleCompareTwoBranchesRightForkPriorityTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
         // left branch
@@ -681,7 +693,7 @@ public class ForkresolutionComparatorTests {
     public void SimpleCompareTwoBranchesForksEqualTest() throws SQLException
     {
         ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
         // left branch

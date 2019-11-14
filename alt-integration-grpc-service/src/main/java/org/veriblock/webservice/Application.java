@@ -8,9 +8,11 @@
 
 package org.veriblock.webservice;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.Context;
@@ -23,29 +25,38 @@ import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
 import org.veriblock.integrations.rewards.PopRewardCalculator;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
+import org.veriblock.sdk.conf.AppInjector;
+import org.veriblock.sdk.conf.DefaultConfiguration;
 
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import java.io.IOException;
+import java.nio.file.Paths;
 
 public final class Application {
-
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
-    public static final String packageName = "webservice";
 
-    public static final String version = AppConstants.APP_VERSION;
-    public static Boolean terminated = false;
+    private static String PACKAGE_NAME = "webservice";
+    public Boolean terminated = false;
+    private VeriBlockSecurity security = null;
+    private Server server = null;
+    private DefaultConfiguration defaultConfiguration;
 
-    public static DefaultConfiguration config = new DefaultConfiguration();
-    public static int apiPort = config.getApiPort();
-    public static String apiHost = "localhost";
+    @Inject
+    public Application(DefaultConfiguration defaultConfiguration) {
+        this.defaultConfiguration = defaultConfiguration;
 
-    private static VeriBlockSecurity security = null;
-    private static Server server = null;
 
-    public static void main(String[] args)
-    {
-        log.info(packageName + " " + version);
+    }
+
+    public static void main(String[] args) {
+        Injector injector = Guice.createInjector(new AppInjector(PACKAGE_NAME));
+        Application app = injector.getInstance(Application.class);
+
+        app.run(args);
+    }
+
+    public void run(String[] args) {
+        log.info(defaultConfiguration.getPackageName() + " " + AppConstants.APP_VERSION);
         terminated = false;
 
         String databasePath = Paths.get(FileManager.getDataDirectory(), ConnectionSelector.defaultDatabaseName).toString();
@@ -54,8 +65,8 @@ public final class Application {
             BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
             AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
             PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
-            Context securityFiles = new Context(config.getVeriblockNetworkParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
-            security = new VeriBlockSecurity(securityFiles);
+            Context.init(defaultConfiguration, veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+            security = new VeriBlockSecurity();
 
             ForkresolutionComparator.setSecurity(security);
             PopRewardCalculator.setSecurity(security);
@@ -68,7 +79,7 @@ public final class Application {
             return;
         }
 
-        server = ServerBuilder.forPort(apiPort)
+        server = ServerBuilder.forPort(defaultConfiguration.getApiPort())
                 .addService(new IntegrationGrpcService(security))
                 .addService(new RewardsGrpcService())
                 .addService(new GrpcDeserializeService())
@@ -82,7 +93,7 @@ public final class Application {
             log.debug("Could not start GRPC server", e);
         }
 
-        log.info("Started API server at " + apiHost + ":" + apiPort);
+        log.info("Started API server at " + defaultConfiguration.getApiHost() + ":" + defaultConfiguration.getApiPort());
 
         try {
             while(true) {
@@ -90,16 +101,16 @@ public final class Application {
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
-            log.warn(packageName + " terminated");
+            log.warn(defaultConfiguration.getPackageName() + " terminated");
             terminated = true;
         }
 
         shutdown();
 
-        log.warn(packageName + " stopped");
+        log.warn(defaultConfiguration.getPackageName() + " stopped");
     }
 
-    public static void shutdown() {
+    public void shutdown() {
         if(server != null) {
             server.shutdown();
 
@@ -109,7 +120,7 @@ public final class Application {
                     Thread.sleep(1000);
                 }
             } catch (InterruptedException e) {
-                log.warn(packageName + " server terminated");
+                log.warn(defaultConfiguration.getPackageName() + " server terminated");
             }
 
             server = null;
@@ -122,7 +133,7 @@ public final class Application {
         security = null;
     }
 
-    public static VeriBlockSecurity getSecurity() {
+    public VeriBlockSecurity getSecurity() {
         return security;
     }
 }

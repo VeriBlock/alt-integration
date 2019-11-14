@@ -8,13 +8,6 @@
 
 package org.veriblock.integrations.rewards;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.nio.file.Paths;
-import java.sql.SQLException;
-import java.util.*;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,12 +19,38 @@ import org.veriblock.integrations.auditor.store.AuditorChangesStore;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.params.MainNetParameters;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
-import org.veriblock.sdk.*;
+import org.veriblock.sdk.Address;
+import org.veriblock.sdk.AltChainBlock;
+import org.veriblock.sdk.AltPublication;
+import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.Coin;
+import org.veriblock.sdk.PublicationData;
+import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
+import org.veriblock.sdk.ValidationResult;
+import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.VeriBlockMerklePath;
+import org.veriblock.sdk.VeriBlockPublication;
+import org.veriblock.sdk.VeriBlockTransaction;
+import org.veriblock.sdk.conf.DefaultConfiguration;
 import org.veriblock.sdk.util.Utils;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
 
 import static org.veriblock.integrations.rewards.PopRewardCalculator.calculatePopScoreFromEndorsements;
 
@@ -147,15 +166,6 @@ public class VeriBlockRewardCalculatorTest {
 
     private class VeriBlockSecurityMock extends VeriBlockSecurity {
 
-        public VeriBlockSecurityMock(Context context) throws SQLException {
-            super(context);
-        }
-
-        ///TODO: unused
-        public VeriBlockSecurityMock(VeriBlockSecurity security) throws SQLException {
-            super(security.getSecurityFiles());
-        }
-
         @Override
         public void clearTemporaryPayloads() {
         }
@@ -182,9 +192,11 @@ public class VeriBlockRewardCalculatorTest {
         AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
         VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock popTxDBStore = new VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock();
 
-        Context securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Properties properties = new Properties();
+        properties.setProperty("veriblockNetwork", "main");
+        Context.init(new DefaultConfiguration(properties), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
-        securityMock = new VeriBlockRewardCalculatorTest.VeriBlockSecurityMock(securityFiles);
+        securityMock = new VeriBlockRewardCalculatorTest.VeriBlockSecurityMock();
         PopRewardCalculator.setSecurity(securityMock);
     }
 
@@ -214,7 +226,7 @@ public class VeriBlockRewardCalculatorTest {
     
     @Test
     public void ratiosForEndorsement() throws SQLException {
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
 
         // we store a single endorsed block in the first (relative to our calculator) VeriBlock block
         String payoutInfo = "payout1";
@@ -300,7 +312,7 @@ public class VeriBlockRewardCalculatorTest {
 
     @Test
     public void popDifficultyCalculateTest() throws SQLException, IllegalArgumentException {
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
 
         // simple case where we don't have any publication for this sequence of blocks
         AltChainBlock block1 = new AltChainBlock("blockHash1", 10, 100);
@@ -480,7 +492,7 @@ public class VeriBlockRewardCalculatorTest {
 
     @Test
     public void popRewardBlocks() throws SQLException {
-        PoPTransactionsDBStore popTxStore = securityMock.getSecurityFiles().getPopTxDBStore();
+        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
 
         int blockNumber = 1;
         // let's start with hardcoded difficulty

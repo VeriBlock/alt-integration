@@ -8,6 +8,28 @@
 
 package org.veriblock.integrations.blockchain;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.veriblock.integrations.Context;
+import org.veriblock.integrations.auditor.Change;
+import org.veriblock.integrations.blockchain.changes.AddVeriBlockBlockChange;
+import org.veriblock.integrations.blockchain.changes.SetVeriBlockHeadChange;
+import org.veriblock.integrations.blockchain.changes.SetVeriBlockProofChange;
+import org.veriblock.integrations.blockchain.store.BitcoinStore;
+import org.veriblock.integrations.blockchain.store.StoredBitcoinBlock;
+import org.veriblock.integrations.blockchain.store.StoredVeriBlockBlock;
+import org.veriblock.integrations.blockchain.store.VeriBlockStore;
+import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.Constants;
+import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
+import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.VerificationException;
+import org.veriblock.sdk.conf.NetworkParameters;
+import org.veriblock.sdk.services.ValidationService;
+import org.veriblock.sdk.util.BitcoinUtils;
+import org.veriblock.sdk.util.Preconditions;
+
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,27 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.veriblock.integrations.auditor.Change;
-import org.veriblock.integrations.blockchain.changes.AddVeriBlockBlockChange;
-import org.veriblock.integrations.blockchain.changes.SetVeriBlockHeadChange;
-import org.veriblock.integrations.blockchain.changes.SetVeriBlockProofChange;
-import org.veriblock.integrations.blockchain.store.BitcoinStore;
-import org.veriblock.integrations.blockchain.store.StoredBitcoinBlock;
-import org.veriblock.integrations.blockchain.store.StoredVeriBlockBlock;
-import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.params.NetworkParameters;
-import org.veriblock.sdk.BlockStoreException;
-import org.veriblock.sdk.Constants;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VBlakeHash;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VerificationException;
-import org.veriblock.sdk.services.ValidationService;
-import org.veriblock.sdk.util.BitcoinUtils;
-import org.veriblock.sdk.util.Preconditions;
 
 public class VeriBlockBlockchain {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockBlockchain.class);
@@ -571,6 +572,10 @@ public class VeriBlockBlockchain {
     }
 
     private void checkDifficulty(VeriBlockBlock block, StoredVeriBlockBlock previous, List<StoredVeriBlockBlock> context) throws VerificationException {
+        if(!Context.getConfiguration().isVBBlockDifficultyValidate()){
+            return;
+        }
+
         if (context.size() < DIFFICULTY_ADJUST_BLOCK_COUNT) {
             log.warn("Not enough context blocks to check difficulty");
             return;

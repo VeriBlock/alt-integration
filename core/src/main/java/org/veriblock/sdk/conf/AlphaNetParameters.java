@@ -6,12 +6,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.integrations.params;
+package org.veriblock.sdk.conf;
 
 import java.math.BigInteger;
 
-public class TestNetParameters implements NetworkParameters {
-    private static final BigInteger MINIMUM_POW_DIFFICULTY = BigInteger.valueOf(100_000_000L);
+public class AlphaNetParameters implements NetworkParameters {
+    private static final BigInteger MINIMUM_POW_DIFFICULTY = BigInteger.valueOf(9_999_872L);
 
     @Override
     public BigInteger getMinimumDifficulty() {
