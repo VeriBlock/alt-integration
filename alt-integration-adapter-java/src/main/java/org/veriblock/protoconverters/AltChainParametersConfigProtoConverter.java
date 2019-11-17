@@ -11,9 +11,9 @@ package org.veriblock.protoconverters;
 import integration.api.grpc.VeriBlockMessages;
 import org.veriblock.integrations.AltChainParametersConfig;
 
-public class AltChainParametresConfigProtoConverter {
+public class AltChainParametersConfigProtoConverter {
 
-    private AltChainParametresConfigProtoConverter () {} // never
+    private AltChainParametersConfigProtoConverter () {} // never
 
     public static AltChainParametersConfig fromProto(VeriBlockMessages.AltChainConfigRequest protoData) {
         AltChainParametersConfig config = new AltChainParametersConfig();

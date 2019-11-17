@@ -10,7 +10,14 @@ package org.veriblock.protoservice;
 
 import java.util.List;
 
+import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
 import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
+import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
+import org.veriblock.integrations.rewards.PopRewardCalculator;
+import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
+import org.veriblock.integrations.rewards.PopRewardCalculator;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.AltChainBlock;
 import org.veriblock.sdk.AltPublication;
@@ -56,4 +63,10 @@ public interface IVeriBlockSecurity {
     public Pair<ValidationResult, List<VBlakeHash>> getLastKnownVBKBlocks(int maxBlockCount);
 
     public Pair<ValidationResult, List<Sha256Hash>> getLastKnownBTCBlocks(int maxBlockCount);
+
+    public ValidationResult setConfig(AltChainParametersConfig altChainConfig,
+                                        ForkresolutionConfig forkresolutionConfig,
+                                        PopRewardCalculatorConfig calculatorConfig,
+                                        BitcoinBlockchainBootstrapConfig bitcoinBootstrapConfig,
+                                        VeriBlockBlockchainBootstrapConfig veriblockBootstrapConfig);
 }

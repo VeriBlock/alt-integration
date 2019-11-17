@@ -15,15 +15,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
+import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
+import org.veriblock.integrations.rewards.PopRewardCalculator;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
 import org.veriblock.protoconverters.AltChainBlockProtoConverter;
-import org.veriblock.protoconverters.AltChainParametresConfigProtoConverter;
+import org.veriblock.protoconverters.AltChainParametersConfigProtoConverter;
 import org.veriblock.protoconverters.AltPublicationProtoConverter;
+import org.veriblock.protoconverters.BitcoinBlockchainBootstrapConfigProtoConverter;
 import org.veriblock.protoconverters.BitcoinBlockProtoConverter;
 import org.veriblock.protoconverters.BlockIndexProtoConverter;
+import org.veriblock.protoconverters.CalculatorConfigProtoConverter;
+import org.veriblock.protoconverters.ForkresolutionConfigProtoConverter;
 import org.veriblock.protoconverters.PoPTransactionDataProtoConverter;
 import org.veriblock.protoconverters.Sha256HashProtoConverter;
 import org.veriblock.protoconverters.VBlakeHashProtoConverter;
+import org.veriblock.protoconverters.VeriBlockBlockchainBootstrapConfigProtoConverter;
 import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
 import org.veriblock.sdk.AltChainBlock;
@@ -228,7 +234,7 @@ public class VeriBlockSecurityProtoService {
     }
 
     public static VeriBlockMessages.GeneralReply setAltChainParametersConfig(VeriBlockMessages.AltChainConfigRequest config) {
-        security.setAltChainParametersConfig(AltChainParametresConfigProtoConverter.fromProto(config));
+        security.setAltChainParametersConfig(AltChainParametersConfigProtoConverter.fromProto(config));
         return VeriBlockServiceCommon.validationResultToProto(ValidationResult.success());
     }
 
@@ -290,5 +296,40 @@ public class VeriBlockSecurityProtoService {
                 .setResult(replyResult)
                 .build();
         return reply;
+    }
+
+    public static VeriBlockMessages.GeneralReply setConfig(VeriBlockMessages.SetConfigRequest request) {
+        ValidationResult result = null;
+        try {
+            if (request.hasAltChainConfig()) {
+                security.setAltChainParametersConfig(
+                    AltChainParametersConfigProtoConverter.fromProto(request.getAltChainConfig()));
+            }
+            if (request.hasForkresolutionConfig()) {
+                ForkresolutionComparator.setForkresolutionConfig(
+                    ForkresolutionConfigProtoConverter.fromProto(request.getForkresolutionConfig()));
+            }
+            if (request.hasCalculatorConfig()) {
+                PopRewardCalculator.setCalculatorConfig(
+                    CalculatorConfigProtoConverter.fromProto(request.getCalculatorConfig()));
+            }
+            if (request.hasBitcoinBootstrapConfig()) {
+                security.getBitcoinBlockchain().bootstrap(
+                    BitcoinBlockchainBootstrapConfigProtoConverter.fromProto(
+                        request.getBitcoinBootstrapConfig()));
+            }
+            if (request.hasVeriblockBootstrapConfig()) {
+                security.getVeriBlockBlockchain().bootstrap(
+                    VeriBlockBlockchainBootstrapConfigProtoConverter.fromProto(
+                        request.getVeriblockBootstrapConfig()));
+            }
+
+            result = ValidationResult.success();
+        } catch (VerificationException | SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        return VeriBlockServiceCommon.validationResultToProto(result);
     }
 }
