@@ -506,7 +506,11 @@ public class VeriBlockBlockchain {
         // Connects to a known "seen" block (except for origin block)
         StoredVeriBlockBlock previous = getInternal(block.getPreviousBlock());
         if (previous == null) {
-            throw new VerificationException("Block does not fit");
+            // corner case: the first bootstrap block connects to the blockchain
+            // by definition despite not having the previous block in the store
+            if (getInternal(block.getHash()) == null) {
+                throw new VerificationException("Block does not fit");
+            }
         }
 
         StoredVeriBlockBlock keystone = store.get(block.getPreviousKeystone());

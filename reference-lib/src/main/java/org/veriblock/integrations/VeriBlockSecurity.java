@@ -261,25 +261,33 @@ public class VeriBlockSecurity {
         checkVeriBlockContextually(publication.getFirstBlock());
     }
 
-    private void checkVeriBlockContextually(VeriBlockBlock firstBlock) throws BlockStoreException, SQLException {
+    void checkVeriBlockContextually(VeriBlockBlock firstBlock) throws BlockStoreException, SQLException {
         if (firstBlock == null) {
             throw new VerificationException("Publication does not have any VeriBlock blocks");
         }
 
         VeriBlockBlock previous = veriblockBlockchain.searchBestChain(firstBlock.getPreviousBlock());
         if (previous == null) {
-            throw new VerificationException("Publication does not connect to VeriBlock blockchain");
+            // corner case: the first bootstrap block has no previous block
+            // but does connect to the blockchain by definition
+            if (veriblockBlockchain.searchBestChain(firstBlock.getHash()) == null) {
+                throw new VerificationException("Publication does not connect to VeriBlock blockchain");
+            }
         }
     }
 
-    private void checkBitcoinContextually(BitcoinBlock firstBlock) throws BlockStoreException, SQLException {
+    void checkBitcoinContextually(BitcoinBlock firstBlock) throws BlockStoreException, SQLException {
         if (firstBlock == null) {
             throw new VerificationException("Publication does not have any Bitcoin blocks");
         }
 
         BitcoinBlock previous = bitcoinBlockchain.searchBestChain(firstBlock.getPreviousBlock());
         if (previous == null) {
-            throw new VerificationException("Publication does not connect to Bitcoin blockchain");
+            // corner case: the first bootstrap block has no previous block
+            // but does connect to the blockchain by definition
+            if (bitcoinBlockchain.searchBestChain(firstBlock.getHash()) == null) {
+                throw new VerificationException("Publication does not connect to Bitcoin blockchain");
+            }
         }
     }
 }
