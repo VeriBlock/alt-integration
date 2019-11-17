@@ -105,7 +105,7 @@ public final class Application {
 
         AltChainParametersConfig altChainConfig = new AltChainParametersConfig();
         altChainConfig.keystoneInterval = 13;
-        ValidationResult replySetAltChainConfig = client.setAltChainParametersConfig(altChainConfig);
+        ValidationResult replySetAltChainConfig = client.setConfig(altChainConfig, null, null, null, null);
         log.info("SetAltChainParametersConfig command success: " + replySetAltChainConfig.isValid());
 
 
@@ -120,9 +120,10 @@ public final class Application {
     public static void TestForkresolutionService()
     {
         VeriBlockForkresolutionProtoClient client  = new VeriBlockForkresolutionProtoClient(channel);
+        VeriBlockSecurityProtoClient securityClient = new VeriBlockSecurityProtoClient(channel);
 
         ForkresolutionConfig forkresolutionConfig = new ForkresolutionConfig(60, 20);
-        ValidationResult replySetForkresolutionConfig = client.setForkresolutionConfig(forkresolutionConfig);
+        ValidationResult replySetForkresolutionConfig = securityClient.setConfig(null, forkresolutionConfig, null, null, null);
         log.info("SetForkresolutionConfig command success: " + replySetForkresolutionConfig.isValid());
 
         Pair<ValidationResult, Integer> replyCompareTwoBranches = client.compareTwoBranches(new ArrayList<AltChainBlock>(), new ArrayList<AltChainBlock>());

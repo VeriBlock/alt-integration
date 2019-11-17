@@ -233,11 +233,6 @@ public class VeriBlockSecurityProtoService {
         return reply;
     }
 
-    public static VeriBlockMessages.GeneralReply setAltChainParametersConfig(VeriBlockMessages.AltChainConfigRequest config) {
-        security.setAltChainParametersConfig(AltChainParametersConfigProtoConverter.fromProto(config));
-        return VeriBlockServiceCommon.validationResultToProto(ValidationResult.success());
-    }
-
     public static VeriBlockMessages.GeneralReply savePoPTransactionData(VeriBlockMessages.SavePoPTransactionDataRequest request) {
         ValidationResult result = null;
 

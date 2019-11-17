@@ -49,13 +49,6 @@ public class VeriBlockRewardsProtoService {
         return reply;
     }
     
-    public static GeneralReply setCalculator(VeriBlockMessages.CalculatorConfig protoConfig) {
-        PopRewardCalculatorConfig config = CalculatorConfigProtoConverter.fromProto(protoConfig);
-        PopRewardCalculator.setCalculatorConfig(config);
-        ValidationResult result = ValidationResult.success();
-        return VeriBlockServiceCommon.validationResultToProto(result);
-    }
-
     public static VeriBlockMessages.RewardsCalculateScoreReply rewardsCalculateScore(VeriBlockMessages.RewardsCalculateScoreRequest request) {
         AltChainBlock endorsedBlock = AltChainBlockProtoConverter.fromProto(request.getEndorsedBlock());
         List<AltChainBlock> endorsementBlocks = AltChainBlockProtoConverter.fromProto(request.getEndorsmentBlocksList());

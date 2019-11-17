@@ -129,13 +129,6 @@ public class VeriBlockSecurityProtoClient implements IVeriBlockSecurity {
     }
 
     @Override
-    public ValidationResult setAltChainParametersConfig(AltChainParametersConfig config)
-    {
-        VeriBlockMessages.GeneralReply reply = service.setAltChainParametersConfig(AltChainParametersConfigProtoConverter.toProto(config));
-        return VeriBlockServiceCommon.validationResultFromProto(reply);
-    }
-
-    @Override
     public ValidationResult savePoPTransactionData(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) {
         VeriBlockMessages.SavePoPTransactionDataRequest request = VeriBlockMessages.SavePoPTransactionDataRequest.newBuilder()
                 .setPopTx(PoPTransactionDataProtoConverter.toProto(popTx))

@@ -56,8 +56,6 @@ public interface IVeriBlockSecurity {
     
     public Pair<ValidationResult, Integer> getMainVBKHeightOfATV(AltPublication publication);
 
-    public ValidationResult setAltChainParametersConfig(AltChainParametersConfig config);
-
     public ValidationResult savePoPTransactionData(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock);
 
     public Pair<ValidationResult, List<VBlakeHash>> getLastKnownVBKBlocks(int maxBlockCount);
