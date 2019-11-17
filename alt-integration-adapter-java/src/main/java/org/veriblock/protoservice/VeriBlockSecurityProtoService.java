@@ -15,6 +15,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.VeriBlockSecurity;
+import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
+import org.veriblock.integrations.rewards.PopRewardCalculator;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
 import org.veriblock.protoconverters.*;
 import org.veriblock.sdk.*;
@@ -216,7 +218,7 @@ public class VeriBlockSecurityProtoService {
     }
 
     public static VeriBlockMessages.GeneralReply setAltChainParametersConfig(VeriBlockMessages.AltChainConfigRequest config) {
-        security.setAltChainParametersConfig(AltChainParametresConfigProtoConverter.fromProto(config));
+        security.setAltChainParametersConfig(AltChainParametersConfigProtoConverter.fromProto(config));
         return VeriBlockServiceCommon.validationResultToProto(ValidationResult.success());
     }
 
@@ -278,5 +280,40 @@ public class VeriBlockSecurityProtoService {
                 .setResult(replyResult)
                 .build();
         return reply;
+    }
+
+    public static VeriBlockMessages.GeneralReply setConfig(VeriBlockMessages.SetConfigRequest request) {
+        ValidationResult result = null;
+        try {
+            if (request.hasAltChainConfig()) {
+                security.setAltChainParametersConfig(
+                    AltChainParametersConfigProtoConverter.fromProto(request.getAltChainConfig()));
+            }
+            if (request.hasForkresolutionConfig()) {
+                ForkresolutionComparator.setForkresolutionConfig(
+                    ForkresolutionConfigProtoConverter.fromProto(request.getForkresolutionConfig()));
+            }
+            if (request.hasCalculatorConfig()) {
+                PopRewardCalculator.setCalculatorConfig(
+                    CalculatorConfigProtoConverter.fromProto(request.getCalculatorConfig()));
+            }
+            if (request.hasBitcoinBootstrapConfig()) {
+                security.getBitcoinBlockchain().bootstrap(
+                    BitcoinBlockchainBootstrapConfigProtoConverter.fromProto(
+                        request.getBitcoinBootstrapConfig()));
+            }
+            if (request.hasVeriblockBootstrapConfig()) {
+                security.getVeriBlockBlockchain().bootstrap(
+                    VeriBlockBlockchainBootstrapConfigProtoConverter.fromProto(
+                        request.getVeriblockBootstrapConfig()));
+            }
+
+            result = ValidationResult.success();
+        } catch (VerificationException | SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        return VeriBlockServiceCommon.validationResultToProto(result);
     }
 }

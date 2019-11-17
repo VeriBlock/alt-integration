@@ -137,4 +137,12 @@ public class IntegrationGrpcService extends IntegrationServiceImplBase {
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void setConfig(VeriBlockMessages.SetConfigRequest request, StreamObserver<GeneralReply> responseObserver) {
+        VeriBlockMessages.GeneralReply reply = VeriBlockSecurityProtoService.setConfig(request);
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
 }

@@ -12,6 +12,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
+import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
+import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
 import org.veriblock.protoconverters.*;
 import org.veriblock.sdk.*;
@@ -127,7 +131,7 @@ public class VeriBlockSecurityProtoClient implements IVeriBlockSecurity {
     @Override
     public ValidationResult setAltChainParametersConfig(AltChainParametersConfig config)
     {
-        VeriBlockMessages.GeneralReply reply = service.setAltChainParametersConfig(AltChainParametresConfigProtoConverter.toProto(config));
+        VeriBlockMessages.GeneralReply reply = service.setAltChainParametersConfig(AltChainParametersConfigProtoConverter.toProto(config));
         return VeriBlockServiceCommon.validationResultFromProto(reply);
     }
 
@@ -162,5 +166,35 @@ public class VeriBlockSecurityProtoClient implements IVeriBlockSecurity {
         ValidationResult resultValid = VeriBlockServiceCommon.validationResultFromProto(reply.getResult());
         List<Sha256Hash> blocks = Sha256HashProtoConverter.fromProto(reply.getBlocksList());
         return new Pair<>(resultValid, blocks);
+    }
+
+    @Override
+    public ValidationResult setConfig(AltChainParametersConfig altChainConfig,
+                                        ForkresolutionConfig forkresolutionConfig,
+                                        PopRewardCalculatorConfig calculatorConfig,
+                                        BitcoinBlockchainBootstrapConfig bitcoinBootstrapConfig,
+                                        VeriBlockBlockchainBootstrapConfig veriblockBootstrapConfig) {
+        VeriBlockMessages.SetConfigRequest.Builder request = VeriBlockMessages.SetConfigRequest.newBuilder();
+
+        if (altChainConfig != null) {
+            request.setAltChainConfig(AltChainParametersConfigProtoConverter.toProto(altChainConfig));
+        }
+        if (forkresolutionConfig != null) {
+            request.setForkresolutionConfig(ForkresolutionConfigProtoConverter.toProto(forkresolutionConfig));
+        }
+        if (calculatorConfig != null) {
+            request.setCalculatorConfig(CalculatorConfigProtoConverter.toProto(calculatorConfig));
+        }
+        if (bitcoinBootstrapConfig != null) {
+            request.setBitcoinBootstrapConfig(
+                BitcoinBlockchainBootstrapConfigProtoConverter.toProto(bitcoinBootstrapConfig));
+        }
+        if (veriblockBootstrapConfig != null) {
+            request.setVeriblockBootstrapConfig(
+                VeriBlockBlockchainBootstrapConfigProtoConverter.toProto(veriblockBootstrapConfig));
+        }
+
+        VeriBlockMessages.GeneralReply reply = service.setConfig(request.build());
+        return VeriBlockServiceCommon.validationResultFromProto(reply);
     }
 }

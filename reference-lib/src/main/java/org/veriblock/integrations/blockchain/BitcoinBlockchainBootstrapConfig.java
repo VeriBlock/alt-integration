@@ -15,8 +15,8 @@ import org.veriblock.sdk.BitcoinBlock;
 
 public class BitcoinBlockchainBootstrapConfig {
 
-    List<BitcoinBlock> blocks;
-    int firstBlockHeight;
+    public List<BitcoinBlock> blocks;
+    public int firstBlockHeight;
 
     public BitcoinBlockchainBootstrapConfig() {
         this.blocks = new ArrayList<BitcoinBlock>();

@@ -15,7 +15,7 @@ import org.veriblock.sdk.VeriBlockBlock;
 
 public class VeriBlockBlockchainBootstrapConfig {
 
-    List<VeriBlockBlock> blocks;
+    public List<VeriBlockBlock> blocks;
 
     public VeriBlockBlockchainBootstrapConfig() {
         this.blocks = new ArrayList<VeriBlockBlock>();
