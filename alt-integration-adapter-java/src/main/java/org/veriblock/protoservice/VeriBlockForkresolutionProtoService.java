@@ -48,12 +48,4 @@ public class VeriBlockForkresolutionProtoService {
                 setResult(VeriBlockServiceCommon.validationResultToProto(validationResult)).
                 build();
     }
-
-    public static VeriBlockMessages.GeneralReply setForkresolutionConfig(VeriBlockMessages.ForkresolutionConfigRequest request)
-    {
-        ForkresolutionComparator.setForkresolutionConfig(ForkresolutionConfigProtoConverter.fromProto(request));
-        return VeriBlockServiceCommon.validationResultToProto(ValidationResult.success());
-    }
-
-
 }

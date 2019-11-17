@@ -40,10 +40,4 @@ public class VeriBlockForkresolutionProtoClient {
         return new Pair<>(validationResult, reply.getComparingsResult());
     }
 
-    public ValidationResult setForkresolutionConfig(ForkresolutionConfig config)
-    {
-        VeriBlockMessages.ForkresolutionConfigRequest request = ForkresolutionConfigProtoConverter.toProto(config);
-        VeriBlockMessages.GeneralReply reply = service.setForkresolutionConfig(request);
-        return VeriBlockServiceCommon.validationResultFromProto(reply);
-    }
 }

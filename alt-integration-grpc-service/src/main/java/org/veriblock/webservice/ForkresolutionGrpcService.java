@@ -22,11 +22,4 @@ public class ForkresolutionGrpcService extends ForkresolutionServiceImplBase {
         responseObserver.onCompleted();
     }
 
-    @Override
-    public void setForkresolutionConfig(VeriBlockMessages.ForkresolutionConfigRequest request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = VeriBlockForkresolutionProtoService.setForkresolutionConfig(request);
-        responseObserver.onNext(reply);
-        responseObserver.onCompleted();
-    }
-
 }
