@@ -109,7 +109,7 @@ public class DefaultConfiguration {
             return null;
 
         if (keystoneFinalityDelay == null || amnestyPeriod == null)
-            throw new IllegalArgumentException("Must specify either all of none of the Forkresolution config values");
+            throw new IllegalArgumentException("Must specify either all or none of the Forkresolution config values");
 
         ForkresolutionConfig config = new ForkresolutionConfig();
         config.keystoneFinalityDelay = Integer.parseInt(keystoneFinalityDelay);
@@ -132,7 +132,7 @@ public class DefaultConfiguration {
         if (startOfDecreasingLine == null || widthOfDecreasingLineNormal == null ||
             widthOfDecreasingLineKeystone == null || aboveIntendedPayoutMultiplierNormal == null ||
             aboveIntendedPayoutMultiplierKeystone == null)
-            throw new IllegalArgumentException("Must specify either all of none of the PopRewardCurve config values");
+            throw new IllegalArgumentException("Must specify either all or none of the PopRewardCurve config values");
 
         PopRewardCurveConfig config = new PopRewardCurveConfig();
         config.startOfDecreasingLine = new BigDecimal(startOfDecreasingLine);
