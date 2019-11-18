@@ -24,7 +24,7 @@ sourceSets {
     main {
         resources {
             srcDirs = ['conf']
-            includes = ["**/*.properties"]
+            includes = ["**/*.properties", "**/*.groovy"]
         }
         
         java {
