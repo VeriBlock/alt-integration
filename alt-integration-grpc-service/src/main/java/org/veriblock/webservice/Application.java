@@ -21,7 +21,6 @@ import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
 import org.veriblock.integrations.AltChainParametersConfig;
 import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
 import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-import org.veriblock.integrations.rewards.PopRewardCurveConfig;
 
 import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;

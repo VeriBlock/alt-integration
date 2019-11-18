@@ -91,12 +91,12 @@ public class DefaultConfiguration {
 
     public NetworkParameters getVeriblockNetworkParameters() {
         String network = getPropertyOverrideOrDefault("veriblockNetwork");
-        if ( "main".equals(network)) {
+        if (network.equalsIgnoreCase("main")) {
             return new MainNetParameters();
-        } else if ("test".equals(network)) {
+        } else if (network.equalsIgnoreCase("test")) {
             return new TestNetParameters();
-        } else if ("alpha".equals(network)) {
-            return new TestNetParameters();
+        } else if (network.equalsIgnoreCase("alpha")) {
+            return new AlphaNetParameters();
         } else  {
             throw new IllegalArgumentException("Unknown Veriblock network name");
         }
