@@ -654,8 +654,7 @@ public class VeriBlockRewardCalculatorTest {
         }
 
         @Override
-        public boolean addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
-            return true;
+        public void addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
         }
 
         @Test

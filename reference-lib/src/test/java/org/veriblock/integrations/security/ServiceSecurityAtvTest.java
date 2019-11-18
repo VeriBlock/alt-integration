@@ -64,9 +64,13 @@ public class ServiceSecurityAtvTest {
         List<VeriBlockPublication> vtbPublications = new ArrayList<>();
         vtbPublications.add(vtbPublication);
         
-        // this test should fail to add some random publication since it does not connect to any block
-        boolean success = security.addPayloads(blockIndex, vtbPublications, altPublications);
-        Assert.assertFalse(success);
+        // adding a random publication should fail since it does not connect to any block
+        try {
+            security.addPayloads(blockIndex, vtbPublications, altPublications);
+            Assert.fail();
+        } catch (VerificationException e) {
+            Assert.assertEquals("Publication does not connect to VeriBlock blockchain", e.getMessage());
+        }
     }
     
     @Test
@@ -85,8 +89,7 @@ public class ServiceSecurityAtvTest {
         String blockHash = "01";
         BlockIndex blockIndex = new BlockIndex(blockHeight, blockHash);
 
-        boolean success = security.addPayloads(blockIndex, null, altPublications);
-        Assert.assertTrue(success);
+        security.addPayloads(blockIndex, null, altPublications);
     }
     
     @Test
@@ -100,8 +103,7 @@ public class ServiceSecurityAtvTest {
         List<AltPublication> altPublications = new ArrayList<>();
         altPublications.add(publication);
 
-        boolean success = security.addTemporaryPayloads(null, altPublications);
-        Assert.assertTrue(success);
+        security.addTemporaryPayloads(null, altPublications);
 
         VeriBlockTransaction tx2 = VeriBlockTransactionsAtv.createAtv();
         AltPublication publication2 = VeriBlockTransactionsAtv.createAtvPublicationAttached(publication.getContainingBlock(), tx2);
@@ -110,8 +112,7 @@ public class ServiceSecurityAtvTest {
         altPublications = new ArrayList<>();
         altPublications.add(publication2);
 
-        success = security.addTemporaryPayloads(null, altPublications);
-        Assert.assertTrue(success);
+        security.addTemporaryPayloads(null, altPublications);
 
         // we have successfully stored two payloads in the temporal storage
         // now let's try to clean the storage
@@ -121,16 +122,19 @@ public class ServiceSecurityAtvTest {
         // we recreate the first transaction again. It should be added without any problems.
         altPublications = new ArrayList<>();
         altPublications.add(publication);
-        success = security.addTemporaryPayloads(null, altPublications);
-        Assert.assertTrue(success);
+        security.addTemporaryPayloads(null, altPublications);
 
         security.clearTemporaryPayloads();
 
         // but after cleaning the second payload cannot be attached
         altPublications = new ArrayList<>();
         altPublications.add(publication2);
-        success = security.addTemporaryPayloads(null, altPublications);
-        Assert.assertFalse(success);
+        try {
+            security.addTemporaryPayloads(null, altPublications);
+            Assert.fail();
+        } catch (VerificationException e) {
+            Assert.assertEquals("Publication does not connect to VeriBlock blockchain", e.getMessage());
+        }
     }
     
     @Test
@@ -153,8 +157,7 @@ public class ServiceSecurityAtvTest {
         List<VBlakeHash> vbkBlocks = security.getLastKnownVBKBlocks(5);
         Assert.assertTrue(vbkBlocks.size() == 1);
 
-        boolean success = security.addPayloads(blockIndex, null, altPublications);
-        Assert.assertTrue(success);
+        security.addPayloads(blockIndex, null, altPublications);
         
         vbkBlocks = security.getLastKnownVBKBlocks(5);
         // and now two blocks exist

@@ -588,4 +588,32 @@ public class VeriBlockBlockchain {
             throw new VerificationException("Block does not conform to expected difficulty");
         }
     }
+
+    // Returns true if the store was empty and the bootstrap
+    // blocks were added to it successfully.
+    // Otherwise, returns false.
+    public boolean bootstrap(List<VeriBlockBlock> blocks) throws SQLException, VerificationException {
+        assert(blocks.size() > 0);
+        boolean bootstrapped = store.getChainHead() != null;
+
+        if (!bootstrapped) {
+            VBlakeHash prevHash = null;
+            for (VeriBlockBlock block : blocks) {
+                if (prevHash != null && !block.getPreviousBlock().equals(prevHash) )
+                    throw new VerificationException("VeriBlock bootstrap blocks must be contiguous");
+
+                prevHash = block.getHash().trimToPreviousBlockSize();
+            }
+
+            for (VeriBlockBlock block : blocks) {
+                BigInteger work = BitcoinUtils.decodeCompactBits(block.getDifficulty());
+                StoredVeriBlockBlock storedBlock = new StoredVeriBlockBlock(
+                                                        block, work, Sha256Hash.ZERO_HASH);
+                store.put(storedBlock);
+                store.setChainHead(storedBlock);
+            }
+        }
+
+        return !bootstrapped;
+    }
 }

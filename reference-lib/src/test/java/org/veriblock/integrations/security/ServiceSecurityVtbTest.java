@@ -59,9 +59,13 @@ public class ServiceSecurityVtbTest {
         List<VeriBlockPublication> vtbPublications = new ArrayList<>();
         vtbPublications.add(vtbPublication);
         
-        // this test should fail to add some random publication since it does not connect to any block
-        boolean success = security.addPayloads(blockIndex, vtbPublications, null);
-        Assert.assertFalse(success);
+        // adding a random publication should fail since it does not connect to any block
+        try {
+            security.addPayloads(blockIndex, vtbPublications, null);
+            Assert.fail();
+        } catch (VerificationException e) {
+            Assert.assertEquals("Publication does not connect to VeriBlock blockchain", e.getMessage());
+        }
     }
     
     @Test
@@ -79,8 +83,7 @@ public class ServiceSecurityVtbTest {
         long blockHeight = 1L;
         String blockHash = "01";
         BlockIndex blockIndex = new BlockIndex(blockHeight, blockHash);
-        boolean success = security.addPayloads(blockIndex, vtbPublications, null);
-        Assert.assertTrue(success);
+        security.addPayloads(blockIndex, vtbPublications, null);
     }
     
     @Test
@@ -95,8 +98,7 @@ public class ServiceSecurityVtbTest {
         List<VeriBlockPublication> vtbPublications = new ArrayList<>();
         vtbPublications.add(publication);
         
-        boolean success = security.addTemporaryPayloads(vtbPublications, null);
-        Assert.assertTrue(success);
+        security.addTemporaryPayloads(vtbPublications, null);
         
         VeriBlockPoPTransaction tx2 = VeriBlockTransactionsVtb.createVtbAttachedToBitcoinBlock(publication.getTransaction().getBlockOfProof().getHash());
         VeriBlockPublication publication2 = VeriBlockTransactionsVtb.createVtbPublicationAttached(publication.getContainingBlock(), tx2);
@@ -105,8 +107,7 @@ public class ServiceSecurityVtbTest {
         vtbPublications = new ArrayList<>();
         vtbPublications.add(publication2);
         
-        success = security.addTemporaryPayloads(vtbPublications, null);
-        Assert.assertTrue(success);
+        security.addTemporaryPayloads(vtbPublications, null);
     }
     
     @Test
@@ -129,8 +130,7 @@ public class ServiceSecurityVtbTest {
         List<Sha256Hash> btcBlocks = security.getLastKnownBTCBlocks(5);
         Assert.assertTrue(btcBlocks.size() == 1);
 
-        boolean success = security.addPayloads(blockIndex, vtbPublications, null);
-        Assert.assertTrue(success);
+        security.addPayloads(blockIndex, vtbPublications, null);
         
         btcBlocks = security.getLastKnownBTCBlocks(5);
         // and now two blocks exist
