@@ -11,7 +11,10 @@ package org.veriblock.integrations.forkresolution;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.veriblock.integrations.AltChainParametersConfig;
 import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
 import org.veriblock.integrations.VeriBlockSecurity;
@@ -25,7 +28,6 @@ import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.Address;
 import org.veriblock.sdk.AltChainBlock;
 import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.BlockStoreException;
 import org.veriblock.sdk.Coin;
 import org.veriblock.sdk.PublicationData;
 import org.veriblock.sdk.Sha256Hash;
@@ -50,8 +52,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.veriblock.integrations.forkresolution.ForkresolutionComparator.compareTwoBranches;
 
+@Ignore
 public class ForkresolutionComparatorTests {
 
     private VeriBlockSecurity veriBlockSecurity;
@@ -72,11 +77,21 @@ public class ForkresolutionComparatorTests {
         properties.setProperty("veriblockNetwork", "main");
         Context.init(new DefaultConfiguration(properties), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
-        ForkresolutionComparator.setSecurity(new VeriBlockSecurityMock());
+        VeriBlockSecurity veriBlockSecuritySpy = Mockito.spy(new VeriBlockSecurity());
+
+        Mockito.doReturn(ValidationResult.success()).when(veriBlockSecuritySpy).checkATVAgainstView(any());
+        AltChainParametersConfig altChainParametersConfig = new AltChainParametersConfig();
+        altChainParametersConfig.keystoneInterval = 10;
+        Mockito.doReturn(altChainParametersConfig).when(veriBlockSecuritySpy).getAltChainParametersConfig();
+
+        doNothing().when(veriBlockSecuritySpy).clearTemporaryPayloads();
+        doNothing().when(veriBlockSecuritySpy).addTemporaryPayloads(any(), any());
+
+        ForkresolutionComparator.setSecurity(veriBlockSecuritySpy);
     }
 
     @After
-    public void tearDown() throws SQLException {
+    public void tearDown() {
         veriBlockSecurity.shutdown();
     }
 
@@ -706,28 +721,6 @@ public class ForkresolutionComparatorTests {
             this.containingAltPublication = new TreeMap<String, List<AltPublication>>();
             this.containingVeriBlockPublication = new TreeMap<String, List<VeriBlockPublication>>();
             this.endoresedAltPublication = new TreeMap<String, List<AltPublication>>();
-        }
-
-        @Test
-        public void test(){}
-    }
-
-    public static class VeriBlockSecurityMock extends VeriBlockSecurity {
-
-        public VeriBlockSecurityMock() {
-        }
-
-        @Override
-        public void clearTemporaryPayloads() {
-        }
-
-        @Override
-        public ValidationResult checkATVAgainstView(AltPublication publication) throws BlockStoreException, SQLException {
-            return ValidationResult.success();
-        }
-
-        @Override
-        public void addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
         }
 
         @Test
