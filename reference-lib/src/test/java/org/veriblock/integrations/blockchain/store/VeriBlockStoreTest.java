@@ -8,9 +8,13 @@
 
 package org.veriblock.integrations.blockchain.store;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
+import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.sdk.BlockStoreException;
 import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VBlakeHash;
@@ -26,11 +30,23 @@ import java.util.List;
 
 public class VeriBlockStoreTest {
 
+    private VeriBlockSecurity veriBlockSecurity;
+    private VeriBlockStore store;
+
+    @Before
+    public void setUp() throws Exception {
+        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
+        veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
+        store = Context.getVeriblockStore();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        veriBlockSecurity.shutdown();
+    }
+
     @Test
     public void EraseCantSplitBlockchainTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
             byte[] raw1 =  Utils.decodeHex("0001998300029690ACA425987B8B529BEC04654A16FCCE708F3F0DEED25E1D2513D05A3B17C49D8B3BCFEFC10CB2E9C4D473B2E25DB7F1BD040098960DE0E313");
             VeriBlockBlock block1 = SerializeDeserializeService.parseVeriBlockBlock(raw1);
             StoredVeriBlockBlock storedBlock1 = new StoredVeriBlockBlock(block1, BigInteger.TEN);
@@ -53,49 +69,27 @@ public class VeriBlockStoreTest {
 
             Assert.assertEquals(store.erase(block2.getHash()), storedBlock2);
             Assert.assertEquals(store.erase(block1.getHash()), storedBlock1);
-
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
 
     @Test
     public void nonexistingBlockStoreTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-
             VBlakeHash hash = VBlakeHash.hash("123".getBytes());
             StoredVeriBlockBlock storedBlock = store.get(hash);
             Assert.assertTrue(storedBlock == null);
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
 
     @Test
     public void veriBlockBlockStoreTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock storedVeriBlockBlockExpected = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
             store.put(storedVeriBlockBlockExpected);
             StoredVeriBlockBlock storedVeriBlockBlockActual = store.get(storedVeriBlockBlockExpected.getHash());
 
             Assert.assertEquals(storedVeriBlockBlockExpected, storedVeriBlockBlockActual);
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
     
     @Test
     public void chainHeadStoreTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock storedVeriBlockBlockExpected = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
             store.put(storedVeriBlockBlockExpected);
@@ -104,17 +98,10 @@ public class VeriBlockStoreTest {
             
             StoredVeriBlockBlock storedVeriBlockBlockActual = store.getChainHead();
             Assert.assertEquals(storedVeriBlockBlockExpected, storedVeriBlockBlockActual);
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
     
     @Test
     public void chainHeadNonExistingBlockStoreTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock storedVeriBlockBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
             
@@ -127,17 +114,10 @@ public class VeriBlockStoreTest {
             
             StoredVeriBlockBlock storedVeriBlockBlockActual = store.getChainHead();
             Assert.assertEquals(storedVeriBlockBlockActual, null);
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
     
     @Test
     public void multipleBlocksStoreTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-            
             VeriBlockBlock block1 = new VeriBlockBlock(1, (short) 1, VBlakeHash.EMPTY_HASH, VBlakeHash.EMPTY_HASH, VBlakeHash.EMPTY_HASH,
                     Sha256Hash.ZERO_HASH, 1, 1, 1);
             StoredVeriBlockBlock storedBlock = new StoredVeriBlockBlock(block1, BigInteger.ONE);
@@ -161,17 +141,10 @@ public class VeriBlockStoreTest {
             
             StoredVeriBlockBlock block2PreviousPrevious = store.getFromChain(block2.getHash(), 2);
             Assert.assertEquals(block2PreviousPrevious, null);
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
     
     @Test
     public void multipleChainsStoreTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-            
             VeriBlockBlock block1 = new VeriBlockBlock(1, (short) 1, VBlakeHash.EMPTY_HASH, VBlakeHash.EMPTY_HASH, VBlakeHash.EMPTY_HASH,
                     Sha256Hash.ZERO_HASH, 1, 1, 1);
             StoredVeriBlockBlock storedBlock = new StoredVeriBlockBlock(block1, BigInteger.ONE);
@@ -201,17 +174,10 @@ public class VeriBlockStoreTest {
             // now block2 belongs to the main chain
             block2Actual = store.scanBestChain(block2.getHash());
             Assert.assertNotEquals(block2Actual, null);
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
 
     @Test
     public void EraseTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock expectedBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
 
@@ -224,18 +190,10 @@ public class VeriBlockStoreTest {
 
             storedBlock = store.get(expectedBlock.getHash());
             Assert.assertEquals(storedBlock, null);
-
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
 
     @Test
     public void EraseNonexistentTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock expectedBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
 
@@ -244,17 +202,10 @@ public class VeriBlockStoreTest {
 
             StoredVeriBlockBlock erasedBlock = store.erase(expectedBlock.getHash());
             Assert.assertEquals(erasedBlock, null);
-
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
 
     @Test
     public void ReplaceBlockTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
             byte[] rawBlockOfProof = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
             StoredBitcoinBlock blockOfProof = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(rawBlockOfProof), BigInteger.TEN, 0);
 
@@ -279,18 +230,10 @@ public class VeriBlockStoreTest {
             storedBlock = store.get(newBlock.getHash());
             Assert.assertEquals(storedBlock.getBlockOfProof(), blockOfProof.getHash());
             Assert.assertEquals(newBlock, storedBlock);
-
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
 
     @Test
     public void ReplaceNonexistentTest() throws SQLException, IOException {
-        try {
-            VeriBlockIntegrationLibraryManager.init();
-            VeriBlockStore store = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock newBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
             StoredVeriBlockBlock oldBlock = null;
@@ -303,9 +246,5 @@ public class VeriBlockStoreTest {
 
             storedBlock = store.get(newBlock.getHash());
             Assert.assertEquals(newBlock, storedBlock);
-
-        } finally {
-            VeriBlockIntegrationLibraryManager.shutdown();
-        }
     }
 }

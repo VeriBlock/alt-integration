@@ -11,13 +11,11 @@ package org.veriblock.sdk.conf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@Singleton
 public class DefaultConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(DefaultConfiguration.class);
 
@@ -59,7 +57,9 @@ public class DefaultConfiguration {
 
     private void load(InputStream inputStream) {
         try {
-            properties.load(inputStream);
+            if(inputStream != null) {
+                properties.load(inputStream);
+            }
         } catch (Exception e) {
             logger.error("Unhandled exception in DefaultConfiguration.load", e);
         }
@@ -75,8 +75,13 @@ public class DefaultConfiguration {
         return host;
     }
 
-    public boolean isVBBlockDifficultyValidate() {
-        Boolean validation = Boolean.valueOf(getPropertyOverrideOrDefault("block.difficulty.validation"));
+    public boolean isValidateVBBlockDifficulty() {
+        Boolean validation = Boolean.valueOf(getPropertyOverrideOrDefault("validation.vb.block.difficulty"));
+        return validation;
+    }
+
+    public boolean isValidateBTCBlockDifficulty() {
+        Boolean validation = Boolean.valueOf(getPropertyOverrideOrDefault("validation.btc.block.difficulty"));
         return validation;
     }
 
@@ -105,16 +110,10 @@ public class DefaultConfiguration {
     }
 
     private void loadDefaults() {
-        try
-        {
-            InputStream stream = DefaultConfiguration.class
-                    .getClassLoader()
-                    .getResourceAsStream(defaultPropertiesPath);
-            try {
-                defaultProperties.load(stream);
-            } finally {
-                stream.close();
-            }
+        try (InputStream stream = DefaultConfiguration.class
+                .getClassLoader()
+                .getResourceAsStream(defaultPropertiesPath)) {
+            defaultProperties.load(stream);
         } catch (IOException e) {
             logger.error("Unable to load default properties", e);
         }

@@ -8,17 +8,13 @@
 
 package org.veriblock.integrations.blockchain;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
+import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.auditor.BlockIdentifier;
 import org.veriblock.integrations.auditor.Change;
 import org.veriblock.integrations.auditor.Changeset;
@@ -29,9 +25,16 @@ import org.veriblock.sdk.VerificationException;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+
 public class VeriBlockBlockchainTest {
     private VeriBlockBlockchain blockchain;
     private VeriBlockStore store;
+    private VeriBlockSecurity veriBlockSecurity;
 
     private static final byte[] raw1 =  Utils.decodeHex("0001998300029690ACA425987B8B529BEC04654A16FCCE708F3F0DEED25E1D2513D05A3B17C49D8B3BCFEFC10CB2E9C4D473B2E25DB7F1BD040098960DE0E313");
     private static final VeriBlockBlock block1 = SerializeDeserializeService.parseVeriBlockBlock(raw1);
@@ -44,21 +47,21 @@ public class VeriBlockBlockchainTest {
 
     @Before
     public void init() throws SQLException, IOException {
-        VeriBlockIntegrationLibraryManager.init();
+        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
+        veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
 
-        VeriBlockStore vbkStore = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-        store = vbkStore;
-        vbkStore.clear();
+        store = Context.getVeriblockStore();
+        store.clear();
         
-        BitcoinStore btcStore = VeriBlockIntegrationLibraryManager.getContext().getBitcoinStore();
+        BitcoinStore btcStore = Context.getBitcoinStore();
         btcStore.clear();
         
-        blockchain = new VeriBlockBlockchain(VeriBlockIntegrationLibraryManager.getContext().getNetworkParameters(), vbkStore, btcStore);
+        blockchain = new VeriBlockBlockchain(Context.getNetworkParameters(), store, btcStore);
     }
 
     @After
     public void teardown() throws SQLException {
-        VeriBlockIntegrationLibraryManager.shutdown();
+        veriBlockSecurity.shutdown();
     }
 
     @Test

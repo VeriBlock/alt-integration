@@ -44,8 +44,6 @@ public final class Application {
     @Inject
     public Application(DefaultConfiguration defaultConfiguration) {
         this.defaultConfiguration = defaultConfiguration;
-
-
     }
 
     public static void main(String[] args) {

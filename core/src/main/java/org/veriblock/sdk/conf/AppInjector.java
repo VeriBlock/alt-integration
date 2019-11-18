@@ -18,8 +18,11 @@ public class AppInjector extends AbstractModule {
 
     @Override
     protected void configure() {
+        logger.debug("App configuration started.");
 
         Names.bindProperties(binder(), defaultConfiguration.getProperties());
+
+        logger.debug("App configuration ended.");
     }
 
     @Provides

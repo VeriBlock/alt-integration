@@ -8,17 +8,13 @@
 
 package org.veriblock.integrations.blockchain;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
+import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.auditor.BlockIdentifier;
 import org.veriblock.integrations.auditor.Change;
 import org.veriblock.integrations.auditor.Changeset;
@@ -27,9 +23,16 @@ import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VerificationException;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+
 public class BitcoinBlockchainTest {
     private BitcoinBlockchain blockchain;
     private BitcoinStore store;
+    private VeriBlockSecurity veriBlockSecurity;
 
     private final static BitcoinBlock block1  = new BitcoinBlock(
             766099456,
@@ -54,9 +57,10 @@ public class BitcoinBlockchainTest {
 
     @Before
     public void init() throws SQLException, IOException {
-        VeriBlockIntegrationLibraryManager.init();
+        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
+        veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
 
-        store = VeriBlockIntegrationLibraryManager.getContext().getBitcoinStore();
+        store = Context.getBitcoinStore();
         store.clear();
         
         blockchain = new BitcoinBlockchain(store);
@@ -66,7 +70,7 @@ public class BitcoinBlockchainTest {
 
         Assert.assertEquals(block2.getHash(),
                             Sha256Hash.wrap("00000000000000000001163c9e1130c26984d831cb16c16f994945a197550897"));
-    
+
         Assert.assertEquals(block3.getHash(),
                             Sha256Hash.wrap("0000000000000000000e008052ab86a7b0c20e46b29c54658b066d471022503f"));
 
@@ -74,7 +78,7 @@ public class BitcoinBlockchainTest {
 
     @After
     public void teardown() throws SQLException {
-        VeriBlockIntegrationLibraryManager.shutdown();
+        veriBlockSecurity.shutdown();
     }
 
     @Test
