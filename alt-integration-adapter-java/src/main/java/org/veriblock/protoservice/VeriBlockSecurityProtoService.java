@@ -98,12 +98,10 @@ public class VeriBlockSecurityProtoService {
 
         ValidationResult result = null;
         try {
-            boolean validationResult = security.addPayloads(blockIndex, vtbPublications, altPublications);
-            if(validationResult) {
-                result = ValidationResult.success();
-            } else {
-                result = ValidationResult.fail("Unknown error");
-            }
+            security.addPayloads(blockIndex, vtbPublications, altPublications);
+            result = ValidationResult.success();
+        } catch (VerificationException e) {
+            result = ValidationResult.fail(e.getMessage());
         } catch (BlockStoreException | SQLException e) {
             result = ValidationResult.fail(e.getMessage());
             log.debug("Could not call VeriBlock security", e);
@@ -134,12 +132,10 @@ public class VeriBlockSecurityProtoService {
         
         ValidationResult result = null;
         try {
-            boolean validationResult = security.addTemporaryPayloads(vtbPublications, altPublications);
-            if(validationResult) {
-                result = ValidationResult.success();
-            } else {
-                result = ValidationResult.fail("Unknown error");
-            }
+            security.addTemporaryPayloads(vtbPublications, altPublications);
+            result = ValidationResult.success();
+        } catch (VerificationException e) {
+            result = ValidationResult.fail(e.getMessage());
         } catch (BlockStoreException | SQLException e) {
             result = ValidationResult.fail(e.getMessage());
             log.debug("Could not call VeriBlock security", e);
