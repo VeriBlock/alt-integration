@@ -50,147 +50,17 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static org.veriblock.integrations.forkresolution.ForkresolutionComparator.compareTwoBranches;
+
 public class ForkresolutionComparatorTests {
 
-    private static AltPublication generateATV(int containingBlockHeight, int containingBlockTimestamp) {
-        PublicationData publicationData = new PublicationData(0,  "header bytes".getBytes(), "payout info bytes".getBytes(), "context info bytes".getBytes());
-
-        VeriBlockTransaction tx = new VeriBlockTransaction(
-                (byte)0x01,
-                new Address("V5Ujv72h4jEBcKnALGc4fKqs6CDAPX"),
-                Coin.valueOf(1000L),
-                Collections.emptyList(),
-                7L,
-                publicationData,
-                Utils.decodeHex("30440220398B74708DC8F8AEE68FCE0C47B8959E6FCE6354665DA3ED87A83F708E62AA6B02202E6C00C00487763C55E92C7B8E1DD538B7375D8DF2B2117E75ACBB9DB7DEB3C7"),
-                Utils.decodeHex("3056301006072A8648CE3D020106052B8104000A03420004DE4EE8300C3CD99E913536CF53C4ADD179F048F8FE90E5ADF3ED19668DD1DBF6C2D8E692B1D36EAC7187950620A28838DA60A8C9DD60190C14C59B82CB90319E"), null);
-
-        AltPublication publication = new AltPublication(
-                tx,
-                new VeriBlockMerklePath("1:0:1FEC8AA4983D69395010E4D18CD8B943749D5B4F575E88A375DEBDC5ED22531C:0000000000000000000000000000000000000000000000000000000000000000:0000000000000000000000000000000000000000000000000000000000000000"),
-                new VeriBlockBlock(containingBlockHeight, (short)2,
-                        VBlakeHash.wrap("000000000000069B7E7B7245449C60619294546AD825AF03"),
-                        VBlakeHash.wrap("00000000000023A90C8B0DFE7C55C1B0935637860679DDD5"),
-                        VBlakeHash.wrap("00000000000065630808D69AB26B825EE4FD21082E18686E"),
-                        Sha256Hash.wrap("26BBFDA7D5E4462EF24AE02D67E47D78", Sha256Hash.VERIBLOCK_MERKLE_ROOT_LENGTH),
-                        containingBlockTimestamp,
-                        16842752,
-                        1),
-                Collections.emptyList());
-
-        return publication;
-    }
-
-    private class PoPTransactionsDBStoreMock extends PoPTransactionsDBStore {
-        private Map<String, List<AltPublication>> containingAltPublication;
-        private Map<String, List<VeriBlockPublication>> containingVeriBlockPublication;
-        private Map<String, List<AltPublication>> endoresedAltPublication;
-
-        public PoPTransactionsDBStoreMock() throws SQLException {
-        }
-
-        {
-            this.containingAltPublication = new TreeMap<String, List<AltPublication>>();
-            this.containingVeriBlockPublication = new TreeMap<String, List<VeriBlockPublication>>();
-            this.endoresedAltPublication = new TreeMap<String, List<AltPublication>>();
-        }
-
-
-        @Override
-        public List<AltPublication> getAltPublciationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
-            Set<AltPublication> altPublications1 = new HashSet<AltPublication>();
-            for (AltChainBlock block : containBlocks) {
-                altPublications1.addAll(containingAltPublication.get(block.getHash()));
-            }
-
-            Set<AltPublication> altPublications2 = new HashSet<AltPublication>();
-            altPublications2.addAll((endoresedAltPublication.get(endorsedBlock.getHash())));
-            altPublications2.retainAll(altPublications1);
-            return new ArrayList<AltPublication>(altPublications2);
-        }
-
-        @Override
-        public void addPoPTransaction(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) throws SQLException {
-            List<AltPublication> altPublications = containingAltPublication.get(containingBlock.getHash());
-            if (altPublications != null) {
-                altPublications.add(popTx.altPublication);
-            } else {
-                altPublications = new ArrayList<AltPublication>();
-                altPublications.add(popTx.altPublication);
-                containingAltPublication.put(containingBlock.getHash(), altPublications);
-            }
-
-            List<VeriBlockPublication> veriBlockPublications = containingVeriBlockPublication.get(containingBlock.getHash());
-            if (veriBlockPublications != null) {
-                veriBlockPublications.addAll(popTx.veriBlockPublications);
-            } else {
-                containingVeriBlockPublication.put(containingBlock.getHash(), new ArrayList<VeriBlockPublication>(popTx.veriBlockPublications));
-            }
-
-            altPublications = endoresedAltPublication.get(endorsedBlock.getHash());
-            if (altPublications != null) {
-                altPublications.add(popTx.altPublication);
-            } else {
-                altPublications = new ArrayList<AltPublication>();
-                altPublications.add(popTx.altPublication);
-                endoresedAltPublication.put(endorsedBlock.getHash(), altPublications);
-            }
-        }
-
-        @Override
-        public List<AltPublication> getAltPublicationsFromBlock(AltChainBlock block) throws SQLException {
-            return containingAltPublication.get(block.getHash());
-        }
-
-        @Override
-        public List<VeriBlockPublication> getVeriBlockPublicationsFromBlock(AltChainBlock block) throws SQLException {
-            return containingVeriBlockPublication.get(block.getHash());
-        }
-
-        @Override
-        public void clear() throws SQLException {
-            this.containingAltPublication = new TreeMap<String, List<AltPublication>>();
-            this.containingVeriBlockPublication = new TreeMap<String, List<VeriBlockPublication>>();
-            this.endoresedAltPublication = new TreeMap<String, List<AltPublication>>();
-        }
-
-    }
-
-    private class VeriBlockSecurityMock extends VeriBlockSecurity {
-
-        @Override
-        public void clearTemporaryPayloads() {
-        }
-
-        @Override
-        public ValidationResult checkATVAgainstView(AltPublication publication) throws BlockStoreException, SQLException {
-            return ValidationResult.success();
-        }
-
-        @Override
-        public boolean addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
-            return true;
-        }
-    }
-
-    private class ForkresolutionComparatorTest extends ForkresolutionComparator {
-        public List<Integer> getReducedPublicationViewTest(List<AltChainBlock> blocks) throws SQLException {
-            return ForkresolutionComparator.getReducedPublicationView(blocks);
-        }
-
-        public int getBestPublicationHeightTest(List<AltChainBlock> blockSequence) throws SQLException {
-            return ForkresolutionComparator.getBestPublicationHeight(blockSequence);
-        }
-
-        public long getPublicationScoreTest(int lowestKeystonePublication, int keystonePublication) {
-            return ForkresolutionComparator.getPublicationScore(lowestKeystonePublication, keystonePublication);
-        }
-    }
-
-    private static VeriBlockSecurityMock securityMock;
+    private VeriBlockSecurity veriBlockSecurity;
 
     @Before
     public void setUp() throws IOException, SQLException {
+        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
+        veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
+
         String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
 
         VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
@@ -202,79 +72,75 @@ public class ForkresolutionComparatorTests {
         properties.setProperty("veriblockNetwork", "main");
         Context.init(new DefaultConfiguration(properties), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
-        securityMock = new VeriBlockSecurityMock();
-        ForkresolutionComparator.setSecurity(securityMock);
+        ForkresolutionComparator.setSecurity(new VeriBlockSecurityMock());
     }
 
     @After
     public void tearDown() throws SQLException {
-        VeriBlockIntegrationLibraryManager.shutdown();
+        veriBlockSecurity.shutdown();
     }
 
     @Test
     public void GetPublicationScoreTest() {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
-
         int leftPublicationHeight = -1;
         int rightPublicationHeight = -1;
         int lowestPublicationHeight = Math.min(leftPublicationHeight, rightPublicationHeight);
 
-        Assert.assertEquals(0, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
-        Assert.assertEquals(0, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
+        Assert.assertEquals(0, getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
+        Assert.assertEquals(0, getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
 
         leftPublicationHeight = -1;
         rightPublicationHeight = 155;
         lowestPublicationHeight = Math.min(leftPublicationHeight, rightPublicationHeight);
 
-        Assert.assertEquals(0, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
-        Assert.assertEquals(100000000, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
+        Assert.assertEquals(0, getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
+        Assert.assertEquals(100000000, getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
 
         leftPublicationHeight = 314;
         rightPublicationHeight = 55;
         lowestPublicationHeight = Math.min(leftPublicationHeight, rightPublicationHeight);
 
-        Assert.assertEquals(0, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
-        Assert.assertEquals(100000000, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
+        Assert.assertEquals(0, getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
+        Assert.assertEquals(100000000, getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
 
         leftPublicationHeight = 55;
         rightPublicationHeight = 314;
         lowestPublicationHeight = Math.min(leftPublicationHeight, rightPublicationHeight);
 
-        Assert.assertEquals(100000000, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
-        Assert.assertEquals(0, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
+        Assert.assertEquals(100000000, getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
+        Assert.assertEquals(0, getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
 
         leftPublicationHeight = 55;
         rightPublicationHeight = 80;
         lowestPublicationHeight = Math.min(leftPublicationHeight, rightPublicationHeight);
 
-        Assert.assertEquals(100000000, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
-        Assert.assertEquals(19057279, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
+        Assert.assertEquals(100000000, getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
+        Assert.assertEquals(19057279, getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
 
         leftPublicationHeight = 80;
         rightPublicationHeight = 55;
         lowestPublicationHeight = Math.min(leftPublicationHeight, rightPublicationHeight);
 
-        Assert.assertEquals(19057279, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
-        Assert.assertEquals(100000000, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
+        Assert.assertEquals(19057279, getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
+        Assert.assertEquals(100000000, getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
 
         leftPublicationHeight = 85;
         rightPublicationHeight = 55;
         lowestPublicationHeight = Math.min(leftPublicationHeight, rightPublicationHeight);
 
-        Assert.assertEquals(9332543, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
-        Assert.assertEquals(100000000, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
+        Assert.assertEquals(9332543, getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
+        Assert.assertEquals(100000000, getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
 
         leftPublicationHeight = 55;
         rightPublicationHeight = 85;
         lowestPublicationHeight = Math.min(leftPublicationHeight, rightPublicationHeight);
 
-        Assert.assertEquals(100000000, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
-        Assert.assertEquals(9332543, comparatorTest.getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
+        Assert.assertEquals(100000000, getPublicationScoreTest(lowestPublicationHeight, leftPublicationHeight));
+        Assert.assertEquals(9332543, getPublicationScoreTest(lowestPublicationHeight, rightPublicationHeight));
     }
 
     @Test
     public void GetBestPublicationHeightSimpleTest() throws SQLException {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -299,12 +165,11 @@ public class ForkresolutionComparatorTests {
         blockList.add(block2);
         blockList.add(block3);
 
-        Assert.assertEquals(120, comparatorTest.getBestPublicationHeightTest(blockList));
+        Assert.assertEquals(120, getBestPublicationHeightTest(blockList));
     }
 
     @Test
     public void GetBestPublicationHeightWithOneBlockInFutureTest() throws SQLException {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -329,13 +194,12 @@ public class ForkresolutionComparatorTests {
         blockList.add(block2);
         blockList.add(block3);
 
-        Assert.assertEquals(130, comparatorTest.getBestPublicationHeightTest(blockList));
+        Assert.assertEquals(130, getBestPublicationHeightTest(blockList));
     }
 
     @Test
     public void GetBestPublicationHeightWithFirstBlockIsNotKeystoneTest() throws SQLException
     {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -360,13 +224,12 @@ public class ForkresolutionComparatorTests {
         blockList.add(block2);
         blockList.add(block3);
 
-        Assert.assertEquals(-1, comparatorTest.getBestPublicationHeightTest(blockList));
+        Assert.assertEquals(-1, getBestPublicationHeightTest(blockList));
     }
 
     @Test
     public void GetBestPublicationHeightWithAllBlockInTheFutureTest() throws SQLException
     {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -391,14 +254,13 @@ public class ForkresolutionComparatorTests {
         blockList.add(block2);
         blockList.add(block3);
 
-        Assert.assertEquals(-1, comparatorTest.getBestPublicationHeightTest(blockList));
+        Assert.assertEquals(-1, getBestPublicationHeightTest(blockList));
     }
 
 
     @Test
     public void GetReducedPublciationViewSimpleTest() throws SQLException
     {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -473,7 +335,7 @@ public class ForkresolutionComparatorTests {
         blockList.add(block12);
         blockList.add(block13);
 
-        List<Integer> reducedPulciationView = comparatorTest.getReducedPublicationViewTest(blockList);
+        List<Integer> reducedPulciationView = getReducedPublicationViewTest(blockList);
 
         Assert.assertEquals(2 , reducedPulciationView.size());
         Assert.assertEquals(new Integer(114), reducedPulciationView.get(0));
@@ -483,7 +345,6 @@ public class ForkresolutionComparatorTests {
     @Test
     public void GetReducedPublciationViewWithFailFinalityDelayTest() throws SQLException
     {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -558,7 +419,7 @@ public class ForkresolutionComparatorTests {
         blockList.add(block12);
         blockList.add(block13);
 
-        List<Integer> reducedPulciationView = comparatorTest.getReducedPublicationViewTest(blockList);
+        List<Integer> reducedPulciationView = getReducedPublicationViewTest(blockList);
 
         Assert.assertEquals(1, reducedPulciationView.size());
         Assert.assertEquals(new Integer(114), reducedPulciationView.get(0));
@@ -567,7 +428,6 @@ public class ForkresolutionComparatorTests {
     @Test
     public void SimpleCompareTwoBranchesLeftForkPriorityTest() throws SQLException
     {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -624,13 +484,12 @@ public class ForkresolutionComparatorTests {
         rigthFork.add(block8);
 
         ///TODO: should use static method calls eg ForkresolutionComparator.compareTwoBranches
-        Assert.assertEquals(1, comparatorTest.compareTwoBranches(leftFork, rigthFork));
+        Assert.assertEquals(1, compareTwoBranches(leftFork, rigthFork));
     }
 
     @Test
     public void SimpleCompareTwoBranchesRightForkPriorityTest() throws SQLException
     {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -686,13 +545,12 @@ public class ForkresolutionComparatorTests {
         rigthFork.add(block7);
         rigthFork.add(block8);
 
-        Assert.assertEquals(-1, comparatorTest.compareTwoBranches(leftFork, rigthFork));
+        Assert.assertEquals(-1, compareTwoBranches(leftFork, rigthFork));
     }
 
     @Test
     public void SimpleCompareTwoBranchesForksEqualTest() throws SQLException
     {
-        ForkresolutionComparatorTest comparatorTest = new ForkresolutionComparatorTest();
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -748,7 +606,145 @@ public class ForkresolutionComparatorTests {
         rigthFork.add(block7);
         rigthFork.add(block8);
 
-        Assert.assertEquals(0, comparatorTest.compareTwoBranches(leftFork, rigthFork));
+        Assert.assertEquals(0, compareTwoBranches(leftFork, rigthFork));
+    }
+
+
+    private AltPublication generateATV(int containingBlockHeight, int containingBlockTimestamp) {
+        PublicationData publicationData = new PublicationData(0,  "header bytes".getBytes(), "payout info bytes".getBytes(), "context info bytes".getBytes());
+
+        VeriBlockTransaction tx = new VeriBlockTransaction(
+                (byte)0x01,
+                new Address("V5Ujv72h4jEBcKnALGc4fKqs6CDAPX"),
+                Coin.valueOf(1000L),
+                Collections.emptyList(),
+                7L,
+                publicationData,
+                Utils.decodeHex("30440220398B74708DC8F8AEE68FCE0C47B8959E6FCE6354665DA3ED87A83F708E62AA6B02202E6C00C00487763C55E92C7B8E1DD538B7375D8DF2B2117E75ACBB9DB7DEB3C7"),
+                Utils.decodeHex("3056301006072A8648CE3D020106052B8104000A03420004DE4EE8300C3CD99E913536CF53C4ADD179F048F8FE90E5ADF3ED19668DD1DBF6C2D8E692B1D36EAC7187950620A28838DA60A8C9DD60190C14C59B82CB90319E"), null);
+
+        AltPublication publication = new AltPublication(
+                tx,
+                new VeriBlockMerklePath("1:0:1FEC8AA4983D69395010E4D18CD8B943749D5B4F575E88A375DEBDC5ED22531C:0000000000000000000000000000000000000000000000000000000000000000:0000000000000000000000000000000000000000000000000000000000000000"),
+                new VeriBlockBlock(containingBlockHeight, (short)2,
+                        VBlakeHash.wrap("000000000000069B7E7B7245449C60619294546AD825AF03"),
+                        VBlakeHash.wrap("00000000000023A90C8B0DFE7C55C1B0935637860679DDD5"),
+                        VBlakeHash.wrap("00000000000065630808D69AB26B825EE4FD21082E18686E"),
+                        Sha256Hash.wrap("26BBFDA7D5E4462EF24AE02D67E47D78", Sha256Hash.VERIBLOCK_MERKLE_ROOT_LENGTH),
+                        containingBlockTimestamp,
+                        16842752,
+                        1),
+                Collections.emptyList());
+
+        return publication;
+    }
+
+    public static class PoPTransactionsDBStoreMock extends PoPTransactionsDBStore {
+        private Map<String, List<AltPublication>> containingAltPublication;
+        private Map<String, List<VeriBlockPublication>> containingVeriBlockPublication;
+        private Map<String, List<AltPublication>> endoresedAltPublication;
+
+        public PoPTransactionsDBStoreMock() throws SQLException {
+            this.containingAltPublication = new TreeMap<>();
+            this.containingVeriBlockPublication = new TreeMap<>();
+            this.endoresedAltPublication = new TreeMap<>();
+        }
+
+        @Override
+        public List<AltPublication> getAltPublciationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
+            Set<AltPublication> altPublications1 = new HashSet<AltPublication>();
+            for (AltChainBlock block : containBlocks) {
+                altPublications1.addAll(containingAltPublication.get(block.getHash()));
+            }
+
+            Set<AltPublication> altPublications2 = new HashSet<AltPublication>();
+            altPublications2.addAll((endoresedAltPublication.get(endorsedBlock.getHash())));
+            altPublications2.retainAll(altPublications1);
+            return new ArrayList<AltPublication>(altPublications2);
+        }
+
+        @Override
+        public void addPoPTransaction(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) throws SQLException {
+            List<AltPublication> altPublications = containingAltPublication.get(containingBlock.getHash());
+            if (altPublications != null) {
+                altPublications.add(popTx.altPublication);
+            } else {
+                altPublications = new ArrayList<AltPublication>();
+                altPublications.add(popTx.altPublication);
+                containingAltPublication.put(containingBlock.getHash(), altPublications);
+            }
+
+            List<VeriBlockPublication> veriBlockPublications = containingVeriBlockPublication.get(containingBlock.getHash());
+            if (veriBlockPublications != null) {
+                veriBlockPublications.addAll(popTx.veriBlockPublications);
+            } else {
+                containingVeriBlockPublication.put(containingBlock.getHash(), new ArrayList<VeriBlockPublication>(popTx.veriBlockPublications));
+            }
+
+            altPublications = endoresedAltPublication.get(endorsedBlock.getHash());
+            if (altPublications != null) {
+                altPublications.add(popTx.altPublication);
+            } else {
+                altPublications = new ArrayList<AltPublication>();
+                altPublications.add(popTx.altPublication);
+                endoresedAltPublication.put(endorsedBlock.getHash(), altPublications);
+            }
+        }
+
+        @Override
+        public List<AltPublication> getAltPublicationsFromBlock(AltChainBlock block) throws SQLException {
+            return containingAltPublication.get(block.getHash());
+        }
+
+        @Override
+        public List<VeriBlockPublication> getVeriBlockPublicationsFromBlock(AltChainBlock block) throws SQLException {
+            return containingVeriBlockPublication.get(block.getHash());
+        }
+
+        @Override
+        public void clear() throws SQLException {
+            this.containingAltPublication = new TreeMap<String, List<AltPublication>>();
+            this.containingVeriBlockPublication = new TreeMap<String, List<VeriBlockPublication>>();
+            this.endoresedAltPublication = new TreeMap<String, List<AltPublication>>();
+        }
+
+        @Test
+        public void test(){}
+    }
+
+    public static class VeriBlockSecurityMock extends VeriBlockSecurity {
+
+        public VeriBlockSecurityMock() {
+        }
+
+        @Override
+        public void clearTemporaryPayloads() {
+        }
+
+        @Override
+        public ValidationResult checkATVAgainstView(AltPublication publication) throws BlockStoreException, SQLException {
+            return ValidationResult.success();
+        }
+
+        @Override
+        public boolean addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
+            return true;
+        }
+
+        @Test
+        public void test(){}
+    }
+
+    public List<Integer> getReducedPublicationViewTest(List<AltChainBlock> blocks) throws SQLException {
+        return ForkresolutionComparator.getReducedPublicationView(blocks);
+    }
+
+    public int getBestPublicationHeightTest(List<AltChainBlock> blockSequence) throws SQLException {
+        return ForkresolutionComparator.getBestPublicationHeight(blockSequence);
+    }
+
+    public long getPublicationScoreTest(int lowestKeystonePublication, int keystonePublication) {
+        return ForkresolutionComparator.getPublicationScore(lowestKeystonePublication, keystonePublication);
     }
 
 }

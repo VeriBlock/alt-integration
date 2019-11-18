@@ -8,16 +8,13 @@
 
 package org.veriblock.integrations.blockchain;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Iterator;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
+import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.auditor.BlockIdentifier;
 import org.veriblock.integrations.auditor.Change;
 import org.veriblock.integrations.auditor.Changeset;
@@ -25,15 +22,22 @@ import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.Sha256Hash;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Iterator;
+
 public class BitcoinBlockchainTest {
     private BitcoinBlockchain blockchain;
     private BitcoinStore store;
+    private VeriBlockSecurity veriBlockSecurity;
 
     @Before
     public void init() throws SQLException, IOException {
-        VeriBlockIntegrationLibraryManager.init();
+        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
+        veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
 
-        store = VeriBlockIntegrationLibraryManager.getContext().getBitcoinStore();
+        store = Context.getBitcoinStore();
         store.clear();
         
         blockchain = new BitcoinBlockchain(store);
@@ -41,7 +45,7 @@ public class BitcoinBlockchainTest {
 
     @After
     public void teardown() throws SQLException {
-        VeriBlockIntegrationLibraryManager.shutdown();
+        veriBlockSecurity.shutdown();
     }
 
     @Test

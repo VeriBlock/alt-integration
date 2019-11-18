@@ -8,16 +8,13 @@
 
 package org.veriblock.integrations.blockchain;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Iterator;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
+import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.auditor.BlockIdentifier;
 import org.veriblock.integrations.auditor.Change;
 import org.veriblock.integrations.auditor.Changeset;
@@ -27,27 +24,33 @@ import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Iterator;
+
 public class VeriBlockBlockchainTest {
     private VeriBlockBlockchain blockchain;
     private VeriBlockStore store;
+    private VeriBlockSecurity veriBlockSecurity;
 
     @Before
     public void init() throws SQLException, IOException {
-        VeriBlockIntegrationLibraryManager.init();
+        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
+        veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
 
-        VeriBlockStore vbkStore = VeriBlockIntegrationLibraryManager.getContext().getVeriblockStore();
-        store = vbkStore;
-        vbkStore.clear();
+        store = Context.getVeriblockStore();
+        store.clear();
         
-        BitcoinStore btcStore = VeriBlockIntegrationLibraryManager.getContext().getBitcoinStore();
+        BitcoinStore btcStore = Context.getBitcoinStore();
         btcStore.clear();
         
-        blockchain = new VeriBlockBlockchain(VeriBlockIntegrationLibraryManager.getContext().getNetworkParameters(), vbkStore, btcStore);
+        blockchain = new VeriBlockBlockchain(Context.getNetworkParameters(), store, btcStore);
     }
 
     @After
     public void teardown() throws SQLException {
-        VeriBlockIntegrationLibraryManager.shutdown();
+        veriBlockSecurity.shutdown();
     }
 
     @Test

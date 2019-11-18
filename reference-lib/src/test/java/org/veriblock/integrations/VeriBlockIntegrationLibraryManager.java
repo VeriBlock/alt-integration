@@ -8,47 +8,42 @@
 
 package org.veriblock.integrations;
 
+import org.junit.Test;
 import org.veriblock.integrations.auditor.store.AuditorChangesStore;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
-import org.veriblock.sdk.conf.DefaultConfiguration;
+import org.veriblock.sdk.conf.AppInjector;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.Properties;
 
 ///TODO: this is not a test - move to helpers package
 public class VeriBlockIntegrationLibraryManager {
-    
-    private static Context securityFiles = null;
     private static VeriBlockSecurity security = null;
-    
-    private VeriBlockIntegrationLibraryManager() { }
+    private static String PACKAGE_NAME = "test";
+    private AppInjector appInjector;
 
-    public static VeriBlockSecurity init() throws SQLException, IOException {
-        if(security != null) return security;
-        
+    //Should have public constructor.
+    public VeriBlockIntegrationLibraryManager() {
+        appInjector = new AppInjector(PACKAGE_NAME);
+
+    }
+
+    public VeriBlockSecurity init() throws SQLException, IOException {
         String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
-            
-        VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
-        BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
-        AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
-        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
+        initContext(databasePath);
 
-        Properties properties = new Properties();
-        properties.setProperty("veriblockNetwork", "main");
-        Context.init(new DefaultConfiguration(properties), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
         Context.resetSecurity();
 
         security = new VeriBlockSecurity();
         return security;
     }
     
-    public static void shutdown() throws SQLException {
+    public void shutdown() throws SQLException {
         if(security != null) {
             security.shutdown();
         }
@@ -56,7 +51,16 @@ public class VeriBlockIntegrationLibraryManager {
         security = null;
     }
     
-    public static Context getContext() {
-        return securityFiles;
+    private void initContext(String path) throws SQLException {
+        VeriBlockStore veriBlockStore = new VeriBlockStore(path);
+        BitcoinStore bitcoinStore = new BitcoinStore(path);
+        AuditorChangesStore auditStore = new AuditorChangesStore(path);
+        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(path);
+
+        Context.init(appInjector.provideWallet(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+    }
+
+    @Test
+    public void test() {
     }
 }

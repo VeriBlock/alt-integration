@@ -572,7 +572,7 @@ public class VeriBlockBlockchain {
     }
 
     private void checkDifficulty(VeriBlockBlock block, StoredVeriBlockBlock previous, List<StoredVeriBlockBlock> context) throws VerificationException {
-        if(!Context.getConfiguration().isVBBlockDifficultyValidate()){
+        if(!Context.getConfiguration().isValidateVBBlockDifficulty()){
             return;
         }
 

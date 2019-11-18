@@ -8,12 +8,8 @@
 
 package org.veriblock.webclient;
 
-import java.math.BigInteger;
-import java.security.SignatureException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import io.grpc.ManagedChannel;
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.AltChainParametersConfig;
@@ -21,13 +17,28 @@ import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
 import org.veriblock.protoservice.VeriBlockDeserializeProtoClient;
 import org.veriblock.protoservice.VeriBlockForkresolutionProtoClient;
 import org.veriblock.protoservice.VeriBlockSecurityProtoClient;
-import org.veriblock.sdk.*;
+import org.veriblock.sdk.AltChainBlock;
+import org.veriblock.sdk.AltPublication;
+import org.veriblock.sdk.BitcoinBlock;
+import org.veriblock.sdk.BlockIndex;
+import org.veriblock.sdk.Pair;
+import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
+import org.veriblock.sdk.ValidationResult;
+import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.VeriBlockPoPTransaction;
+import org.veriblock.sdk.VeriBlockPublication;
+import org.veriblock.sdk.VeriBlockTransaction;
+import org.veriblock.sdk.conf.DefaultConfiguration;
 import org.veriblock.sdk.transactions.VeriBlockTransactionsAtv;
 import org.veriblock.sdk.transactions.VeriBlockTransactionsVtb;
 import org.veriblock.sdk.util.BitcoinUtils;
 
-import io.grpc.ManagedChannel;
-import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
+import java.math.BigInteger;
+import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public final class Application {
 
@@ -38,7 +49,7 @@ public final class Application {
     public static final String version = AppConstants.APP_VERSION;
     public static Boolean terminated = false;
 
-    public static DefaultConfiguration config = new DefaultConfiguration();
+    public static DefaultConfiguration config = new DefaultConfiguration(packageName);
     public static int apiPort = config.getApiPort();
     public static String apiHost = "localhost";
     

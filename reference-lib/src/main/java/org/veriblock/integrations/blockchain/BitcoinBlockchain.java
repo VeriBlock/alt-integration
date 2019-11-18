@@ -8,17 +8,9 @@
 
 package org.veriblock.integrations.blockchain;
 
-import java.math.BigInteger;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.auditor.Change;
 import org.veriblock.integrations.blockchain.changes.AddBitcoinBlockChange;
 import org.veriblock.integrations.blockchain.changes.SetBitcoinHeadChange;
@@ -32,6 +24,16 @@ import org.veriblock.sdk.VerificationException;
 import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.BitcoinUtils;
 import org.veriblock.sdk.util.Preconditions;
+
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class BitcoinBlockchain {
     private static final Logger log = LoggerFactory.getLogger(BitcoinBlockchain.class);
@@ -289,6 +291,10 @@ public class BitcoinBlockchain {
     }
 
     private void checkDifficulty(BitcoinBlock block, StoredBitcoinBlock previous) throws VerificationException, BlockStoreException, SQLException {
+        if(!Context.getConfiguration().isValidateBTCBlockDifficulty()){
+            return;
+        }
+
         // Previous + 1 = height of block
         if ((previous.getHeight() + 1) % 2016 > 0) {
             // Difficulty should be same as previous

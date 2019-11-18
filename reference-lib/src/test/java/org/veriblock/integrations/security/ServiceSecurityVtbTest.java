@@ -40,12 +40,13 @@ public class ServiceSecurityVtbTest {
     
     @Before
     public void setUp() throws SQLException, IOException {
-        security = VeriBlockIntegrationLibraryManager.init();
+        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
+        security = veriBlockIntegrationLibraryManager.init();
     }
     
     @After
     public void tearDown() throws SQLException {
-        VeriBlockIntegrationLibraryManager.shutdown();
+        security.shutdown();
     }
     
     @Test

@@ -56,136 +56,15 @@ import static org.veriblock.integrations.rewards.PopRewardCalculator.calculatePo
 
 public class VeriBlockRewardCalculatorTest {
 
-    private static AltPublication generateATV(int containingBlockHeight, String payoutInfo) {
-
-        PublicationData publicationData = new PublicationData(0, new byte[]{}, payoutInfo.getBytes(), new byte[]{});
-        VeriBlockTransaction tx = new VeriBlockTransaction(
-                (byte) 0x01,
-                new Address("VB2zTVQH6JmjJJZTYwCcrDB9kAJp7G"),
-                Coin.valueOf(1000L),
-                Collections.emptyList(),
-                7L,
-                publicationData,
-                Utils.decodeHex("304402201124F58AC7AF281A5B7889E02F726483DA1DC2387C5B58456F969B9B0AEF02FC022074F8522D51D4E01329E435657EF7F4D424D7DBD64F7E3FECBC9554C75988AA97"),
-                Utils.decodeHex("3056301006072A8648CE3D020106052B8104000A03420004B558286EE19E59D8B4D0F72505B62491D239AD3AAF6657D52AB5C2A09C93EC361E11359B2527A924A79135AAF9C61EB9150D34F40E89299ED54DD5372EBB2C88"), null);
-
-        AltPublication publication = new AltPublication(
-                tx,
-                new VeriBlockMerklePath("1:13:E20ED2CFFAC2DDB4E85C8A852BD63320324B6014259DA1E0FE4491F084704997:5B977EA09A554AD56957F662284044E7D37450DDADF7DB3647712F5969399787:20D0A3D873EEEEE6A222A75316DCE60B53CA43EAEA09D27F0ECE897303A53AE9:C06FE913DCA5DC2736563B80834D69E6DFDF1B1E92383EA62791E410421B6C11:049F68D350EEB8B3DF630C8308B5C8C2BA4CD6210868395B084AF84D19FF0E90:0000000000000000000000000000000000000000000000000000000000000000:36252DFC621DE420FB083AD9D8767CBA627EDDEEC64E421E9576CEE21297DD0A"),
-                new VeriBlockBlock(containingBlockHeight, (short) 2,
-                        VBlakeHash.wrap("000000000000069B7E7B7245449C60619294546AD825AF03"),
-                        VBlakeHash.wrap("00000000000023A90C8B0DFE7C55C1B0935637860679DDD5"),
-                        VBlakeHash.wrap("00000000000065630808D69AB26B825EE4FD21082E18686E"),
-                        Sha256Hash.wrap("0356EB39B851682679F9A0131A4E4A5F", Sha256Hash.VERIBLOCK_MERKLE_ROOT_LENGTH),
-                        1520158,
-                        16842752,
-                        1),
-                Collections.emptyList());
-
-        return publication;
-    }
-
-    private class PoPTransactionsDBStoreMock extends PoPTransactionsDBStore {
-        private Map<String, List<AltPublication>> containingAltPublication;
-        private Map<String, List<VeriBlockPublication>> containingVeriBlockPublication;
-        private Map<String, List<AltPublication>> endoresedAltPublication;
-
-        public PoPTransactionsDBStoreMock() throws SQLException {
-        }
-
-        {
-            this.containingAltPublication = new TreeMap<String, List<AltPublication>>();
-            this.containingVeriBlockPublication = new TreeMap<String, List<VeriBlockPublication>>();
-            this.endoresedAltPublication = new TreeMap<String, List<AltPublication>>();
-        }
-
-
-        @Override
-        public List<AltPublication> getAltPublciationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
-            Set<AltPublication> altPublications1 = new HashSet<AltPublication>();
-            for (AltChainBlock block : containBlocks) {
-                if(containingAltPublication.get(block.getHash()) != null) {
-                    altPublications1.addAll(containingAltPublication.get(block.getHash()));
-                }
-            }
-
-            Set<AltPublication> altPublications2 = new HashSet<AltPublication>();
-            if(endoresedAltPublication.get(endorsedBlock.getHash()) != null) {
-                altPublications2.addAll(endoresedAltPublication.get(endorsedBlock.getHash()));
-            }
-            altPublications2.retainAll(altPublications1);
-            return new ArrayList<AltPublication>(altPublications2);
-        }
-
-        @Override
-        public void addPoPTransaction(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) throws SQLException {
-            List<AltPublication> altPublications = containingAltPublication.get(containingBlock.getHash());
-            if (altPublications != null) {
-                altPublications.add(popTx.altPublication);
-            } else {
-                altPublications = new ArrayList<AltPublication>();
-                altPublications.add(popTx.altPublication);
-                containingAltPublication.put(containingBlock.getHash(), altPublications);
-            }
-
-            List<VeriBlockPublication> veriBlockPublications = containingVeriBlockPublication.get(containingBlock.getHash());
-            if (veriBlockPublications != null) {
-                veriBlockPublications.addAll(popTx.veriBlockPublications);
-            } else {
-                containingVeriBlockPublication.put(containingBlock.getHash(), new ArrayList<VeriBlockPublication>(popTx.veriBlockPublications));
-            }
-
-            altPublications = endoresedAltPublication.get(endorsedBlock.getHash());
-            if (altPublications != null) {
-                altPublications.add(popTx.altPublication);
-            } else {
-                altPublications = new ArrayList<AltPublication>();
-                altPublications.add(popTx.altPublication);
-                endoresedAltPublication.put(endorsedBlock.getHash(), altPublications);
-            }
-        }
-
-        @Override
-        public List<AltPublication> getAltPublicationsFromBlock(AltChainBlock block) throws SQLException {
-            return containingAltPublication.get(block.getHash());
-        }
-
-        @Override
-        public List<VeriBlockPublication> getVeriBlockPublicationsFromBlock(AltChainBlock block) throws SQLException {
-            return containingVeriBlockPublication.get(block.getHash());
-        }
-
-        @Override
-        public void clear() throws SQLException {
-            this.containingAltPublication = new TreeMap<String, List<AltPublication>>();
-            this.containingVeriBlockPublication = new TreeMap<String, List<VeriBlockPublication>>();
-            this.endoresedAltPublication = new TreeMap<String, List<AltPublication>>();
-        }
-
-    }
-
-    private class VeriBlockSecurityMock extends VeriBlockSecurity {
-
-        @Override
-        public void clearTemporaryPayloads() {
-        }
-
-        @Override
-        public ValidationResult checkATVAgainstView(AltPublication publication) throws BlockStoreException, SQLException {
-            return ValidationResult.success();
-        }
-
-        @Override
-        public boolean addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
-            return true;
-        }
-    }
-
-    private static VeriBlockRewardCalculatorTest.VeriBlockSecurityMock securityMock;
+    private VeriBlockRewardCalculatorTest.VeriBlockSecurityMock securityMock;
+    private VeriBlockSecurity veriBlockSecurity;
 
     @Before
-    public void setUp() throws SQLException, IOException
-    {String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
+    public void setUp() throws SQLException, IOException {
+        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
+        veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
+
+        String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
 
         VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
         BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
@@ -201,8 +80,8 @@ public class VeriBlockRewardCalculatorTest {
     }
 
     @After
-    public void tearDown() throws SQLException {
-        VeriBlockIntegrationLibraryManager.shutdown();
+    public void tearDown() {
+        veriBlockSecurity.shutdown();
     }
     
     @Test
@@ -649,5 +528,137 @@ public class VeriBlockRewardCalculatorTest {
         long rewardPerEndorsement = (long) ((double) rewardTotal * block30Weight.doubleValue() / scoreTotal.doubleValue());
         // let's check if we correctly reflect the scoring algorithm
         Assert.assertTrue(Math.abs(rewardPerEndorsement - rewards.get(3)) < 100);
+    }
+
+    private AltPublication generateATV(int containingBlockHeight, String payoutInfo) {
+
+        PublicationData publicationData = new PublicationData(0, new byte[]{}, payoutInfo.getBytes(), new byte[]{});
+        VeriBlockTransaction tx = new VeriBlockTransaction(
+                (byte) 0x01,
+                new Address("VB2zTVQH6JmjJJZTYwCcrDB9kAJp7G"),
+                Coin.valueOf(1000L),
+                Collections.emptyList(),
+                7L,
+                publicationData,
+                Utils.decodeHex("304402201124F58AC7AF281A5B7889E02F726483DA1DC2387C5B58456F969B9B0AEF02FC022074F8522D51D4E01329E435657EF7F4D424D7DBD64F7E3FECBC9554C75988AA97"),
+                Utils.decodeHex("3056301006072A8648CE3D020106052B8104000A03420004B558286EE19E59D8B4D0F72505B62491D239AD3AAF6657D52AB5C2A09C93EC361E11359B2527A924A79135AAF9C61EB9150D34F40E89299ED54DD5372EBB2C88"), null);
+
+        AltPublication publication = new AltPublication(
+                tx,
+                new VeriBlockMerklePath("1:13:E20ED2CFFAC2DDB4E85C8A852BD63320324B6014259DA1E0FE4491F084704997:5B977EA09A554AD56957F662284044E7D37450DDADF7DB3647712F5969399787:20D0A3D873EEEEE6A222A75316DCE60B53CA43EAEA09D27F0ECE897303A53AE9:C06FE913DCA5DC2736563B80834D69E6DFDF1B1E92383EA62791E410421B6C11:049F68D350EEB8B3DF630C8308B5C8C2BA4CD6210868395B084AF84D19FF0E90:0000000000000000000000000000000000000000000000000000000000000000:36252DFC621DE420FB083AD9D8767CBA627EDDEEC64E421E9576CEE21297DD0A"),
+                new VeriBlockBlock(containingBlockHeight, (short) 2,
+                        VBlakeHash.wrap("000000000000069B7E7B7245449C60619294546AD825AF03"),
+                        VBlakeHash.wrap("00000000000023A90C8B0DFE7C55C1B0935637860679DDD5"),
+                        VBlakeHash.wrap("00000000000065630808D69AB26B825EE4FD21082E18686E"),
+                        Sha256Hash.wrap("0356EB39B851682679F9A0131A4E4A5F", Sha256Hash.VERIBLOCK_MERKLE_ROOT_LENGTH),
+                        1520158,
+                        16842752,
+                        1),
+                Collections.emptyList());
+
+        return publication;
+    }
+
+    public static class PoPTransactionsDBStoreMock extends PoPTransactionsDBStore {
+        private Map<String, List<AltPublication>> containingAltPublication;
+        private Map<String, List<VeriBlockPublication>> containingVeriBlockPublication;
+        private Map<String, List<AltPublication>> endoresedAltPublication;
+
+        public PoPTransactionsDBStoreMock() throws SQLException {
+        }
+
+        {
+            this.containingAltPublication = new TreeMap<String, List<AltPublication>>();
+            this.containingVeriBlockPublication = new TreeMap<String, List<VeriBlockPublication>>();
+            this.endoresedAltPublication = new TreeMap<String, List<AltPublication>>();
+        }
+
+
+        @Override
+        public List<AltPublication> getAltPublciationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
+            Set<AltPublication> altPublications1 = new HashSet<AltPublication>();
+            for (AltChainBlock block : containBlocks) {
+                if(containingAltPublication.get(block.getHash()) != null) {
+                    altPublications1.addAll(containingAltPublication.get(block.getHash()));
+                }
+            }
+
+            Set<AltPublication> altPublications2 = new HashSet<AltPublication>();
+            if(endoresedAltPublication.get(endorsedBlock.getHash()) != null) {
+                altPublications2.addAll(endoresedAltPublication.get(endorsedBlock.getHash()));
+            }
+            altPublications2.retainAll(altPublications1);
+            return new ArrayList<AltPublication>(altPublications2);
+        }
+
+        @Override
+        public void addPoPTransaction(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) throws SQLException {
+            List<AltPublication> altPublications = containingAltPublication.get(containingBlock.getHash());
+            if (altPublications != null) {
+                altPublications.add(popTx.altPublication);
+            } else {
+                altPublications = new ArrayList<AltPublication>();
+                altPublications.add(popTx.altPublication);
+                containingAltPublication.put(containingBlock.getHash(), altPublications);
+            }
+
+            List<VeriBlockPublication> veriBlockPublications = containingVeriBlockPublication.get(containingBlock.getHash());
+            if (veriBlockPublications != null) {
+                veriBlockPublications.addAll(popTx.veriBlockPublications);
+            } else {
+                containingVeriBlockPublication.put(containingBlock.getHash(), new ArrayList<VeriBlockPublication>(popTx.veriBlockPublications));
+            }
+
+            altPublications = endoresedAltPublication.get(endorsedBlock.getHash());
+            if (altPublications != null) {
+                altPublications.add(popTx.altPublication);
+            } else {
+                altPublications = new ArrayList<AltPublication>();
+                altPublications.add(popTx.altPublication);
+                endoresedAltPublication.put(endorsedBlock.getHash(), altPublications);
+            }
+        }
+
+        @Override
+        public List<AltPublication> getAltPublicationsFromBlock(AltChainBlock block) throws SQLException {
+            return containingAltPublication.get(block.getHash());
+        }
+
+        @Override
+        public List<VeriBlockPublication> getVeriBlockPublicationsFromBlock(AltChainBlock block) throws SQLException {
+            return containingVeriBlockPublication.get(block.getHash());
+        }
+
+        @Override
+        public void clear() throws SQLException {
+            this.containingAltPublication = new TreeMap<String, List<AltPublication>>();
+            this.containingVeriBlockPublication = new TreeMap<String, List<VeriBlockPublication>>();
+            this.endoresedAltPublication = new TreeMap<String, List<AltPublication>>();
+        }
+
+        @Test
+        public void name() {}
+    }
+
+
+
+    public static class VeriBlockSecurityMock extends VeriBlockSecurity {
+
+        @Override
+        public void clearTemporaryPayloads() {
+        }
+
+        @Override
+        public ValidationResult checkATVAgainstView(AltPublication publication) throws BlockStoreException, SQLException {
+            return ValidationResult.success();
+        }
+
+        @Override
+        public boolean addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
+            return true;
+        }
+
+        @Test
+        public void name() {}
     }
 }
