@@ -15,6 +15,14 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
+import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
+import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
+import org.veriblock.integrations.rewards.PopRewardCurveConfig;
+
 import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.auditor.store.AuditorChangesStore;
@@ -65,6 +73,27 @@ public final class Application {
             PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
             Context.init(defaultConfiguration, veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
             security = new VeriBlockSecurity();
+
+            ConfigurationParser config = new ConfigurationParser(defaultConfiguration.getProperties());
+            BitcoinBlockchainBootstrapConfig btcBootstrap = config.getBitcoinBlockchainBootstrapConfig();
+            if (btcBootstrap != null)
+                security.getBitcoinBlockchain().bootstrap(btcBootstrap);
+
+            VeriBlockBlockchainBootstrapConfig vbkBootstrap = config.getVeriBlockBlockchainBootstrapConfig();
+            if (vbkBootstrap != null)
+                security.getVeriBlockBlockchain().bootstrap(vbkBootstrap);
+
+            AltChainParametersConfig altChainParametersConfig = config.getAltChainParametersConfig();
+            if (altChainParametersConfig != null)
+                security.setAltChainParametersConfig(altChainParametersConfig);
+
+            ForkresolutionConfig forkresolutionConfig = config.getForkresolutionConfig();
+            if (forkresolutionConfig != null)
+                ForkresolutionComparator.setForkresolutionConfig(forkresolutionConfig);
+
+            PopRewardCalculatorConfig popRewardCalculatorConfig = config.getPopRewardCalculatorConfig();
+            if (popRewardCalculatorConfig != null)
+                PopRewardCalculator.setCalculatorConfig(popRewardCalculatorConfig);
 
             ForkresolutionComparator.setSecurity(security);
             PopRewardCalculator.setSecurity(security);
