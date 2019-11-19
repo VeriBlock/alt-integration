@@ -253,41 +253,45 @@ public class VeriBlockSecurity {
     }
 
     private void verifyPublicationContextually(VeriBlockPublication publication) throws VerificationException, BlockStoreException, SQLException {
-        checkVeriBlockContextually(publication.getFirstBlock());
-        checkBitcoinContextually(publication.getFirstBitcoinBlock());
+        checkConnectivity(publication.getFirstBlock());
+        checkConnectivity(publication.getFirstBitcoinBlock());
     }
 
     private void verifyPublicationContextually(AltPublication publication) throws VerificationException, BlockStoreException, SQLException {
-        checkVeriBlockContextually(publication.getFirstBlock());
+        checkConnectivity(publication.getFirstBlock());
     }
 
-    void checkVeriBlockContextually(VeriBlockBlock firstBlock) throws BlockStoreException, SQLException {
-        if (firstBlock == null) {
+    void checkConnectivity(VeriBlockBlock block) throws BlockStoreException, SQLException {
+        if (block == null) {
             throw new VerificationException("Publication does not have any VeriBlock blocks");
         }
 
-        VeriBlockBlock previous = veriblockBlockchain.searchBestChain(firstBlock.getPreviousBlock());
-        if (previous == null) {
-            // corner case: the first bootstrap block has no previous block
-            // but does connect to the blockchain by definition
-            if (veriblockBlockchain.searchBestChain(firstBlock.getHash()) == null) {
-                throw new VerificationException("Publication does not connect to VeriBlock blockchain");
-            }
+        VeriBlockBlock previous = veriblockBlockchain.searchBestChain(block.getPreviousBlock());
+        if (previous != null) {
+            return;
+        }
+
+        // corner case: the first bootstrap block has no previous block
+        // but does connect to the blockchain by definition
+        if (veriblockBlockchain.searchBestChain(block.getHash()) == null) {
+            throw new VerificationException("Publication does not connect to VeriBlock blockchain");
         }
     }
 
-    void checkBitcoinContextually(BitcoinBlock firstBlock) throws BlockStoreException, SQLException {
-        if (firstBlock == null) {
+    void checkConnectivity(BitcoinBlock block) throws BlockStoreException, SQLException {
+        if (block == null) {
             throw new VerificationException("Publication does not have any Bitcoin blocks");
         }
 
-        BitcoinBlock previous = bitcoinBlockchain.searchBestChain(firstBlock.getPreviousBlock());
-        if (previous == null) {
-            // corner case: the first bootstrap block has no previous block
-            // but does connect to the blockchain by definition
-            if (bitcoinBlockchain.searchBestChain(firstBlock.getHash()) == null) {
-                throw new VerificationException("Publication does not connect to Bitcoin blockchain");
-            }
+        BitcoinBlock previous = bitcoinBlockchain.searchBestChain(block.getPreviousBlock());
+        if (previous != null) {
+            return;
+        }
+
+        // corner case: the first bootstrap block has no previous block
+        // but does connect to the blockchain by definition
+        if (bitcoinBlockchain.searchBestChain(block.getHash()) == null) {
+            throw new VerificationException("Publication does not connect to Bitcoin blockchain");
         }
     }
 }

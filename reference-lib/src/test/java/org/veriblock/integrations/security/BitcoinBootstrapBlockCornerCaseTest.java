@@ -53,22 +53,23 @@ public class BitcoinBootstrapBlockCornerCaseTest {
 
     @Before
     public void setUp() throws SQLException, IOException {
-        security = VeriBlockIntegrationLibraryManager.init();
+        VeriBlockIntegrationLibraryManager manager = new VeriBlockIntegrationLibraryManager();
+        security = manager.init();
         blockchain = security.getBitcoinBlockchain();
     }
     
     @After
     public void tearDown() throws SQLException {
-        VeriBlockIntegrationLibraryManager.shutdown();
+        security.shutdown();
     }
 
     @Test
     public void checkBitcoinContextuallyTest() throws SQLException {
         blockchain.bootstrap(Arrays.asList(block1, block2, block3), block1Height);
 
-        security.checkBitcoinContextually(block1);
-        security.checkBitcoinContextually(block2);
-        security.checkBitcoinContextually(block3);
+        security.checkConnectivity(block1);
+        security.checkConnectivity(block2);
+        security.checkConnectivity(block3);
     }
 
     @Test
