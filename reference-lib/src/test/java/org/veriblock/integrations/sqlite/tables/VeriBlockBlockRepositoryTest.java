@@ -27,7 +27,6 @@ import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
 public class VeriBlockBlockRepositoryTest {
-    private byte[] rawBlock;
     private StoredVeriBlockBlock newBlock;
     private StoredVeriBlockBlock newBlock2;
     private StoredVeriBlockBlock newBlock3;

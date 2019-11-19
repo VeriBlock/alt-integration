@@ -26,7 +26,6 @@ import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.Sha256Hash;
 
 public class BitcoinBlockRepositoryTest {
-    private byte[] rawBlock;
     private StoredBitcoinBlock newBlock;
     private StoredBitcoinBlock newBlock2;
     private StoredBitcoinBlock newBlock3;

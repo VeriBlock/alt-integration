@@ -6,24 +6,18 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.integrations;
+package org.veriblock.integrations.security;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Comparator;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.veriblock.integrations.blockchain.BitcoinBlockchain;
 import org.veriblock.integrations.VeriBlockIntegrationLibraryManager;
 import org.veriblock.integrations.VeriBlockSecurity;
-import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.util.Utils;
+import org.veriblock.integrations.blockchain.BitcoinBlockchain;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.Sha256Hash;
 

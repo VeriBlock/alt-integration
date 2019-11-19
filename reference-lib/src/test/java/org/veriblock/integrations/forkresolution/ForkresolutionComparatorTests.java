@@ -56,6 +56,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.veriblock.integrations.forkresolution.ForkresolutionComparator.compareTwoBranches;
 
+///TODO: unignore this
 @Ignore
 public class ForkresolutionComparatorTests {
 

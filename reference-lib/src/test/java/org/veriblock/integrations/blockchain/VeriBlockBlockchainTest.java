@@ -96,8 +96,6 @@ public class VeriBlockBlockchainTest {
 
         blockchain.add(block3);
 
-        Changeset changeset = new Changeset(BlockIdentifier.wrap(block1.getHash().getBytes()));
-
         Assert.assertEquals(store.get(block1.getHash()).getBlock(), block1);
         Assert.assertEquals(store.get(block2.getHash()).getBlock(), block2);
         Assert.assertEquals(store.get(block3.getHash()).getBlock(), block3);
