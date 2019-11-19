@@ -20,6 +20,8 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
+import static junit.framework.TestCase.assertEquals;
+
 public class AltPublicationTests {
 
     @Test
@@ -190,6 +192,7 @@ public class AltPublicationTests {
                 Collections.emptyList());
 
         byte[] serialized = SerializeDeserializeService.serialize(input);
+        System.out.println(Utils.encodeHex(serialized));
         AltPublication deserialized = SerializeDeserializeService.parseAltPublication(serialized);
 
         Assert.assertEquals(input, deserialized);
@@ -201,6 +204,21 @@ public class AltPublicationTests {
         byte[] data = Utils.decodeHex("01580101166772F51AB208D32771AB1506970EEB664462730B838E0203E800010701370100010C6865616465722062797465730112636F6E7465787420696E666F20627974657301117061796F757420696E666F2062797465734630440220398B74708DC8F8AEE68FCE0C47B8959E6FCE6354665DA3ED87A83F708E62AA6B02202E6C00C00487763C55E92C7B8E1DD538B7375D8DF2B2117E75ACBB9DB7DEB3C7583056301006072A8648CE3D020106052B8104000A03420004DE4EE8300C3CD99E913536CF53C4ADD179F048F8FE90E5ADF3ED19668DD1DBF6C2D8E692B1D36EAC7187950620A28838DA60A8C9DD60190C14C59B82CB90319E04000000010400000000201FEC8AA4983D69395010E4D18CD8B943749D5B4F575E88A375DEBDC5ED22531C040000000220000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000040000013880002449C60619294546AD825AF03B0935637860679DDD55EE4FD21082E18686E26BBFDA7D5E4462EF24AE02D67E47D785C9B90F301010000000000010100");
         AltPublication deserialized = SerializeDeserializeService.parseAltPublication(data);
         ValidationService.verify(deserialized);
+    }
+
+    @Test
+    public void roundTripParseVbkBlock(){
+        VeriBlockBlock block = new VeriBlockBlock(5000, (short) 2,
+                VBlakeHash.wrap("000000000000069B7E7B7245449C60619294546AD825AF03"),
+                VBlakeHash.wrap("00000000000023A90C8B0DFE7C55C1B0935637860679DDD5"),
+                VBlakeHash.wrap("00000000000065630808D69AB26B825EE4FD21082E18686E"),
+                Sha256Hash.wrap("26BBFDA7D5E4462EF24AE02D67E47D78", Sha256Hash.VERIBLOCK_MERKLE_ROOT_LENGTH),
+                1553699059,
+                16842752,
+                1);
+        byte[] data = SerializeDeserializeService.serialize(block);
+        VeriBlockBlock block2 = SerializeDeserializeService.parseVeriBlockBlock(data);
+        assertEquals(block, block2);
     }
 
 

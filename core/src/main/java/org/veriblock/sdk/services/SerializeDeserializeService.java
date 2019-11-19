@@ -362,7 +362,15 @@ public class SerializeDeserializeService {
     }
 
     public static VeriBlockBlock parseVeriBlockBlock(byte[] raw){
-        Preconditions.argument(raw != null && raw.length == Constants.HEADER_SIZE_VeriBlockBlock, "Invalid VeriBlock raw data");
+        Preconditions.argument(raw != null, "Invlid raw VeriBlockBlock");
+
+        if(raw.length == Constants.HEADER_SIZE_VeriBlockBlock + 1){
+            // consume one byte - "length" of this block header
+            return parseVeriBlockBlock(ByteBuffer.wrap(raw));
+        }
+
+        // at this point, raw.length is always 64 bytes
+        Preconditions.argument(raw.length == Constants.HEADER_SIZE_VeriBlockBlock, "Invalid VeriBlock raw data");
 
         ByteBuffer buffer = ByteBuffer.allocateDirect(raw.length);
 
