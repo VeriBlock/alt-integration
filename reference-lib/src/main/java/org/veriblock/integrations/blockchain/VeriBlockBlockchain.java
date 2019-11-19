@@ -616,4 +616,8 @@ public class VeriBlockBlockchain {
 
         return !bootstrapped;
     }
+
+    public boolean bootstrap(VeriBlockBlockchainBootstrapConfig config) throws SQLException, VerificationException {
+        return bootstrap(config.blocks);
+    }
 }
