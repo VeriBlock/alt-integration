@@ -53,15 +53,6 @@ public class VeriBlockRewardsProtoClient implements IVeriBlockRewards {
     }
     
     @Override
-    public ValidationResult setCalculator(PopRewardCalculatorConfig config) {
-        VeriBlockMessages.SetCalculatorRequest request = VeriBlockMessages.SetCalculatorRequest.newBuilder()
-                .setCalculator(CalculatorConfigProtoConverter.toProto(config))
-                .build();
-        GeneralReply reply = service.setCalculator(request);
-        return VeriBlockServiceCommon.validationResultFromProto(reply);
-    }
-    
-    @Override
     public Pair<ValidationResult, BigDecimal> rewardsCalculateScore(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks) {
         VeriBlockMessages.AltChainBlock endorsedBlockProto = AltChainBlockProtoConverter.toProto(endorsedBlock);
         List<VeriBlockMessages.AltChainBlock> endorsementBlocksProto = AltChainBlockProtoConverter.toProto(endorsementBlocks);

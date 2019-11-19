@@ -22,9 +22,7 @@ public interface IVeriBlockRewards {
     public ValidationResult resetRewards();
     
     public Pair<ValidationResult, PopRewardCalculatorConfig> getCalculator();
-    
-    public ValidationResult setCalculator(PopRewardCalculatorConfig config);
-    
+
     public Pair<ValidationResult, BigDecimal> rewardsCalculateScore(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks);
     
     public Pair<ValidationResult, PopPayoutRound> rewardsCalculateOutputs(int blockNumber, AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks, BigDecimal popDifficulty);
