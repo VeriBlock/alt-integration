@@ -261,7 +261,7 @@ public class VeriBlockSecurity {
         checkConnectivity(publication.getFirstBlock());
     }
 
-    void checkConnectivity(VeriBlockBlock block) throws BlockStoreException, SQLException {
+    public void checkConnectivity(VeriBlockBlock block) throws BlockStoreException, SQLException {
         if (block == null) {
             throw new VerificationException("Publication does not have any VeriBlock blocks");
         }
@@ -278,7 +278,7 @@ public class VeriBlockSecurity {
         }
     }
 
-    void checkConnectivity(BitcoinBlock block) throws BlockStoreException, SQLException {
+    public void checkConnectivity(BitcoinBlock block) throws BlockStoreException, SQLException {
         if (block == null) {
             throw new VerificationException("Publication does not have any Bitcoin blocks");
         }
