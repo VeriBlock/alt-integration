@@ -15,11 +15,13 @@ import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
+import org.veriblock.sdk.conf.AppConfiguration;
 import org.veriblock.sdk.conf.AppInjector;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Properties;
 
 ///TODO: this is not a test - move to helpers package
 public class VeriBlockIntegrationLibraryManager {
@@ -29,7 +31,16 @@ public class VeriBlockIntegrationLibraryManager {
 
     //Should have public constructor.
     public VeriBlockIntegrationLibraryManager() {
-        appInjector = new AppInjector(PACKAGE_NAME);
+        Properties properties = new Properties();
+        properties.setProperty("veriblockNetwork", "test");
+        properties.setProperty("validation.vb.block.difficulty", "false");
+        properties.setProperty("validation.btc.block.difficulty", "false");
+        properties.setProperty("app.api.host", "localhost");
+        properties.setProperty("app.api.port", "19011");
+        properties.setProperty("veriblock.blockchain.minimumDifficulty", "900000000000");
+
+        AppConfiguration configuration = new AppConfiguration(properties);
+        appInjector = new AppInjector(configuration);
 
     }
 

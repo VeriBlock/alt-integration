@@ -15,25 +15,23 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
-import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
 import org.veriblock.integrations.AltChainParametersConfig;
-import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
-import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-
 import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.auditor.store.AuditorChangesStore;
+import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
+import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
 import org.veriblock.integrations.rewards.PopRewardCalculator;
+import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
+import org.veriblock.sdk.conf.AppConfiguration;
 import org.veriblock.sdk.conf.AppInjector;
-import org.veriblock.sdk.conf.DefaultConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -42,26 +40,27 @@ public final class Application {
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
 
-    private static String PACKAGE_NAME = "webservice";
+    private static String DEFAULT_PROPERTY_FILE_NAME = "webservice-default";
     public Boolean terminated = false;
     private VeriBlockSecurity security = null;
     private Server server = null;
-    private DefaultConfiguration defaultConfiguration;
+    private AppConfiguration appConfiguration;
 
     @Inject
-    public Application(DefaultConfiguration defaultConfiguration) {
-        this.defaultConfiguration = defaultConfiguration;
+    public Application(AppConfiguration appConfiguration) {
+        this.appConfiguration = appConfiguration;
     }
 
     public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new AppInjector(PACKAGE_NAME));
+        AppConfiguration configuration = new AppConfiguration(DEFAULT_PROPERTY_FILE_NAME);
+        Injector injector = Guice.createInjector(new AppInjector(configuration));
         Application app = injector.getInstance(Application.class);
 
         app.run(args);
     }
 
     public void run(String[] args) {
-        log.info(defaultConfiguration.getPackageName() + " " + AppConstants.APP_VERSION);
+        log.info(appConfiguration.getDefaultPropertiesFileName() + " " + AppConstants.APP_VERSION);
         terminated = false;
 
         String databasePath = Paths.get(FileManager.getDataDirectory(), ConnectionSelector.defaultDatabaseName).toString();
@@ -70,10 +69,10 @@ public final class Application {
             BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
             AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
             PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
-            Context.init(defaultConfiguration, veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+            Context.init(appConfiguration, veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
             security = new VeriBlockSecurity();
 
-            ConfigurationParser config = new ConfigurationParser(defaultConfiguration.getProperties());
+            ConfigurationParser config = new ConfigurationParser(appConfiguration.getProperties());
             BitcoinBlockchainBootstrapConfig btcBootstrap = config.getBitcoinBlockchainBootstrapConfig();
             if (btcBootstrap != null)
                 security.getBitcoinBlockchain().bootstrap(btcBootstrap);
@@ -105,7 +104,7 @@ public final class Application {
             return;
         }
 
-        server = ServerBuilder.forPort(defaultConfiguration.getApiPort())
+        server = ServerBuilder.forPort(appConfiguration.getApiPort())
                 .addService(new IntegrationGrpcService(security))
                 .addService(new RewardsGrpcService())
                 .addService(new GrpcDeserializeService())
@@ -119,7 +118,7 @@ public final class Application {
             log.debug("Could not start GRPC server", e);
         }
 
-        log.info("Started API server at " + defaultConfiguration.getApiHost() + ":" + defaultConfiguration.getApiPort());
+        log.info("Started API server at " + appConfiguration.getApiHost() + ":" + appConfiguration.getApiPort());
 
         try {
             while(true) {
@@ -127,13 +126,13 @@ public final class Application {
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
-            log.warn(defaultConfiguration.getPackageName() + " terminated");
+            log.warn(appConfiguration.getDefaultPropertiesFileName() + " terminated");
             terminated = true;
         }
 
         shutdown();
 
-        log.warn(defaultConfiguration.getPackageName() + " stopped");
+        log.warn(appConfiguration.getDefaultPropertiesFileName() + " stopped");
     }
 
     public void shutdown() {
@@ -146,7 +145,7 @@ public final class Application {
                     Thread.sleep(1000);
                 }
             } catch (InterruptedException e) {
-                log.warn(defaultConfiguration.getPackageName() + " server terminated");
+                log.warn(appConfiguration.getDefaultPropertiesFileName() + " server terminated");
             }
 
             server = null;
