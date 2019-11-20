@@ -10,25 +10,25 @@ import org.slf4j.LoggerFactory;
 
 public class AppInjector extends AbstractModule {
     private static final Logger logger = LoggerFactory.getLogger(AppInjector.class);
-    private DefaultConfiguration defaultConfiguration;
+    private AppConfiguration appConfiguration;
 
-    public AppInjector(String packageName) {
-        this.defaultConfiguration = new DefaultConfiguration(packageName);
+    public AppInjector(AppConfiguration packageName) {
+        this.appConfiguration = packageName;
     }
 
     @Override
     protected void configure() {
         logger.debug("App configuration started.");
 
-        Names.bindProperties(binder(), defaultConfiguration.getProperties());
+        Names.bindProperties(binder(), appConfiguration.getProperties());
 
         logger.debug("App configuration ended.");
     }
 
     @Provides
     @Singleton
-    public DefaultConfiguration provideWallet() {
-        return defaultConfiguration;
+    public AppConfiguration provideWallet() {
+        return appConfiguration;
     }
 
 }

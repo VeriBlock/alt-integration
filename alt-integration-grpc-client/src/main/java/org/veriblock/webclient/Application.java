@@ -29,7 +29,7 @@ import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockPoPTransaction;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VeriBlockTransaction;
-import org.veriblock.sdk.conf.DefaultConfiguration;
+import org.veriblock.sdk.conf.AppConfiguration;
 import org.veriblock.sdk.transactions.VeriBlockTransactionsAtv;
 import org.veriblock.sdk.transactions.VeriBlockTransactionsVtb;
 import org.veriblock.sdk.util.BitcoinUtils;
@@ -49,7 +49,7 @@ public final class Application {
     public static final String version = AppConstants.APP_VERSION;
     public static Boolean terminated = false;
 
-    public static DefaultConfiguration config = new DefaultConfiguration(packageName);
+    public static AppConfiguration config = new AppConfiguration(packageName);
     public static int apiPort = config.getApiPort();
     public static String apiHost = "localhost";
     
