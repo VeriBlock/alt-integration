@@ -36,7 +36,6 @@ public class VeriBlockIntegrationLibraryManager {
     public VeriBlockSecurity init() throws SQLException, IOException {
         String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
         initContext(databasePath);
-
         Context.resetSecurity();
 
         security = new VeriBlockSecurity();

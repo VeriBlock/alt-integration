@@ -78,7 +78,7 @@ public class Context {
     public static void init() throws BlockStoreException, SQLException {
         if(networkParameters == null) {
             Properties properties = new Properties();
-            properties.setProperty("veriblockNetwork", "main");
+            properties.setProperty("veriblock.blockchain.minimumDifficulty", "900000000000");
             init(new DefaultConfiguration(properties), new VeriBlockStore(), new BitcoinStore(),
                     new AuditorChangesStore(), new PoPTransactionsDBStore());
         }
