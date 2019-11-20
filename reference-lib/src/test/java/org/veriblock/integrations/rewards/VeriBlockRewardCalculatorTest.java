@@ -72,7 +72,7 @@ public class VeriBlockRewardCalculatorTest {
         VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock popTxDBStore = new VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock();
 
         Properties properties = new Properties();
-        properties.setProperty("veriblockNetwork", "main");
+        properties.setProperty("veriblock.blockchain.minimumDifficulty", "900000000000");
         Context.init(new DefaultConfiguration(properties), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
         securityMock = new VeriBlockRewardCalculatorTest.VeriBlockSecurityMock();
