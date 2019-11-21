@@ -25,21 +25,27 @@ public class StreamUtils {
         stream.write(trimmed);
     }
 
+    public static void writeSingleByteLengthValueToStream(OutputStream stream, byte[] value) throws IOException {
+        stream.write((byte)value.length);
+        stream.write(value);
+    }
+    
+    public static void writeSingleIntLengthValueToStream(OutputStream stream, int value) throws IOException {
+    	byte[] valueBytes = Utils.toByteArray(value);
+        writeSingleByteLengthValueToStream(stream, valueBytes);
+    }
+    
     public static void writeVariableLengthValueToStream(OutputStream stream, byte[] value) throws IOException {
         byte[] dataSize = Utils.trimmedByteArrayFromInteger(value.length);
         stream.write((byte)dataSize.length);
         stream.write(dataSize);
         stream.write(value);
     }
+    
 
-    public static void writeSingleByteLengthValueToStream(OutputStream stream, byte[] value) throws IOException {
-        stream.write((byte)value.length);
-        stream.write(value);
-    }
-
-    public static byte[] getSingleByteLengthValue(ByteBuffer buffer, int maxLength, int minLength) {
+    public static byte[] getSingleByteLengthValue(ByteBuffer buffer, int minLength, int maxLength) {
         int length = buffer.get();
-        checkLength(length, maxLength, minLength);
+        checkLength(length, minLength, maxLength);
         
         byte[] value = new byte[length];
         buffer.get(value);
@@ -48,18 +54,22 @@ public class StreamUtils {
     }
     
     public static byte[] getSingleByteLengthValue(ByteBuffer buffer) {
-        return getSingleByteLengthValue(buffer, 255, 0);
+        return getSingleByteLengthValue(buffer, 0, 255);
+    }
+    
+    public static int getSingleIntValue(ByteBuffer buffer) {
+        return Utils.toInt(getSingleByteLengthValue(buffer, 4, 4));
     }
 
-    public static byte[] getVariableLengthValue(ByteBuffer buffer, int maxLength, int minLength) {
+    public static byte[] getVariableLengthValue(ByteBuffer buffer, int minLength, int maxLength) {
         byte lengthLength = buffer.get();
-        checkLength(lengthLength, 4, 0);
+        checkLength(lengthLength, 0, 4);
         
         byte[] lengthBytes = new byte[4];
         buffer.get(lengthBytes, 4 - lengthLength, lengthLength);
 
         int length = ByteBuffer.wrap(lengthBytes).getInt();
-        checkLength(length, maxLength, minLength);
+        checkLength(length, minLength, maxLength);
         
         byte[] value = new byte[length];
         buffer.get(value);
@@ -68,10 +78,10 @@ public class StreamUtils {
     }
     
     public static byte[] getVariableLengthValue(ByteBuffer buffer) {  
-        return getVariableLengthValue(buffer, Integer.MAX_VALUE, 0);
+        return getVariableLengthValue(buffer, 0, Integer.MAX_VALUE);
     }
     
-    private static void checkLength(int length, int maxLength, int minLength)
+    private static void checkLength(int length, int minLength, int maxLength)
     {
         if (length < minLength || length > maxLength)
             throw new IllegalArgumentException("Unexpected length: " + length

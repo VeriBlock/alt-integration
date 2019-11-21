@@ -9,7 +9,6 @@
 package org.veriblock.integrations.blockchain.store;
 
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,14 +17,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
-import org.veriblock.integrations.sqlite.tables.BlockData;
 import org.veriblock.integrations.sqlite.tables.KeyValueData;
 import org.veriblock.integrations.sqlite.tables.KeyValueRepository;
-import org.veriblock.integrations.sqlite.tables.VeriBlockBlocksRepository;
+import org.veriblock.integrations.sqlite.tables.VeriBlockBlockRepository;
 import org.veriblock.sdk.BlockStoreException;
 import org.veriblock.sdk.VBlakeHash;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
 public class VeriBlockStore {
@@ -34,20 +30,20 @@ public class VeriBlockStore {
 
     // underlying database
     private final Connection databaseConnection;
-    private final VeriBlockBlocksRepository veriBlockRepository;
+    private final VeriBlockBlockRepository veriBlockRepository;
     private final KeyValueRepository keyValueRepository;
 
     private final String chainHeadRepositoryName = "chainHeadVbk";
 
     public VeriBlockStore() throws SQLException {
         databaseConnection = ConnectionSelector.setConnectionDefault();
-        veriBlockRepository = new VeriBlockBlocksRepository(databaseConnection);
+        veriBlockRepository = new VeriBlockBlockRepository(databaseConnection);
         keyValueRepository = new KeyValueRepository(databaseConnection);
     }
 
     public VeriBlockStore(String databasePath) throws SQLException {
         databaseConnection = ConnectionSelector.setConnection(databasePath);
-        veriBlockRepository = new VeriBlockBlocksRepository(databaseConnection);
+        veriBlockRepository = new VeriBlockBlockRepository(databaseConnection);
         keyValueRepository = new KeyValueRepository(databaseConnection);
     }
 
@@ -60,7 +56,7 @@ public class VeriBlockStore {
     }
 
     public void clear() throws SQLException {
-        veriBlockRepository.getBlocksRepository().clear();
+        veriBlockRepository.clear();
         keyValueRepository.clear();
     }
 
@@ -90,34 +86,28 @@ public class VeriBlockStore {
     }
 
     public void put(StoredVeriBlockBlock storedBlock) throws BlockStoreException, SQLException {
-        byte[] serialized = SerializeDeserializeService.serialize(storedBlock.getBlock());
-        String id = Utils.encodeHex(storedBlock.getHash().getBytes());
-        BlockData data = new BlockData();
-        data.id = id;
-        data.previousId = Utils.encodeHex(storedBlock.getBlock().getPreviousBlock().getBytes());
-        data.height = storedBlock.getHeight();
-        data.work = storedBlock.getWork();
-        data.data = serialized;
-        veriBlockRepository.getBlocksRepository().save(data);
+        veriBlockRepository.save(storedBlock);
     }
 
     public StoredVeriBlockBlock get(VBlakeHash hash) throws BlockStoreException, SQLException {
-        List<BlockData> blocks = veriBlockRepository.getBlocksRepository().getEndsWithId(Utils.encodeHex(hash.getBytes()));
-        if(blocks.isEmpty()) return null;
-        
-        BlockData data = blocks.get(0);
-        if(data == null) return null;
-
-        VeriBlockBlock block = SerializeDeserializeService.parseVeriBlockBlock(ByteBuffer.wrap(data.data));
-        StoredVeriBlockBlock storedBlock = new StoredVeriBlockBlock(block, data.work);
-        return storedBlock;
+        List<StoredVeriBlockBlock> blocks = veriBlockRepository.getEndsWithId(hash);
+        return blocks.isEmpty() ? null : blocks.get(0);
     }
 
-    ///HACK: it is actually a delete method. It deletes block with hash.
-    ///HACK: storedBlock is not being used.
+    public StoredVeriBlockBlock erase(VBlakeHash hash) throws BlockStoreException, SQLException {
+        StoredVeriBlockBlock erased = get(hash);
+
+        if(erased != null && veriBlockRepository.isInUse(hash.trimToPreviousBlockSize())) {
+            throw new BlockStoreException("Cannot erase a block referenced by another block");
+        }
+
+        veriBlockRepository.delete(hash);
+        return erased;
+     }
+
     public StoredVeriBlockBlock replace(VBlakeHash hash, StoredVeriBlockBlock storedBlock) throws BlockStoreException, SQLException {
         StoredVeriBlockBlock replaced = get(hash);
-        veriBlockRepository.getBlocksRepository().delete(Utils.encodeHex(hash.getBytes()));
+        veriBlockRepository.save(storedBlock);
         return replaced;
     }
 

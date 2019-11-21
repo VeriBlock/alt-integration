@@ -8,6 +8,28 @@
 
 package org.veriblock.integrations.blockchain;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.veriblock.integrations.Context;
+import org.veriblock.integrations.auditor.Change;
+import org.veriblock.integrations.blockchain.changes.AddVeriBlockBlockChange;
+import org.veriblock.integrations.blockchain.changes.SetVeriBlockHeadChange;
+import org.veriblock.integrations.blockchain.changes.SetVeriBlockProofChange;
+import org.veriblock.integrations.blockchain.store.BitcoinStore;
+import org.veriblock.integrations.blockchain.store.StoredBitcoinBlock;
+import org.veriblock.integrations.blockchain.store.StoredVeriBlockBlock;
+import org.veriblock.integrations.blockchain.store.VeriBlockStore;
+import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.Constants;
+import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
+import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.VerificationException;
+import org.veriblock.sdk.conf.NetworkParameters;
+import org.veriblock.sdk.services.ValidationService;
+import org.veriblock.sdk.util.BitcoinUtils;
+import org.veriblock.sdk.util.Preconditions;
+
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,27 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.veriblock.integrations.auditor.Change;
-import org.veriblock.integrations.blockchain.changes.AddVeriBlockBlockChange;
-import org.veriblock.integrations.blockchain.changes.SetVeriBlockHeadChange;
-import org.veriblock.integrations.blockchain.changes.SetVeriBlockProofChange;
-import org.veriblock.integrations.blockchain.store.BitcoinStore;
-import org.veriblock.integrations.blockchain.store.StoredBitcoinBlock;
-import org.veriblock.integrations.blockchain.store.StoredVeriBlockBlock;
-import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.params.NetworkParameters;
-import org.veriblock.sdk.BlockStoreException;
-import org.veriblock.sdk.Constants;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VBlakeHash;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VerificationException;
-import org.veriblock.sdk.services.ValidationService;
-import org.veriblock.sdk.util.BitcoinUtils;
-import org.veriblock.sdk.util.Preconditions;
 
 public class VeriBlockBlockchain {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockBlockchain.class);
@@ -126,7 +127,7 @@ public class VeriBlockBlockchain {
 
         List<Change> changes = new ArrayList<>();
         store.put(storedBlock);
-        changes.add(new AddVeriBlockBlockChange(storedBlock, storedBlock));
+        changes.add(new AddVeriBlockBlockChange(null, storedBlock));
 
         // Try to update the prior keystone's proof
         Change keystoneChange = trySetBlockProof(storedBlock.getBlock().getEffectivePreviousKeystone(), blockOfProof);
@@ -257,8 +258,12 @@ public class VeriBlockBlockchain {
                 switch (change.getOperation()) {
                     case ADD_BLOCK:
                         StoredVeriBlockBlock newValue = StoredVeriBlockBlock.deserialize(change.getNewValue());
-                        StoredVeriBlockBlock oldValue = StoredVeriBlockBlock.deserialize(change.getOldValue());
-                        store.replace(newValue.getHash(), oldValue);
+                        if (change.getOldValue() != null && change.getOldValue().length > 0) {
+                            StoredVeriBlockBlock oldValue = StoredVeriBlockBlock.deserialize(change.getOldValue());
+                            store.replace(newValue.getHash(), oldValue);
+                       } else {
+                            store.erase(newValue.getHash());
+                        }
                         break;
                     case SET_HEAD:
                         StoredVeriBlockBlock priorHead = StoredVeriBlockBlock.deserialize(change.getOldValue());
@@ -271,6 +276,12 @@ public class VeriBlockBlockchain {
                 }
             }
         }
+    }
+
+    public VeriBlockBlock getChainHead() throws SQLException {
+        StoredVeriBlockBlock chainHead = store.getChainHead();
+
+        return chainHead == null ? null : chainHead.getBlock();
     }
 
     private StoredVeriBlockBlock getInternal(VBlakeHash hash) throws BlockStoreException, SQLException {
@@ -495,7 +506,11 @@ public class VeriBlockBlockchain {
         // Connects to a known "seen" block (except for origin block)
         StoredVeriBlockBlock previous = getInternal(block.getPreviousBlock());
         if (previous == null) {
-            throw new VerificationException("Block does not fit");
+            // corner case: the first bootstrap block connects to the blockchain
+            // by definition despite not having the previous block in the store
+            if (getInternal(block.getHash()) == null) {
+                throw new VerificationException("Block does not fit");
+            }
         }
 
         StoredVeriBlockBlock keystone = store.get(block.getPreviousKeystone());
@@ -561,6 +576,10 @@ public class VeriBlockBlockchain {
     }
 
     private void checkDifficulty(VeriBlockBlock block, StoredVeriBlockBlock previous, List<StoredVeriBlockBlock> context) throws VerificationException {
+        if(!Context.getConfiguration().isValidateVBBlockDifficulty()){
+            return;
+        }
+
         if (context.size() < DIFFICULTY_ADJUST_BLOCK_COUNT) {
             log.warn("Not enough context blocks to check difficulty");
             return;
@@ -572,5 +591,37 @@ public class VeriBlockBlockchain {
         if (block.getDifficulty() != (int)BitcoinUtils.encodeCompactBits(calculated)) {
             throw new VerificationException("Block does not conform to expected difficulty");
         }
+    }
+
+    // Returns true if the store was empty and the bootstrap
+    // blocks were added to it successfully.
+    // Otherwise, returns false.
+    public boolean bootstrap(List<VeriBlockBlock> blocks) throws SQLException, VerificationException {
+        assert(blocks.size() > 0);
+        boolean bootstrapped = store.getChainHead() != null;
+
+        if (!bootstrapped) {
+            VBlakeHash prevHash = null;
+            for (VeriBlockBlock block : blocks) {
+                if (prevHash != null && !block.getPreviousBlock().equals(prevHash) )
+                    throw new VerificationException("VeriBlock bootstrap blocks must be contiguous");
+
+                prevHash = block.getHash().trimToPreviousBlockSize();
+            }
+
+            for (VeriBlockBlock block : blocks) {
+                BigInteger work = BitcoinUtils.decodeCompactBits(block.getDifficulty());
+                StoredVeriBlockBlock storedBlock = new StoredVeriBlockBlock(
+                                                        block, work, Sha256Hash.ZERO_HASH);
+                store.put(storedBlock);
+                store.setChainHead(storedBlock);
+            }
+        }
+
+        return !bootstrapped;
+    }
+
+    public boolean bootstrap(VeriBlockBlockchainBootstrapConfig config) throws SQLException, VerificationException {
+        return bootstrap(config.blocks);
     }
 }

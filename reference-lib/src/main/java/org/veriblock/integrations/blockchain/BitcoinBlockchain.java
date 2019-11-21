@@ -8,17 +8,9 @@
 
 package org.veriblock.integrations.blockchain;
 
-import java.math.BigInteger;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.auditor.Change;
 import org.veriblock.integrations.blockchain.changes.AddBitcoinBlockChange;
 import org.veriblock.integrations.blockchain.changes.SetBitcoinHeadChange;
@@ -32,6 +24,16 @@ import org.veriblock.sdk.VerificationException;
 import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.BitcoinUtils;
 import org.veriblock.sdk.util.Preconditions;
+
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class BitcoinBlockchain {
     private static final Logger log = LoggerFactory.getLogger(BitcoinBlockchain.class);
@@ -105,7 +107,7 @@ public class BitcoinBlockchain {
 
         List<Change> changes = new ArrayList<>();
         store.put(storedBlock);
-        changes.add(new AddBitcoinBlockChange(storedBlock, storedBlock));
+        changes.add(new AddBitcoinBlockChange(null, storedBlock));
 
         StoredBitcoinBlock chainHead = store.getChainHead();
         if (chainHead == null || storedBlock.getWork().compareTo(chainHead.getWork()) > 0) {
@@ -176,8 +178,12 @@ public class BitcoinBlockchain {
                 switch (change.getOperation()) {
                     case ADD_BLOCK:
                         StoredBitcoinBlock newValue = StoredBitcoinBlock.deserialize(change.getNewValue());
-                        StoredBitcoinBlock oldValue = StoredBitcoinBlock.deserialize(change.getOldValue());
-                        store.replace(newValue.getHash(), oldValue);
+                        if (change.getOldValue() != null && change.getOldValue().length > 0) {
+                            StoredBitcoinBlock oldValue = StoredBitcoinBlock.deserialize(change.getOldValue());
+                            store.replace(newValue.getHash(), oldValue);
+                        } else {
+                            store.erase(newValue.getHash());
+                        }
                         break;
                     case SET_HEAD:
                         StoredBitcoinBlock priorHead = StoredBitcoinBlock.deserialize(change.getOldValue());
@@ -188,6 +194,12 @@ public class BitcoinBlockchain {
                 }
             }
         }
+    }
+
+    public BitcoinBlock getChainHead() throws SQLException {
+        StoredBitcoinBlock chainHead = store.getChainHead();
+
+        return chainHead == null ? null : chainHead.getBlock();
     }
 
     private StoredBitcoinBlock getInternal(Sha256Hash hash) throws BlockStoreException, SQLException {
@@ -245,7 +257,11 @@ public class BitcoinBlockchain {
         // Connects to a known "seen" block (except for origin block)
         StoredBitcoinBlock previous = getInternal(block.getPreviousBlock());
         if (previous == null) {
-            throw new VerificationException("Block does not fit");
+            // corner case: the first bootstrap block connects to the blockchain
+            // by definition despite not having the previous block in the store
+            if (getInternal(block.getHash()) == null) {
+                throw new VerificationException("Block does not fit");
+            }
         }
 
         return previous;
@@ -279,6 +295,10 @@ public class BitcoinBlockchain {
     }
 
     private void checkDifficulty(BitcoinBlock block, StoredBitcoinBlock previous) throws VerificationException, BlockStoreException, SQLException {
+        if(!Context.getConfiguration().isValidateBTCBlockDifficulty()){
+            return;
+        }
+
         // Previous + 1 = height of block
         if ((previous.getHeight() + 1) % 2016 > 0) {
             // Difficulty should be same as previous
@@ -324,4 +344,40 @@ public class BitcoinBlockchain {
             }
         }
     }
+
+    // Returns true if the store was empty and the bootstrap
+    // blocks were added to it successfully.
+    // Otherwise, returns false.
+    public boolean bootstrap(List<BitcoinBlock> blocks, int firstBlockHeight) throws SQLException, VerificationException {
+        assert(blocks.size() > 0);
+        assert(firstBlockHeight >= 0);
+
+        boolean bootstrapped = store.getChainHead() != null;
+
+        if (!bootstrapped) {
+            Sha256Hash prevHash = null;
+            for (BitcoinBlock block : blocks) {
+                if (prevHash != null && !block.getPreviousBlock().equals(prevHash) )
+                    throw new VerificationException("Bitcoin bootstrap blocks must be contiguous");
+
+                prevHash = block.getHash();
+            }
+
+            int blockHeight = firstBlockHeight;
+            for (BitcoinBlock block : blocks) {
+                BigInteger work = BitcoinUtils.decodeCompactBits(block.getBits());
+                StoredBitcoinBlock storedBlock = new StoredBitcoinBlock(block, work, blockHeight);
+                blockHeight++;
+                store.put(storedBlock);
+                store.setChainHead(storedBlock);
+            }
+        }
+
+        return !bootstrapped;
+    }
+
+    public boolean bootstrap(BitcoinBlockchainBootstrapConfig config) throws SQLException, VerificationException {
+        return bootstrap(config.blocks, config.firstBlockHeight);
+    }
+
 }

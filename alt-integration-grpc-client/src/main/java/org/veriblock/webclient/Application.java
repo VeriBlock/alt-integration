@@ -8,19 +8,20 @@
 
 package org.veriblock.webclient;
 
-import java.math.BigInteger;
-import java.security.SignatureException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import io.grpc.ManagedChannel;
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.veriblock.protoservice.DeserializeProtoClient;
+import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
+import org.veriblock.protoservice.VeriBlockDeserializeProtoClient;
+import org.veriblock.protoservice.VeriBlockForkresolutionProtoClient;
 import org.veriblock.protoservice.VeriBlockSecurityProtoClient;
+import org.veriblock.sdk.AltChainBlock;
 import org.veriblock.sdk.AltPublication;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.BlockIndex;
+import org.veriblock.sdk.Pair;
 import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.ValidationResult;
@@ -28,10 +29,16 @@ import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockPoPTransaction;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VeriBlockTransaction;
+import org.veriblock.sdk.conf.AppConfiguration;
+import org.veriblock.sdk.transactions.VeriBlockTransactionsAtv;
+import org.veriblock.sdk.transactions.VeriBlockTransactionsVtb;
 import org.veriblock.sdk.util.BitcoinUtils;
 
-import io.grpc.ManagedChannel;
-import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
+import java.math.BigInteger;
+import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public final class Application {
 
@@ -42,7 +49,7 @@ public final class Application {
     public static final String version = AppConstants.APP_VERSION;
     public static Boolean terminated = false;
 
-    public static DefaultConfiguration config = new DefaultConfiguration();
+    public static AppConfiguration config = new AppConfiguration(packageName);
     public static int apiPort = config.getApiPort();
     public static String apiHost = "localhost";
     
@@ -93,12 +100,35 @@ public final class Application {
         ValidationResult replyAddPayloads = client.addPayloads(blockIndex, atvs, vtbPublications);
         log.info("AddPayloads command success: " + replyAddPayloads.isValid());
         
-        DeserializeProtoClient client2 = new DeserializeProtoClient(channel);
+        VeriBlockDeserializeProtoClient client2 = new VeriBlockDeserializeProtoClient(channel);
         client2.parseAltPublication("123".getBytes());
+
+        AltChainParametersConfig altChainConfig = new AltChainParametersConfig();
+        altChainConfig.keystoneInterval = 13;
+        ValidationResult replySetAltChainConfig = client.setConfig(altChainConfig, null, null, null, null);
+        log.info("SetAltChainParametersConfig command success: " + replySetAltChainConfig.isValid());
+
+
+
+        TestForkresolutionService();
 
         shutdown();
 
         log.warn(packageName + " stopped");
+    }
+
+    public static void TestForkresolutionService()
+    {
+        VeriBlockForkresolutionProtoClient client  = new VeriBlockForkresolutionProtoClient(channel);
+        VeriBlockSecurityProtoClient securityClient = new VeriBlockSecurityProtoClient(channel);
+
+        ForkresolutionConfig forkresolutionConfig = new ForkresolutionConfig(60, 20);
+        ValidationResult replySetForkresolutionConfig = securityClient.setConfig(null, forkresolutionConfig, null, null, null);
+        log.info("SetForkresolutionConfig command success: " + replySetForkresolutionConfig.isValid());
+
+        Pair<ValidationResult, Integer> replyCompareTwoBranches = client.compareTwoBranches(new ArrayList<AltChainBlock>(), new ArrayList<AltChainBlock>());
+        log.info("CompareTwoBranches command success: " + replyCompareTwoBranches.getFirst().isValid());
+        log.info("CompareTwoBranches command result: " + replyCompareTwoBranches.getSecond());
     }
 
     public static void shutdown() {

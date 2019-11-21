@@ -10,10 +10,7 @@ package org.veriblock.protoconverters;
 
 import java.util.List;
 
-import org.veriblock.sdk.Address;
-import org.veriblock.sdk.Coin;
-import org.veriblock.sdk.Output;
-import org.veriblock.sdk.VeriBlockTransaction;
+import org.veriblock.sdk.*;
 
 import com.google.protobuf.ByteString;
 
@@ -29,12 +26,12 @@ public final class VeriBlockTransactionProtoConverter {
     Coin sourceAmount = CoinProtoConverter.fromProto(protoData.getSourceAmount());
     List<Output> outputs = OutputsProtoConverter.fromProto(protoData.getOutputsList());
     long signatureIndex = protoData.getSignatureIndex();
-    byte[] data = protoData.getData().toByteArray();
+    PublicationData publicationData = PublicationDataProtoConverter.fromProto(protoData.getPublicationData());
     byte[] signature = protoData.getSignature().toByteArray();
     byte[] publicKey = protoData.getPublicKey().toByteArray();
     Byte networkByte = NetworkByteConverter.fromProto(protoData.getNetworkByte());
 
-    VeriBlockTransaction result = new VeriBlockTransaction(type, sourceAddress, sourceAmount, outputs, signatureIndex, data,
+    VeriBlockTransaction result = new VeriBlockTransaction(type, sourceAddress, sourceAmount, outputs, signatureIndex, publicationData,
         signature, publicKey, networkByte);
     return result;
   }
@@ -45,7 +42,7 @@ public final class VeriBlockTransactionProtoConverter {
       VeriBlockMessages.Coin sourceAmount = CoinProtoConverter.toProto(data.getSourceAmount());
       List<VeriBlockMessages.Output> outputs = OutputsProtoConverter.toProto(data.getOutputs());
       long signatureIndex = data.getSignatureIndex();
-      byte[] rawData = data.getData();
+      VeriBlockMessages.PublicationData publicationData = PublicationDataProtoConverter.toProto(data.getPublicationData());
       byte[] signature = data.getSignature();
       byte[] publicKey = data.getPublicKey();
       VeriBlockMessages.NetworkByte networkByte = NetworkByteConverter.toProto(data.getNetworkByte());
@@ -56,7 +53,7 @@ public final class VeriBlockTransactionProtoConverter {
           .setSourceAmount(sourceAmount)
           .addAllOutputs(outputs)
           .setSignatureIndex(signatureIndex)
-          .setData(ByteString.copyFrom(rawData))
+          .setPublicationData(publicationData)
           .setSignature(ByteString.copyFrom(signature))
           .setPublicKey(ByteString.copyFrom(publicKey))
           .setNetworkByte(networkByte);

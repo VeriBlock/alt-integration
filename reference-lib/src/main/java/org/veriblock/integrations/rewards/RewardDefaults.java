@@ -15,11 +15,11 @@ public final class RewardDefaults {
     
     // this is our 100% reward budget. May vary up to 500%
     public static final long POP_DEFAULT_REWARD_PER_BLOCK = 10 * 1000000;
-    
-    // we expect keystones every 10th block
-    public static final int KEYSTONE_INTERVAL_BLOCKS = 10;
+
     // average 50 blocks before the endorsed block to calculate it's difficulty
-    public static final int POP_DIFFICULTY_AVERAGING_INTERVALBLOCKS = 50;
+    public static final int POP_DIFFICULTY_AVERAGING_INTERVAL = 50;
+    // the interval for calculating score for the block
+    public static final int POP_REWARD_SETTLEMENT_INTERVAL = 400;
     // we only store 50 values in relativeScoreLookupTable and do not want to search more blocks
     public static final int POP_SEARCH_UP_TO_VBK_BLOCKS = 50;
     
@@ -51,7 +51,7 @@ public final class RewardDefaults {
     public static final double WIDTH_OF_DECREASING_LINE_REWARD_PERIOD_NORMAL   = 100.0;
     ///HACK: keystone reward curve is more steep even with 2x larger width
     public static final double WIDTH_OF_DECREASING_LINE_REWARD_PERIOD_KEYSTONE = 200.0;
-    
+
     // reward score table
     // we score each VeriBlock and lower the reward for late blocks
     public static final double[] popRelativeScoreLookupTable = {

@@ -30,14 +30,7 @@ public class RewardsGrpcService extends RewardsServiceImplBase {
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
-    
-    @Override
-    public void setCalculator(VeriBlockMessages.SetCalculatorRequest request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        GeneralReply reply = VeriBlockRewardsProtoService.setCalculator(request.getCalculator());
-        responseObserver.onNext(reply);
-        responseObserver.onCompleted();
-    }
-    
+
     @Override
     public void rewardsCalculateScore(VeriBlockMessages.RewardsCalculateScoreRequest request, StreamObserver<VeriBlockMessages.RewardsCalculateScoreReply> responseObserver) {
         VeriBlockMessages.RewardsCalculateScoreReply reply = VeriBlockRewardsProtoService.rewardsCalculateScore(request);
@@ -48,6 +41,13 @@ public class RewardsGrpcService extends RewardsServiceImplBase {
     @Override
     public void rewardsCalculateOutputs(VeriBlockMessages.RewardsCalculateOutputsRequest request, StreamObserver<VeriBlockMessages.RewardsCalculateOutputsReply> responseObserver) {
         VeriBlockMessages.RewardsCalculateOutputsReply reply = VeriBlockRewardsProtoService.rewardsCalculateOutputs(request);
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void rewardsCalculatePopDifficulty(VeriBlockMessages.RewardsCalculatePopDifficultyRequest request, StreamObserver<VeriBlockMessages.RewardsCalculateScoreReply> responseObserver) {
+        VeriBlockMessages.RewardsCalculateScoreReply reply = VeriBlockRewardsProtoService.rewardsCalculatePopDifficulty(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }

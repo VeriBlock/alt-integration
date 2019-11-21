@@ -9,8 +9,8 @@
 package org.veriblock.sdk;
 
 public class BlockIndex {
-    private final long height;
-    private final String hash;
+    protected final long height;
+    protected final String hash;
 
     public long getHeight() {
         return height;

@@ -8,16 +8,36 @@
 
 package org.veriblock.integrations.rewards;
 
+import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.integrations.Context;
+import org.veriblock.integrations.VeriBlockSecurity;
+import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.AltChainBlock;
+import org.veriblock.sdk.AltPublication;
+import org.veriblock.sdk.ValidationResult;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PopRewardCalculator {    
     // payout rounds methods
     
     private static PopRewardCalculatorConfig config = new PopRewardCalculatorConfig();
-    
+
+    private static VeriBlockSecurity security;
+
+    private static PoPTransactionsDBStore popTxDBStore;
+
+    public static void setSecurity(VeriBlockSecurity security)
+    {
+        PopRewardCalculator.security = security;
+        PopRewardCalculator.popTxDBStore = Context.getPopTxDBStore();
+    }
+
     public static PopRewardCalculatorConfig getCalculatorConfig() {
         return config;
     }
@@ -25,6 +45,8 @@ public class PopRewardCalculator {
     public static void setCalculatorConfig(PopRewardCalculatorConfig config) {
         PopRewardCalculator.config = config;
     }
+
+    public static AltChainParametersConfig getAltChainConfig() { return security.getAltChainParametersConfig(); }
     
     public static boolean isKeystoneRound(int payoutRound) {
         return payoutRound == config.keystoneRound;
@@ -32,7 +54,7 @@ public class PopRewardCalculator {
     
     // rounds for blocks are [4, 1, 2, 3, 1, 2, 3, 1, 2, 3, 4, ...]
     public static int getRoundForBlockNumber(int number) {
-        if (number % config.keystoneInterval == 0) {
+        if (number % security.getAltChainParametersConfig().keystoneInterval == 0) {
             return config.keystoneRound;
         }
         
@@ -40,7 +62,7 @@ public class PopRewardCalculator {
             return 0;
         }
 
-        int round = ((number - 1) % config.keystoneInterval) % (config.payoutRounds - 1);
+        int round = ((number - 1) % security.getAltChainParametersConfig().keystoneInterval) % (config.payoutRounds - 1);
         return round;
     }
     
@@ -60,7 +82,7 @@ public class PopRewardCalculator {
         int roundForBlockNumber = getRoundForBlockNumber(blockNumber);
         if (round != roundForBlockNumber) return -1;
 
-        int keystonePeriodIndex = blockNumber % config.keystoneInterval;
+        int keystonePeriodIndex = blockNumber % security.getAltChainParametersConfig().keystoneInterval;
         
         if(keystonePeriodIndex == 0) return 1;
         if(config.payoutRounds == 0) return -1;
@@ -108,25 +130,69 @@ public class PopRewardCalculator {
 
         return config.relativeScoreLookupTable.get(relativeBlock);
     }
-    
-    // endorsements contain the POP transactions grouped by VeriBlock height.
-    // eg endorsements[0] contains the POP transactions which endorse some block X and stored into VeriBlock block at height N
-    // and endorsements[1] contains the POP transactions which endorse some block X and stored into VeriBlock block at height N + 1
-    public static BigDecimal calculatePopScoreFromEndorsements(PopRewardEndorsements endorsements) {
-        BigDecimal totalScore = BigDecimal.ZERO;
-        
-        int veriBlockLowestHeight = endorsements.getLowestVeriBlockHeight();
-        for(int veriBlockHeight : endorsements.getBlocksWithEndorsements().keySet()) {
-            List<PopEndorsement> blockEndorsements = endorsements.getBlocksWithEndorsements().get(veriBlockHeight);
-            int relativeHeight = veriBlockHeight - veriBlockLowestHeight;
-            BigDecimal score = getScoreMultiplierFromRelativeBlock(relativeHeight);
-            
-            // totalScore += (score * endorsements[i].length)
-            // we sum all the endorsements for the current block, adjust the sum to the current block score weight and
-            // add everything to the totalScore
-            totalScore = totalScore.add(score.multiply(new BigDecimal(blockEndorsements.size())));
+
+    public static int getBestPublicationHeight(List<AltPublication> publications) throws SQLException {
+        int bestPublication = -1;
+        for(AltPublication publication : publications) {
+            ValidationResult fsuccess = security.checkATVAgainstView(publication);
+            int vbkHeight = publication.getContainingBlock().getHeight();
+
+            if(fsuccess.isValid() && (vbkHeight < bestPublication || bestPublication < 0))
+                bestPublication = vbkHeight;
+        }
+        return bestPublication;
+    }
+
+    public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException {
+        if(blocksInterval.size() != config.popRewardSettlementInterval + config.popDifficultyAveragingInterval) {
+            throw new IllegalArgumentException("The amount of blocks must be equal to popRewardSettlementInterval + popDifficultyAveragingInterval");
         }
 
+        BigDecimal difficulty = BigDecimal.ZERO;
+
+        Collections.sort(blocksInterval);  // make the ascending order for the blocks in the collection, it needs for the correct calculation of the pop score
+
+        for(int i = 0; i < config.popDifficultyAveragingInterval; ++i)
+        {
+            BigDecimal score = calculatePopScoreFromEndorsements(blocksInterval.get(i), blocksInterval.subList(i + 1 , i  + 1 + config.popRewardSettlementInterval));
+            difficulty = difficulty.add(score);
+        }
+
+        difficulty = difficulty.divide(new BigDecimal(config.popDifficultyAveragingInterval), RoundingMode.FLOOR);
+
+        if (difficulty.compareTo(BigDecimal.ONE) < 0) {
+            difficulty = BigDecimal.ONE; // Minimum difficulty
+        }
+        return difficulty;
+    }
+
+    public static BigDecimal calculatePopScoreFromEndorsements(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks) throws SQLException {
+        BigDecimal totalScore = BigDecimal.ZERO;
+
+        List<AltPublication> endorsements = popTxDBStore.getAltPublciationsEndorse(endorsedBlock, endorsementBlocks);
+
+        int bestPublication = getBestPublicationHeight(endorsements);
+
+        for(AltPublication publication : endorsements) {
+            ValidationResult fsuccess = security.checkATVAgainstView(publication);
+            int relativeHeight = publication.getContainingBlock().getHeight() - bestPublication;
+
+            if(fsuccess.isValid())
+                totalScore = totalScore.add(getScoreMultiplierFromRelativeBlock(relativeHeight));
+        }
+        return totalScore;
+    }
+
+    public static BigDecimal calculatePopScoreFromEndorsements(List<AltPublication> endorsements , int bestPublication) throws SQLException {
+        BigDecimal totalScore = BigDecimal.ZERO;
+
+        for(AltPublication publication : endorsements) {
+            ValidationResult fsuccess = security.checkATVAgainstView(publication);
+            int relativeHeight = publication.getContainingBlock().getHeight() - bestPublication;
+
+            if(fsuccess.isValid())
+                totalScore = totalScore.add(getScoreMultiplierFromRelativeBlock(relativeHeight));
+        }
         return totalScore;
     }
 
@@ -143,8 +209,8 @@ public class PopRewardCalculator {
 
     public static BigDecimal calculateTotalPopBlockReward(int blockNumber, BigDecimal difficulty, BigDecimal score) {
         if (difficulty.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("calculateTotalReward cannot be called with a negative or" +
-                    " zero difficulty (called with " + difficulty + ")!");
+            throw new IllegalArgumentException("calculateTotalReward cannot be called with a negative difficulty" +
+                    " (called with " + difficulty + ")!");
         }
         if (score.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("calculateTotalReward cannot be called with a negative score" +
@@ -210,29 +276,35 @@ public class PopRewardCalculator {
         return calculateTotalPopBlockReward(blockNumber, difficulty, scoreForThisBlock);
     }
 
-    public static PopPayoutRound calculatePopPayoutRound(int blockNumber, PopRewardEndorsements endorsements, BigDecimal popDifficulty) {
-        BigDecimal scoreForThisBlock = calculatePopScoreFromEndorsements(endorsements);
+    public static PopPayoutRound calculatePopPayoutRound(int blockNumber, AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks, BigDecimal popDifficulty) throws SQLException {
+
+        if(endorsementBlocks.size() != config.popRewardSettlementInterval)
+            throw new IllegalArgumentException("The amount of endorsementBlocks must be equal to popRewardSettlementInterval");
+
+        List<AltPublication> endorsements = popTxDBStore.getAltPublciationsEndorse(endorsedBlock, endorsementBlocks);
+
+        int veriBlockLowestHeight = getBestPublicationHeight(endorsements);
+        BigDecimal scoreForThisBlock = calculatePopScoreFromEndorsements(endorsements, veriBlockLowestHeight);
         // round down the reward to integer value
         long popBlockReward = calculatePopRewardForBlock(blockNumber, scoreForThisBlock, popDifficulty).longValue();
 
         // we have the total reward per block in popBlockReward. Let's distribute it now.
-        
+
         List<PopRewardOutput> outputsToPopMiners = new ArrayList<>();
 
         long totalRewardPaidOut = 0L;
-        
+
         ///HACK: I hoped to simplify the reward calculation rules and express the rewardPerBlock value but could
         ///      not find a proper expression. So we are having quite complex function to obtain the rewardPerEndorsement and it looks
         ///      like:
         ///      rewardPerEndorsement = popBlockReward * endorsementLevelWeight(i) / (sum(endorsementLevelWeight(k) * endorsmentsLength(k))
         ///      where k iterates over blocks containing endorsements
-        
-        int veriBlockLowestHeight = endorsements.getLowestVeriBlockHeight();
-        for(int veriBlockHeight : endorsements.getBlocksWithEndorsements().keySet()) {
-            List<PopEndorsement> blockEndorsements = endorsements.getBlocksWithEndorsements().get(veriBlockHeight);
+
+        for(AltPublication publication : endorsements) {
+            int veriBlockHeight = publication.getContainingBlock().getHeight();
             int relativeHeight = veriBlockHeight - veriBlockLowestHeight;
             BigDecimal endorsementLevelWeight = getScoreMultiplierFromRelativeBlock(relativeHeight);
-            
+
             long rewardPerEndorsement = new BigDecimal(popBlockReward)
                     .multiply(endorsementLevelWeight)
                     .divide(scoreForThisBlock, RoundingMode.FLOOR)
@@ -241,14 +313,10 @@ public class PopRewardCalculator {
             if (rewardPerEndorsement <= 0) {
                 continue;
             }
-            
-            for(PopEndorsement endorsementToReward : blockEndorsements) {
-                //String txId = endorsementToReward.getTxId();
-                String popMinerAddress = endorsementToReward.getMiner();
 
-                outputsToPopMiners.add(new PopRewardOutput(popMinerAddress, rewardPerEndorsement));
-                totalRewardPaidOut += rewardPerEndorsement;
-            }
+            byte[] popMinerAddress = publication.getTransaction().getPublicationData().getPayoutInfo();
+            outputsToPopMiners.add(new PopRewardOutput(popMinerAddress, rewardPerEndorsement));
+            totalRewardPaidOut += rewardPerEndorsement;
         }
 
         if (totalRewardPaidOut > popBlockReward) {

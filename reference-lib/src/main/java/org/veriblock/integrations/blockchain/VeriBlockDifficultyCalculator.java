@@ -8,14 +8,14 @@
 
 package org.veriblock.integrations.blockchain;
 
+import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.conf.NetworkParameters;
+import org.veriblock.sdk.util.BitcoinUtils;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.List;
-
-import org.veriblock.integrations.params.NetworkParameters;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.util.BitcoinUtils;
 
 public strictfp class VeriBlockDifficultyCalculator {
     public static final int RETARGET_PERIOD = 100; // In blocks

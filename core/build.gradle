@@ -10,8 +10,16 @@ version = '0.1.4'
 
 dependencies {
     testImplementation 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.7.22'
 
+
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.60'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
+    //Guice
+    compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
+    compile group: 'com.google.inject.extensions', name: 'guice-multibindings', version: '4.2.2'
+    compile group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.2.2'
 }
 
 jar {
@@ -51,6 +59,19 @@ publishing {
             artifactId 'integrations-sdk'
             version this.version
             from components.java
+        }
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['conf']
+            includes = ["**/*.properties"]
+        }
+
+        java {
+            srcDirs += ['conf']
         }
     }
 }

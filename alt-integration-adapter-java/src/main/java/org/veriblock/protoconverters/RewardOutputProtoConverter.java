@@ -11,6 +11,7 @@ package org.veriblock.protoconverters;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.protobuf.ByteString;
 import org.veriblock.integrations.rewards.PopRewardOutput;
 
 import integration.api.grpc.VeriBlockMessages;
@@ -20,7 +21,7 @@ public final class RewardOutputProtoConverter {
     private RewardOutputProtoConverter() {} //never
     
     public static PopRewardOutput fromProto(VeriBlockMessages.RewardOutput protoData) {
-        PopRewardOutput result = new PopRewardOutput(protoData.getAddress(), Long.parseUnsignedLong(protoData.getReward()));
+        PopRewardOutput result = new PopRewardOutput(protoData.getPayoutInfo().toByteArray(), Long.parseUnsignedLong(protoData.getReward()));
         return result;
     }
     
@@ -34,7 +35,7 @@ public final class RewardOutputProtoConverter {
     
     public static VeriBlockMessages.RewardOutput toProto(PopRewardOutput data) {
         VeriBlockMessages.RewardOutput.Builder result = VeriBlockMessages.RewardOutput.newBuilder();
-        result = result.setAddress(data.getPopMinerAddress())
+        result = result.setPayoutInfo(ByteString.copyFrom(data.getPopMinerPayoutInfo()))
                 .setReward(Long.toString(data.getReward()));
         return result.build();
     }

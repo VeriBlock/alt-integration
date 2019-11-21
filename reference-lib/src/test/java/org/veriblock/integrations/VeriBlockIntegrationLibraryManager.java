@@ -8,47 +8,52 @@
 
 package org.veriblock.integrations;
 
+import org.junit.Test;
+import org.veriblock.integrations.auditor.store.AuditorChangesStore;
+import org.veriblock.integrations.blockchain.store.BitcoinStore;
+import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.integrations.blockchain.store.VeriBlockStore;
+import org.veriblock.integrations.sqlite.ConnectionSelector;
+import org.veriblock.integrations.sqlite.FileManager;
+import org.veriblock.sdk.conf.AppConfiguration;
+import org.veriblock.sdk.conf.AppInjector;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Properties;
 
-import org.veriblock.integrations.auditor.store.AuditorChangesStore;
-import org.veriblock.integrations.blockchain.store.BitcoinStore;
-import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.params.MainNetParameters;
-import org.veriblock.integrations.sqlite.ConnectionSelector;
-import org.veriblock.integrations.sqlite.FileManager;
-
+///TODO: this is not a test - move to helpers package
 public class VeriBlockIntegrationLibraryManager {
-    
-    private static Context securityFiles = null;
     private static VeriBlockSecurity security = null;
-    
-    private VeriBlockIntegrationLibraryManager() { }
+    private static String PACKAGE_NAME = "test";
+    private AppInjector appInjector;
 
-    public static VeriBlockSecurity init() throws SQLException, IOException {
-        if(security != null) return security;
-        
+    //Should have public constructor.
+    public VeriBlockIntegrationLibraryManager() {
+        Properties properties = new Properties();
+        properties.setProperty("veriblockNetwork", "test");
+        properties.setProperty("validation.vb.block.difficulty", "false");
+        properties.setProperty("validation.btc.block.difficulty", "false");
+        properties.setProperty("app.api.host", "localhost");
+        properties.setProperty("app.api.port", "19011");
+        properties.setProperty("veriblock.blockchain.minimumDifficulty", "900000000000");
+
+        AppConfiguration configuration = new AppConfiguration(properties);
+        appInjector = new AppInjector(configuration);
+
+    }
+
+    public VeriBlockSecurity init() throws SQLException, IOException {
         String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
-            
-        VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
-        BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
-        AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
-            
-        securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore);
-        
-        // erase database for testing determination
-        if(securityFiles != null) {            
-            securityFiles.getBitcoinStore().clear();
-            securityFiles.getVeriblockStore().clear();
-            securityFiles.getChangeStore().clear();
-        }
+        initContext(databasePath);
+        Context.resetSecurity();
 
-        security = new VeriBlockSecurity(securityFiles);
+        security = new VeriBlockSecurity();
         return security;
     }
     
-    public static void shutdown() throws SQLException {
+    public void shutdown() throws SQLException {
         if(security != null) {
             security.shutdown();
         }
@@ -56,7 +61,16 @@ public class VeriBlockIntegrationLibraryManager {
         security = null;
     }
     
-    public static Context getContext() {
-        return securityFiles;
+    private void initContext(String path) throws SQLException {
+        VeriBlockStore veriBlockStore = new VeriBlockStore(path);
+        BitcoinStore bitcoinStore = new BitcoinStore(path);
+        AuditorChangesStore auditStore = new AuditorChangesStore(path);
+        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(path);
+
+        Context.init(appInjector.provideWallet(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+    }
+
+    @Test
+    public void test() {
     }
 }

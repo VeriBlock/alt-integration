@@ -20,6 +20,8 @@ import org.veriblock.sdk.AltPublication;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.BlockIndex;
 import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.ValidationResult;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockPublication;
@@ -28,34 +30,32 @@ import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.Utils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public final class VeriBlockSecurity {
+public class VeriBlockSecurity {
 
-    private final Context context;
     private final VeriBlockBlockchain veriblockBlockchain;
     private final BitcoinBlockchain bitcoinBlockchain;
     private final AuditJournal journal;
     private final BitcoinStore bitcoinStore;
+    private AltChainParametersConfig altChainParametersConfig;
 
-    public VeriBlockSecurity(Context context) {
-        veriblockBlockchain = new VeriBlockBlockchain(context.getNetworkParameters(), context.getVeriblockStore(), context.getBitcoinStore());
-        bitcoinBlockchain = new BitcoinBlockchain(context.getBitcoinStore());
-        journal = new AuditJournal(context.getChangeStore());
-        bitcoinStore = context.getBitcoinStore();
-        this.context = context;
-    }
-    
-    public VeriBlockSecurity() throws BlockStoreException, SQLException {
-        this(new Context());
+    public VeriBlockSecurity() {
+        veriblockBlockchain = new VeriBlockBlockchain(Context.getNetworkParameters(), Context.getVeriblockStore(), Context.getBitcoinStore());
+        bitcoinBlockchain = new BitcoinBlockchain(Context.getBitcoinStore());
+        journal = new AuditJournal(Context.getChangeStore());
+        bitcoinStore = Context.getBitcoinStore();
+        altChainParametersConfig = new AltChainParametersConfig();
     }
     
     public void shutdown() {
-        context.getBitcoinStore().shutdown();
-        context.getVeriblockStore().shutdown();
-        context.getChangeStore().shutdown();
+        Context.getBitcoinStore().shutdown();
+        Context.getVeriblockStore().shutdown();
+        Context.getChangeStore().shutdown();
+        Context.getPopTxDBStore().shutdown();
     }
     
     public VeriBlockBlockchain getVeriBlockBlockchain() {
@@ -66,9 +66,9 @@ public final class VeriBlockSecurity {
         return bitcoinBlockchain;
     }
     
-    public Context getSecurityFiles() {
-        return context;
-    }
+    public void setAltChainParametersConfig(AltChainParametersConfig config) { this.altChainParametersConfig = config; }
+
+    public AltChainParametersConfig getAltChainParametersConfig() { return this.altChainParametersConfig; }
 
     public ValidationResult checkATVInternally(AltPublication publication) {
         try {
@@ -91,8 +91,7 @@ public final class VeriBlockSecurity {
     }
 
     // TODO: Exception when blockIndex.height is less than or equal to highest known
-    // TODO: Exception when publications are not valid
-    public boolean addPayloads(BlockIndex blockIndex, List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
+    public void addPayloads(BlockIndex blockIndex, List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws VerificationException, BlockStoreException, SQLException {
         Changeset changeset = new Changeset(BlockIdentifier.wrap(Utils.decodeHex(blockIndex.getHash())));
 
         try {
@@ -134,7 +133,6 @@ public final class VeriBlockSecurity {
 
             journal.record(changeset);
 
-            return true;
         } catch (VerificationException e) {
             Iterator<Change> changeIterator = changeset.reverseIterator();
             while (changeIterator.hasNext()) {
@@ -142,7 +140,7 @@ public final class VeriBlockSecurity {
                 bitcoinBlockchain.rewind(Collections.singletonList(change));
                 veriblockBlockchain.rewind(Collections.singletonList(change));
             }
-            return false;
+            throw e;
         }
     }
 
@@ -154,7 +152,7 @@ public final class VeriBlockSecurity {
         bitcoinBlockchain.rewind(changes);
     }
 
-    public boolean addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws BlockStoreException, SQLException {
+    public void addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws VerificationException, BlockStoreException, SQLException {
         try {
             if (veriblockPublications != null && veriblockPublications.size() > 0) {
                 for (VeriBlockPublication publication : veriblockPublications) {
@@ -193,10 +191,9 @@ public final class VeriBlockSecurity {
                 }
             }
 
-            return true;
         } catch (VerificationException e) {
             clearTemporaryPayloads();
-            return false;
+            throw e;
         }
     }
 
@@ -225,33 +222,75 @@ public final class VeriBlockSecurity {
         return block != null ? block.getHeight() : Integer.MAX_VALUE;
     }
 
+    public List<VBlakeHash> getLastKnownVBKBlocks(int maxBlockCount) throws SQLException {
+        List<VBlakeHash> result = new ArrayList<>(maxBlockCount);
+
+        VeriBlockBlock block = veriblockBlockchain.getChainHead();
+        for (int count = 0; block != null && count < maxBlockCount; ++count) {
+            result.add(block.getHash());
+
+            VBlakeHash prevBlockHash = block.getPreviousBlock();
+            block = prevBlockHash == null ? null
+                                          : veriblockBlockchain.get(prevBlockHash);
+        }
+
+        return result;
+    }
+
+    public List<Sha256Hash> getLastKnownBTCBlocks(int maxBlockCount) throws SQLException {
+        List<Sha256Hash> result = new ArrayList<>(maxBlockCount);
+
+        BitcoinBlock block = bitcoinBlockchain.getChainHead();
+        for (int count = 0; block != null && count < maxBlockCount; ++count) {
+            result.add(block.getHash());
+
+            Sha256Hash prevBlockHash = block.getPreviousBlock();
+            block = prevBlockHash == null ? null
+                                          : bitcoinBlockchain.get(prevBlockHash);
+        }
+
+        return result;
+    }
+
     private void verifyPublicationContextually(VeriBlockPublication publication) throws VerificationException, BlockStoreException, SQLException {
-        checkVeriBlockContextually(publication.getFirstBlock());
-        checkBitcoinContextually(publication.getFirstBitcoinBlock());
+        checkConnectivity(publication.getFirstBlock());
+        checkConnectivity(publication.getFirstBitcoinBlock());
     }
 
     private void verifyPublicationContextually(AltPublication publication) throws VerificationException, BlockStoreException, SQLException {
-        checkVeriBlockContextually(publication.getFirstBlock());
+        checkConnectivity(publication.getFirstBlock());
     }
 
-    private void checkVeriBlockContextually(VeriBlockBlock firstBlock) throws BlockStoreException, SQLException {
-        if (firstBlock == null) {
+    public void checkConnectivity(VeriBlockBlock block) throws BlockStoreException, SQLException {
+        if (block == null) {
             throw new VerificationException("Publication does not have any VeriBlock blocks");
         }
 
-        VeriBlockBlock previous = veriblockBlockchain.searchBestChain(firstBlock.getPreviousBlock());
-        if (previous == null) {
+        VeriBlockBlock previous = veriblockBlockchain.searchBestChain(block.getPreviousBlock());
+        if (previous != null) {
+            return;
+        }
+
+        // corner case: the first bootstrap block has no previous block
+        // but does connect to the blockchain by definition
+        if (veriblockBlockchain.searchBestChain(block.getHash()) == null) {
             throw new VerificationException("Publication does not connect to VeriBlock blockchain");
         }
     }
 
-    private void checkBitcoinContextually(BitcoinBlock firstBlock) throws BlockStoreException, SQLException {
-        if (firstBlock == null) {
+    public void checkConnectivity(BitcoinBlock block) throws BlockStoreException, SQLException {
+        if (block == null) {
             throw new VerificationException("Publication does not have any Bitcoin blocks");
         }
 
-        BitcoinBlock previous = bitcoinBlockchain.searchBestChain(firstBlock.getPreviousBlock());
-        if (previous == null) {
+        BitcoinBlock previous = bitcoinBlockchain.searchBestChain(block.getPreviousBlock());
+        if (previous != null) {
+            return;
+        }
+
+        // corner case: the first bootstrap block has no previous block
+        // but does connect to the blockchain by definition
+        if (bitcoinBlockchain.searchBestChain(block.getHash()) == null) {
             throw new VerificationException("Publication does not connect to Bitcoin blockchain");
         }
     }

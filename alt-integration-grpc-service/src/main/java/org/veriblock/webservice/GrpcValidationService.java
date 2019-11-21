@@ -11,139 +11,139 @@ package org.veriblock.webservice;
 import integration.api.grpc.ValidationServiceGrpc;
 import integration.api.grpc.VeriBlockMessages;
 import io.grpc.stub.StreamObserver;
-import org.veriblock.protoservice.ValidationProtoService;
+import org.veriblock.protoservice.VeriBlockValidationProtoService;
 
 public class GrpcValidationService extends ValidationServiceGrpc.ValidationServiceImplBase {
 
     @Override
     public void verifyVeriBlockPoPTx(VeriBlockMessages.VeriBlockPoPTransaction request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.verifyVeriBlockPoPTx(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.verifyVeriBlockPoPTx(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkSignatureVeriBlockPoPTx(VeriBlockMessages.VeriBlockPoPTransaction request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkSignatureVeriBlockPoPTx(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkSignatureVeriBlockPoPTx(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkBitcoinTransactionForPoPData(VeriBlockMessages.VeriBlockPoPTransaction request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkBitcoinTransactionForPoPData(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkBitcoinTransactionForPoPData(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkBitcoinMerklePathVeriBlockPoPTx(VeriBlockMessages.VeriBlockPoPTransaction request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkBitcoinMerklePathVeriBlockPoPTx(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkBitcoinMerklePathVeriBlockPoPTx(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkBitcoinBlocksVeriBlockPoPTx(VeriBlockMessages.VeriBlockPoPTransaction request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkBitcoinBlocksVeriBlockPoPTx(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkBitcoinBlocksVeriBlockPoPTx(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void verifyVeriBlockPublication(VeriBlockMessages.VeriBlockPublication request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.verifyVeriBlockPublication(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.verifyVeriBlockPublication(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkBlocksVeriBlockPublication(VeriBlockMessages.VeriBlockPublication request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkBlocksVeriBlockPublication(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkBlocksVeriBlockPublication(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkMerklePathVeriBlockPublication(VeriBlockMessages.VeriBlockPublication request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkMerklePathVeriBlockPublication(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkMerklePathVeriBlockPublication(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void verifyVeriBlockTransaction(VeriBlockMessages.VeriBlockTransaction request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.verifyVeriBlockTransaction(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.verifyVeriBlockTransaction(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkSignatureVeriBlockTransaction(VeriBlockMessages.VeriBlockTransaction request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkSignatureVeriBlockTransaction(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkSignatureVeriBlockTransaction(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void verifyVeriBlockBlock(VeriBlockMessages.VeriBlockBlock request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.verifyVeriBlockBlock(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.verifyVeriBlockBlock(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkProofOfWorkVeriBlockBlock(VeriBlockMessages.VeriBlockBlock request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkProofOfWorkVeriBlockBlock(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkProofOfWorkVeriBlockBlock(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkMaximumDriftVeriBlockBlock(VeriBlockMessages.VeriBlockBlock request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkMaximumDriftVeriBlockBlock(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkMaximumDriftVeriBlockBlock(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void verifyBitcoinBlock(VeriBlockMessages.BitcoinBlock request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.verifyBitcoinBlock(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.verifyBitcoinBlock(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkProofOfWorkBitcoinBlock(VeriBlockMessages.BitcoinBlock request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkProofOfWorkBitcoinBlock(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkProofOfWorkBitcoinBlock(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkMaximumDriftBitcoinBlock(VeriBlockMessages.BitcoinBlock request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkMaximumDriftBitcoinBlock(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkMaximumDriftBitcoinBlock(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void verifyAltPublication(VeriBlockMessages.AltPublication request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.verifyAltPublication(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.verifyAltPublication(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkMerklePathAltPublication(VeriBlockMessages.AltPublication request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkMerklePathAltPublication(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkMerklePathAltPublication(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
     @Override
     public void checkBlocksAltPublication(VeriBlockMessages.AltPublication request, StreamObserver<VeriBlockMessages.GeneralReply> responseObserver) {
-        VeriBlockMessages.GeneralReply reply = ValidationProtoService.checkBlocksAltPublication(request);
+        VeriBlockMessages.GeneralReply reply = VeriBlockValidationProtoService.checkBlocksAltPublication(request);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }

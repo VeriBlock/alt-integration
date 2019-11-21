@@ -22,10 +22,10 @@ public class PublicationData {
         return header;
     }
 
+
     public byte[] getPayoutInfo() {
         return payoutInfo;
     }
-
     public byte[] getContextInfo() {
         return contextInfo;
     }

@@ -8,42 +8,64 @@
 
 package org.veriblock.webservice;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.veriblock.integrations.AltChainParametersConfig;
 import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.integrations.auditor.store.AuditorChangesStore;
+import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
+import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
-import org.veriblock.integrations.params.MainNetParameters;
+import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
+import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
+import org.veriblock.integrations.rewards.PopRewardCalculator;
+import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
+import org.veriblock.sdk.conf.AppConfiguration;
+import org.veriblock.sdk.conf.AppInjector;
+import org.veriblock.sdk.exceptions.AltConfigurationException;
 
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import java.io.IOException;
+import java.nio.file.Paths;
 
 public final class Application {
-
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
-    public static final String packageName = "webservice";
 
-    public static final String version = AppConstants.APP_VERSION;
-    public static Boolean terminated = false;
+    private static String DEFAULT_PROPERTY_FILE_NAME = "webservice-default";
+    public Boolean terminated = false;
+    private VeriBlockSecurity security = null;
+    private Server server = null;
+    private AppConfiguration appConfiguration;
 
-    public static DefaultConfiguration config = new DefaultConfiguration();
-    public static int apiPort = config.getApiPort();
-    public static String apiHost = "localhost";
+    @Inject
+    public Application(AppConfiguration appConfiguration) {
+        this.appConfiguration = appConfiguration;
+    }
 
-    private static VeriBlockSecurity security = null;
-    private static Server server = null;
+    public static void main(String[] args) {
+        try {
+            AppConfiguration configuration = new AppConfiguration(DEFAULT_PROPERTY_FILE_NAME);
+            Injector injector = Guice.createInjector(new AppInjector(configuration));
+            Application app = injector.getInstance(Application.class);
 
-    public static void main(String[] args)
-    {
-        log.info(packageName + " " + version);
+            app.run(args);
+        } catch (AltConfigurationException ex){
+            log.error(ex.getMessage(), ex);
+        }
+    }
+
+    public void run(String[] args) {
+        log.info(appConfiguration.getDefaultPropertiesFileName() + " " + AppConstants.APP_VERSION);
         terminated = false;
 
         String databasePath = Paths.get(FileManager.getDataDirectory(), ConnectionSelector.defaultDatabaseName).toString();
@@ -51,8 +73,38 @@ public final class Application {
             VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
             BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
             AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
-            Context securityFiles = new Context(new MainNetParameters(), veriBlockStore, bitcoinStore, auditStore);
-            security = new VeriBlockSecurity(securityFiles);
+            PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
+            Context.init(appConfiguration, veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+            security = new VeriBlockSecurity();
+
+            ConfigurationParser config = new ConfigurationParser(appConfiguration.getProperties());
+            BitcoinBlockchainBootstrapConfig btcBootstrap = config.getBitcoinBlockchainBootstrapConfig();
+            if (btcBootstrap != null) {
+                security.getBitcoinBlockchain().bootstrap(btcBootstrap);
+            }
+
+            VeriBlockBlockchainBootstrapConfig vbkBootstrap = config.getVeriBlockBlockchainBootstrapConfig();
+            if (vbkBootstrap != null) {
+                security.getVeriBlockBlockchain().bootstrap(vbkBootstrap);
+            }
+
+            AltChainParametersConfig altChainParametersConfig = config.getAltChainParametersConfig();
+            if (altChainParametersConfig != null) {
+                security.setAltChainParametersConfig(altChainParametersConfig);
+            }
+
+            ForkresolutionConfig forkresolutionConfig = config.getForkresolutionConfig();
+            if (forkresolutionConfig != null) {
+                ForkresolutionComparator.setForkresolutionConfig(forkresolutionConfig);
+            }
+
+            PopRewardCalculatorConfig popRewardCalculatorConfig = config.getPopRewardCalculatorConfig();
+            if (popRewardCalculatorConfig != null) {
+                PopRewardCalculator.setCalculatorConfig(popRewardCalculatorConfig);
+            }
+
+            ForkresolutionComparator.setSecurity(security);
+            PopRewardCalculator.setSecurity(security);
         } catch (Exception e) {
             log.debug("Could not initialize VeriBlock security", e);
             return;
@@ -62,12 +114,13 @@ public final class Application {
             return;
         }
 
-        server = ServerBuilder.forPort(apiPort)
+        server = ServerBuilder.forPort(appConfiguration.getApiPort())
                 .addService(new IntegrationGrpcService(security))
                 .addService(new RewardsGrpcService())
                 .addService(new GrpcDeserializeService())
                 .addService(new GrpcSerializeService())
                 .addService(new GrpcValidationService())
+                .addService(new ForkresolutionGrpcService())
                 .build();
         try {
             server.start();
@@ -75,7 +128,7 @@ public final class Application {
             log.debug("Could not start GRPC server", e);
         }
 
-        log.info("Started API server at " + apiHost + ":" + apiPort);
+        log.info("Started API server at " + appConfiguration.getApiHost() + ":" + appConfiguration.getApiPort());
 
         try {
             while(true) {
@@ -83,16 +136,16 @@ public final class Application {
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
-            log.warn(packageName + " terminated");
+            log.warn(appConfiguration.getDefaultPropertiesFileName() + " terminated");
             terminated = true;
         }
 
         shutdown();
 
-        log.warn(packageName + " stopped");
+        log.warn(appConfiguration.getDefaultPropertiesFileName() + " stopped");
     }
 
-    public static void shutdown() {
+    public void shutdown() {
         if(server != null) {
             server.shutdown();
 
@@ -102,7 +155,7 @@ public final class Application {
                     Thread.sleep(1000);
                 }
             } catch (InterruptedException e) {
-                log.warn(packageName + " server terminated");
+                log.warn(appConfiguration.getDefaultPropertiesFileName() + " server terminated");
             }
 
             server = null;
@@ -115,7 +168,7 @@ public final class Application {
         security = null;
     }
 
-    public static VeriBlockSecurity getSecurity() {
+    public VeriBlockSecurity getSecurity() {
         return security;
     }
 }

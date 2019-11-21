@@ -8,27 +8,43 @@
 
 package org.veriblock.protoservice;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.protobuf.ByteString;
+import integration.api.grpc.VeriBlockMessages;
+import integration.api.grpc.VeriBlockMessages.GeneralReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
+import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
+import org.veriblock.integrations.rewards.PopRewardCalculator;
+import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
+import org.veriblock.protoconverters.AltChainBlockProtoConverter;
+import org.veriblock.protoconverters.AltChainParametersConfigProtoConverter;
 import org.veriblock.protoconverters.AltPublicationProtoConverter;
+import org.veriblock.protoconverters.BitcoinBlockchainBootstrapConfigProtoConverter;
 import org.veriblock.protoconverters.BitcoinBlockProtoConverter;
 import org.veriblock.protoconverters.BlockIndexProtoConverter;
+import org.veriblock.protoconverters.CalculatorConfigProtoConverter;
+import org.veriblock.protoconverters.ForkresolutionConfigProtoConverter;
+import org.veriblock.protoconverters.PoPTransactionDataProtoConverter;
+import org.veriblock.protoconverters.Sha256HashProtoConverter;
+import org.veriblock.protoconverters.VBlakeHashProtoConverter;
+import org.veriblock.protoconverters.VeriBlockBlockchainBootstrapConfigProtoConverter;
 import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
+import org.veriblock.sdk.AltChainBlock;
 import org.veriblock.sdk.AltPublication;
 import org.veriblock.sdk.BlockIndex;
 import org.veriblock.sdk.BlockStoreException;
+import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.ValidationResult;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VerificationException;
 
-import integration.api.grpc.VeriBlockMessages;
-import integration.api.grpc.VeriBlockMessages.GeneralReply;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VeriBlockSecurityProtoService {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockSecurityProtoService.class);
@@ -43,9 +59,7 @@ public class VeriBlockSecurityProtoService {
     public static GeneralReply resetSecurity() {
         ValidationResult result = null;
         try {
-            security.getSecurityFiles().getBitcoinStore().clear();
-            security.getSecurityFiles().getVeriblockStore().clear();
-            security.getSecurityFiles().getChangeStore().clear();
+            Context.resetSecurity();
             result = ValidationResult.success();
         } catch (SQLException e) {
             result = ValidationResult.fail(e.getMessage());
@@ -90,12 +104,10 @@ public class VeriBlockSecurityProtoService {
 
         ValidationResult result = null;
         try {
-            boolean validationResult = security.addPayloads(blockIndex, vtbPublications, altPublications);
-            if(validationResult) {
-                result = ValidationResult.success();
-            } else {
-                result = ValidationResult.fail("Unknown error");
-            }
+            security.addPayloads(blockIndex, vtbPublications, altPublications);
+            result = ValidationResult.success();
+        } catch (VerificationException e) {
+            result = ValidationResult.fail(e.getMessage());
         } catch (BlockStoreException | SQLException e) {
             result = ValidationResult.fail(e.getMessage());
             log.debug("Could not call VeriBlock security", e);
@@ -126,12 +138,10 @@ public class VeriBlockSecurityProtoService {
         
         ValidationResult result = null;
         try {
-            boolean validationResult = security.addTemporaryPayloads(vtbPublications, altPublications);
-            if(validationResult) {
-                result = ValidationResult.success();
-            } else {
-                result = ValidationResult.fail("Unknown error");
-            }
+            security.addTemporaryPayloads(vtbPublications, altPublications);
+            result = ValidationResult.success();
+        } catch (VerificationException e) {
+            result = ValidationResult.fail(e.getMessage());
         } catch (BlockStoreException | SQLException e) {
             result = ValidationResult.fail(e.getMessage());
             log.debug("Could not call VeriBlock security", e);
@@ -221,5 +231,100 @@ public class VeriBlockSecurityProtoService {
                 .setResult(replyResult)
                 .build();
         return reply;
+    }
+
+    public static VeriBlockMessages.GeneralReply savePoPTransactionData(VeriBlockMessages.SavePoPTransactionDataRequest request) {
+        ValidationResult result = null;
+
+        try {
+            PoPTransactionData popTx = PoPTransactionDataProtoConverter.fromProto(request.getPopTx());
+            AltChainBlock containingBlock = AltChainBlockProtoConverter.fromProto(request.getContainingBlock());
+            AltChainBlock endorsedBlock = AltChainBlockProtoConverter.fromProto(request.getEndorsedBlock());
+            Context.getPopTxDBStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
+            result = ValidationResult.success();
+        }
+        catch (SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        return VeriBlockServiceCommon.validationResultToProto(result);
+    }
+
+    public static VeriBlockMessages.GetLastKnownVBKBlocksReply getLastKnownVBKBlocks(VeriBlockMessages.GetLastKnownBlocksRequest request) {
+        ValidationResult result = null;
+        List<VBlakeHash> blocks = new ArrayList<>();
+        try {
+            blocks = security.getLastKnownVBKBlocks(request.getMaxBlockCount());
+            result = ValidationResult.success();
+        } catch (BlockStoreException | SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        GeneralReply replyResult = VeriBlockServiceCommon.validationResultToProto(result);
+        List<ByteString> protoBlocks = VBlakeHashProtoConverter.toProto(blocks);
+
+        VeriBlockMessages.GetLastKnownVBKBlocksReply reply = VeriBlockMessages.GetLastKnownVBKBlocksReply.newBuilder()
+                .addAllBlocks(protoBlocks)
+                .setResult(replyResult)
+                .build();
+        return reply;
+    }
+
+    public static VeriBlockMessages.GetLastKnownBTCBlocksReply getLastKnownBTCBlocks(VeriBlockMessages.GetLastKnownBlocksRequest request) {
+        ValidationResult result = null;
+        List<Sha256Hash> blocks = new ArrayList<>();
+        try {
+            blocks = security.getLastKnownBTCBlocks(request.getMaxBlockCount());
+            result = ValidationResult.success();
+        } catch (BlockStoreException | SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        GeneralReply replyResult = VeriBlockServiceCommon.validationResultToProto(result);
+        List<ByteString> protoBlocks = Sha256HashProtoConverter.toProto(blocks);
+
+        VeriBlockMessages.GetLastKnownBTCBlocksReply reply = VeriBlockMessages.GetLastKnownBTCBlocksReply.newBuilder()
+                .addAllBlocks(protoBlocks)
+                .setResult(replyResult)
+                .build();
+        return reply;
+    }
+
+    public static VeriBlockMessages.GeneralReply setConfig(VeriBlockMessages.SetConfigRequest request) {
+        ValidationResult result = null;
+        try {
+            if (request.hasAltChainConfig()) {
+                security.setAltChainParametersConfig(
+                    AltChainParametersConfigProtoConverter.fromProto(request.getAltChainConfig()));
+            }
+            if (request.hasForkresolutionConfig()) {
+                ForkresolutionComparator.setForkresolutionConfig(
+                    ForkresolutionConfigProtoConverter.fromProto(request.getForkresolutionConfig()));
+            }
+            if (request.hasCalculatorConfig()) {
+                PopRewardCalculator.setCalculatorConfig(
+                    CalculatorConfigProtoConverter.fromProto(request.getCalculatorConfig()));
+            }
+            if (request.hasBitcoinBootstrapConfig()) {
+                security.getBitcoinBlockchain().bootstrap(
+                    BitcoinBlockchainBootstrapConfigProtoConverter.fromProto(
+                        request.getBitcoinBootstrapConfig()));
+            }
+            if (request.hasVeriblockBootstrapConfig()) {
+                security.getVeriBlockBlockchain().bootstrap(
+                    VeriBlockBlockchainBootstrapConfigProtoConverter.fromProto(
+                        request.getVeriblockBootstrapConfig()));
+            }
+
+            result = ValidationResult.success();
+        } catch (VerificationException | SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        return VeriBlockServiceCommon.validationResultToProto(result);
     }
 }

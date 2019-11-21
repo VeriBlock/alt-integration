@@ -17,7 +17,6 @@ public class PopRewardCalculatorConfig {
     public BigInteger basicReward;
     public int payoutRounds;
     public int keystoneRound;
-    public int keystoneInterval;
     public List<BigDecimal> roundRatios;
     public BigDecimal maxRewardThresholdNormal;
     public BigDecimal maxRewardThresholdKeystone;
@@ -25,12 +24,13 @@ public class PopRewardCalculatorConfig {
     public boolean flatScoreRoundUse;
     public PopRewardCurveConfig curveConfig;
     public List<BigDecimal> relativeScoreLookupTable;
+    public int popDifficultyAveragingInterval;
+    public int popRewardSettlementInterval;
     
     public PopRewardCalculatorConfig() {
         basicReward = new BigInteger(Long.toString(RewardDefaults.POP_DEFAULT_REWARD_PER_BLOCK));
         payoutRounds = RewardDefaults.PAYOUT_ROUNDS_COUNT;
         keystoneRound = RewardDefaults.ROUND_4;
-        keystoneInterval = RewardDefaults.KEYSTONE_INTERVAL_BLOCKS;
         roundRatios = new ArrayList<>();
         roundRatios.add(new BigDecimal(RewardDefaults.ROUND_1_RATIO));
         roundRatios.add(new BigDecimal(RewardDefaults.ROUND_2_RATIO));
@@ -43,6 +43,8 @@ public class PopRewardCalculatorConfig {
         flatScoreRoundUse = true;
         curveConfig = new PopRewardCurveConfig();
         relativeScoreLookupTable = new ArrayList<>();
+        popDifficultyAveragingInterval = RewardDefaults.POP_DIFFICULTY_AVERAGING_INTERVAL;
+        popRewardSettlementInterval = RewardDefaults.POP_REWARD_SETTLEMENT_INTERVAL;
         for(double value : RewardDefaults.popRelativeScoreLookupTable) {
             relativeScoreLookupTable.add(new BigDecimal(value));
         }
