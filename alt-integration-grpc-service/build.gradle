@@ -4,9 +4,7 @@ plugins {
 }
 
 repositories {
-    flatDir {
-        dirs '../libs'
-    }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -14,7 +12,7 @@ dependencies {
     compile group: 'io.grpc', name: 'grpc-netty-shaded', version: '1.23.0'
     compile "org.codehaus.groovy:groovy:2.4.12"
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    implementation name: 'alt-integration-proto-java-1.0-SNAPSHOT'
+    implementation 'com.github.VeriBlock:alt-integration-proto:v2'
     compile project(':core')
     compile project(':reference-lib')
     compile project(':alt-integration-adapter-java')
