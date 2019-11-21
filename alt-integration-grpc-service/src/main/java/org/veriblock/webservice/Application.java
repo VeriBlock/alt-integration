@@ -32,6 +32,7 @@ import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
 import org.veriblock.sdk.conf.AppConfiguration;
 import org.veriblock.sdk.conf.AppInjector;
+import org.veriblock.sdk.exceptions.AltConfigurationException;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -52,11 +53,15 @@ public final class Application {
     }
 
     public static void main(String[] args) {
-        AppConfiguration configuration = new AppConfiguration(DEFAULT_PROPERTY_FILE_NAME);
-        Injector injector = Guice.createInjector(new AppInjector(configuration));
-        Application app = injector.getInstance(Application.class);
+        try {
+            AppConfiguration configuration = new AppConfiguration(DEFAULT_PROPERTY_FILE_NAME);
+            Injector injector = Guice.createInjector(new AppInjector(configuration));
+            Application app = injector.getInstance(Application.class);
 
-        app.run(args);
+            app.run(args);
+        } catch (AltConfigurationException ex){
+            log.error(ex.getMessage(), ex);
+        }
     }
 
     public void run(String[] args) {
@@ -74,24 +79,29 @@ public final class Application {
 
             ConfigurationParser config = new ConfigurationParser(appConfiguration.getProperties());
             BitcoinBlockchainBootstrapConfig btcBootstrap = config.getBitcoinBlockchainBootstrapConfig();
-            if (btcBootstrap != null)
+            if (btcBootstrap != null) {
                 security.getBitcoinBlockchain().bootstrap(btcBootstrap);
+            }
 
             VeriBlockBlockchainBootstrapConfig vbkBootstrap = config.getVeriBlockBlockchainBootstrapConfig();
-            if (vbkBootstrap != null)
+            if (vbkBootstrap != null) {
                 security.getVeriBlockBlockchain().bootstrap(vbkBootstrap);
+            }
 
             AltChainParametersConfig altChainParametersConfig = config.getAltChainParametersConfig();
-            if (altChainParametersConfig != null)
+            if (altChainParametersConfig != null) {
                 security.setAltChainParametersConfig(altChainParametersConfig);
+            }
 
             ForkresolutionConfig forkresolutionConfig = config.getForkresolutionConfig();
-            if (forkresolutionConfig != null)
+            if (forkresolutionConfig != null) {
                 ForkresolutionComparator.setForkresolutionConfig(forkresolutionConfig);
+            }
 
             PopRewardCalculatorConfig popRewardCalculatorConfig = config.getPopRewardCalculatorConfig();
-            if (popRewardCalculatorConfig != null)
+            if (popRewardCalculatorConfig != null) {
                 PopRewardCalculator.setCalculatorConfig(popRewardCalculatorConfig);
+            }
 
             ForkresolutionComparator.setSecurity(security);
             PopRewardCalculator.setSecurity(security);

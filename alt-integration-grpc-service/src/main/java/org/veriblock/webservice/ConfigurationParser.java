@@ -8,15 +8,9 @@
 
 package org.veriblock.webservice;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.List;
-
+import org.veriblock.integrations.AltChainParametersConfig;
 import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
 import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
-import org.veriblock.integrations.AltChainParametersConfig;
 import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
 import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
 import org.veriblock.integrations.rewards.PopRewardCurveConfig;
@@ -24,6 +18,12 @@ import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 public class ConfigurationParser {
     private final Properties properties;
@@ -34,8 +34,10 @@ public class ConfigurationParser {
 
     public AltChainParametersConfig getAltChainParametersConfig() {
         String keystoneInterval = properties.getProperty("altChain.parameters.keystoneInterval");
-        if (keystoneInterval == null)
+
+        if (keystoneInterval == null) {
             return null;
+        }
 
         AltChainParametersConfig config = new AltChainParametersConfig();
         config.keystoneInterval = Integer.parseInt(keystoneInterval);
@@ -46,11 +48,14 @@ public class ConfigurationParser {
     public ForkresolutionConfig getForkresolutionConfig() {
         String keystoneFinalityDelay = properties.getProperty("forkResolution.keystoneFinalityDelay");
         String amnestyPeriod = properties.getProperty("forkResolution.amnestyPeriod");
-        if (keystoneFinalityDelay == null && amnestyPeriod == null)
-            return null;
 
-        if (keystoneFinalityDelay == null || amnestyPeriod == null)
+        if (keystoneFinalityDelay == null && amnestyPeriod == null) {
+            return null;
+        }
+
+        if (keystoneFinalityDelay == null || amnestyPeriod == null) {
             throw new IllegalArgumentException("Must specify either all or none of the Forkresolution config values");
+        }
 
         ForkresolutionConfig config = new ForkresolutionConfig();
         config.keystoneFinalityDelay = Integer.parseInt(keystoneFinalityDelay);
@@ -65,15 +70,18 @@ public class ConfigurationParser {
         String widthOfDecreasingLineKeystone = properties.getProperty("popReward.curve.widthOfDecreasingLineKeystone");
         String aboveIntendedPayoutMultiplierNormal = properties.getProperty("popReward.curve.aboveIntendedPayoutMultiplierNormal");
         String aboveIntendedPayoutMultiplierKeystone = properties.getProperty("popReward.curve.aboveIntendedPayoutMultiplierKeystone");
+
         if (startOfDecreasingLine == null && widthOfDecreasingLineNormal == null &&
             widthOfDecreasingLineKeystone == null && aboveIntendedPayoutMultiplierNormal == null &&
-            aboveIntendedPayoutMultiplierKeystone == null)
+            aboveIntendedPayoutMultiplierKeystone == null) {
             return null;
+        }
 
         if (startOfDecreasingLine == null || widthOfDecreasingLineNormal == null ||
             widthOfDecreasingLineKeystone == null || aboveIntendedPayoutMultiplierNormal == null ||
-            aboveIntendedPayoutMultiplierKeystone == null)
+            aboveIntendedPayoutMultiplierKeystone == null) {
             throw new IllegalArgumentException("Must specify either all or none of the PopRewardCurve config values");
+        }
 
         PopRewardCurveConfig config = new PopRewardCurveConfig();
         config.startOfDecreasingLine = new BigDecimal(startOfDecreasingLine);
@@ -98,21 +106,24 @@ public class ConfigurationParser {
         String relativeScoreLookupTable = properties.getProperty("popReward.calculator.relativeScoreLookupTable");
         String popDifficultyAveragingInterval = properties.getProperty("popReward.calculator.popDifficultyAveragingInterval");
         String popRewardSettlementInterval = properties.getProperty("popReward.calculator.popRewardSettlementInterval");
+
         if (basicReward == null && payoutRounds == null &&
             keystoneRound == null && roundRatios == null &&
             maxRewardThresholdNormal == null && maxRewardThresholdKeystone == null &&
             flatScoreRound == null && flatScoreRoundUse == null &&
             curveConfig == null && relativeScoreLookupTable == null &&
-            popDifficultyAveragingInterval == null && popRewardSettlementInterval == null)
+            popDifficultyAveragingInterval == null && popRewardSettlementInterval == null) {
             return null;
+        }
 
         if (basicReward == null || payoutRounds == null ||
             keystoneRound == null || roundRatios == null ||
             maxRewardThresholdNormal == null || maxRewardThresholdKeystone == null ||
             flatScoreRound == null || flatScoreRoundUse == null ||
             curveConfig == null || relativeScoreLookupTable == null ||
-            popDifficultyAveragingInterval == null || popRewardSettlementInterval == null)
+            popDifficultyAveragingInterval == null || popRewardSettlementInterval == null) {
             throw new IllegalArgumentException("Must specify either all or none of the PopRewardCalculator config values");
+        }
 
         PopRewardCalculatorConfig config = new PopRewardCalculatorConfig();
         config.basicReward = new BigInteger(basicReward);
@@ -136,16 +147,19 @@ public class ConfigurationParser {
         String[] items = str.split(",", 0);
 
         List<BigDecimal> result = new ArrayList<BigDecimal>(items.length);
-        for(String item : items)
+        for(String item : items) {
             result.add(new BigDecimal(item));
+        }
 
         return result;
     }
 
     public VeriBlockBlockchainBootstrapConfig getVeriBlockBlockchainBootstrapConfig() {
         String blocks = properties.getProperty("veriblock.blockchain.bootstrap.blocks");
-        if (blocks == null)
+
+        if (blocks == null) {
             return null;
+        }
 
         return new VeriBlockBlockchainBootstrapConfig(parseVeriBlockBlockList(blocks));
     }
@@ -154,8 +168,9 @@ public class ConfigurationParser {
         String[] items = str.split(",", 0);
 
         List<VeriBlockBlock> result = new ArrayList<VeriBlockBlock>(items.length);
-        for(String item : items)
+        for(String item : items) {
             result.add(SerializeDeserializeService.parseVeriBlockBlock(Utils.decodeHex(item)));
+        }
 
         return result;
     }
@@ -163,22 +178,25 @@ public class ConfigurationParser {
     public BitcoinBlockchainBootstrapConfig getBitcoinBlockchainBootstrapConfig() {
         String blocks = properties.getProperty("bitcoin.blockchain.bootstrap.blocks");
         String firstBlockHeight = properties.getProperty("bitcoin.blockchain.bootstrap.firstBlockHeight");
-        if (blocks == null && firstBlockHeight == null)
+
+        if (blocks == null && firstBlockHeight == null) {
             return null;
+        }
 
-        if (blocks == null || firstBlockHeight == null)
+        if (blocks == null || firstBlockHeight == null) {
             throw new IllegalArgumentException("Must specify either all of none of the BitcoinBlockchainBootstrap config values");
+        }
 
-        return new BitcoinBlockchainBootstrapConfig(parseBitcoinBlockList(blocks),
-                                                    Integer.parseInt(firstBlockHeight));
+        return new BitcoinBlockchainBootstrapConfig(parseBitcoinBlockList(blocks), Integer.parseInt(firstBlockHeight));
     }
 
     private static List<BitcoinBlock> parseBitcoinBlockList(String str) {
         String[] items = str.split(",", 0);
 
         List<BitcoinBlock> result = new ArrayList<BitcoinBlock>(items.length);
-        for(String item : items)
+        for(String item : items) {
             result.add(SerializeDeserializeService.parseBitcoinBlock(Utils.decodeHex(item)));
+        }
 
         return result;
     }
