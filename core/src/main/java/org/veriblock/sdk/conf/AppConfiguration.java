@@ -10,6 +10,7 @@ package org.veriblock.sdk.conf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.veriblock.sdk.exceptions.AltConfigurationException;
 import org.veriblock.sdk.util.FileUtils;
 import org.veriblock.sdk.util.Utils;
 
@@ -54,9 +55,9 @@ public class AppConfiguration {
                 loadFromFile(stream);
             }
         } catch (FileNotFoundException e) {
-            logger.info("Unable to load custom properties file: File '{}' does not exist. Using default properties.", mainPropertiesPath);
+            throw new AltConfigurationException(String.format("Unable to load custom properties file: File '%1$s' does not exist. Using default properties.", mainPropertiesPath));
         } catch (IOException e) {
-            logger.info("Unable to load custom properties file. Using default properties.", e);
+            throw new AltConfigurationException(String.format("Unable to load custom properties file. Using default properties.", e));
         }
     }
 
@@ -66,7 +67,7 @@ public class AppConfiguration {
                 properties.load(inputStream);
             }
         } catch (Exception e) {
-            logger.error("Unhandled exception in DefaultConfiguration.load", e);
+            throw new AltConfigurationException(String.format("Unhandled exception in DefaultConfiguration.load", e));
         }
     }
 
@@ -100,13 +101,15 @@ public class AppConfiguration {
 
         byte[] magicBytes = txMagicByte == null ? new byte[0] : Utils.decodeHex(txMagicByte);
 
-        if (magicBytes.length > 1)
-            throw new IllegalArgumentException("veriblock.blockchain.transactionMagicByte must be empty or 2 hex digits");
+        if (magicBytes.length > 1) {
+            throw new AltConfigurationException("veriblock.blockchain.transactionMagicByte must be empty or 2 hex digits");
+        }
 
         Byte magicByte = magicBytes.length == 0 ? null : magicBytes[0];
 
-        if (minDifficulty == null)
-            throw new IllegalArgumentException("veriblock.blockchain.minimumDifficulty is required");
+        if (minDifficulty == null) {
+            throw new AltConfigurationException("veriblock.blockchain.minimumDifficulty is required");
+        }
 
         return new NetworkParameters() {
                     public BigInteger getMinimumDifficulty() {
@@ -125,20 +128,25 @@ public class AppConfiguration {
         String allowMinDifficultyBlocks = properties.getProperty("bitcoin.blockchain.allowMinDifficultyBlocks");
         String powNoRetargeting = properties.getProperty("bitcoin.blockchain.powNoRetargeting");
 
-        if (powLimit == null)
-            throw new IllegalArgumentException("bitcoin.blockchain.powLimit is required");
+        if (powLimit == null){
+            throw new AltConfigurationException("bitcoin.blockchain.powLimit is required");
+        }
 
-        if (powTargetTimespan == null)
-            throw new IllegalArgumentException("bitcoin.blockchain.powTargetTimespan is required");
+        if (powTargetTimespan == null){
+            throw new AltConfigurationException("bitcoin.blockchain.powTargetTimespan is required");
+        }
 
-        if (powTargetSpacing == null)
-            throw new IllegalArgumentException("bitcoin.blockchain.powTargetSpacing is required");
+        if (powTargetSpacing == null){
+            throw new AltConfigurationException("bitcoin.blockchain.powTargetSpacing is required");
+        }
 
-        if (allowMinDifficultyBlocks == null)
-            throw new IllegalArgumentException("bitcoin.blockchain.allowMinDifficultyBlocks is required");
+        if (allowMinDifficultyBlocks == null){
+            throw new AltConfigurationException("bitcoin.blockchain.allowMinDifficultyBlocks is required");
+        }
 
-        if (powNoRetargeting == null)
-            throw new IllegalArgumentException("bitcoin.blockchain.powNoRetargeting is required");
+        if (powNoRetargeting == null){
+            throw new AltConfigurationException("bitcoin.blockchain.powNoRetargeting is required");
+        }
 
         return new BitcoinNetworkParameters() {
                     public BigInteger getPowLimit() {
@@ -168,7 +176,12 @@ public class AppConfiguration {
 
     private Properties loadDefaults() {
         Properties properties = FileUtils.loadProperty(defaultPropertiesPath);
-        return properties != null ? properties : new Properties();
+
+        if(properties == null){
+            throw new AltConfigurationException("Default property not initialised.");
+        }
+
+        return properties;
     }
 
     public Properties getProperties() {

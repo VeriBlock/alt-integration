@@ -366,8 +366,7 @@ public class BitcoinBlockchain {
             int blockHeight = firstBlockHeight;
             for (BitcoinBlock block : blocks) {
                 BigInteger work = BitcoinUtils.decodeCompactBits(block.getBits());
-                StoredBitcoinBlock storedBlock = new StoredBitcoinBlock(
-                                                            block, work, blockHeight);
+                StoredBitcoinBlock storedBlock = new StoredBitcoinBlock(block, work, blockHeight);
                 blockHeight++;
                 store.put(storedBlock);
                 store.setChainHead(storedBlock);
