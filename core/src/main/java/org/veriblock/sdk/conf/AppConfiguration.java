@@ -10,46 +10,48 @@ package org.veriblock.sdk.conf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.veriblock.sdk.util.FileUtils;
+import org.veriblock.sdk.util.Utils;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Properties;
 
-import org.veriblock.sdk.util.Utils;
+public class AppConfiguration {
+    private static final Logger logger = LoggerFactory.getLogger(AppConfiguration.class);
 
-public class DefaultConfiguration {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultConfiguration.class);
-
-    private Properties defaultProperties = new Properties();
+    private Properties defaultProperties;
     private Properties properties;
 
-    private String packageName;
+    private String defaultPropertiesFileName;
     private String defaultPropertiesPath;
     private String mainPropertiesPath;
 
-    public DefaultConfiguration(String packageName) {
-        this.packageName = packageName;
-        this.defaultPropertiesPath = packageName + "-default.properties";
-        this.mainPropertiesPath = packageName + ".properties";
-        loadDefaults();
-        properties = new Properties(defaultProperties);
-        load();
+    public AppConfiguration(String defaultPropertiesFileName) {
+        this.defaultPropertiesFileName = defaultPropertiesFileName;
+        this.defaultPropertiesPath = defaultPropertiesFileName + ".properties";
+        this.mainPropertiesPath = System.getenv("ALT_INT_PROPERTIES_FILE_PATH");
+        this.defaultProperties = loadDefaults();
+        this.properties = new Properties(defaultProperties);
+        if(this.mainPropertiesPath != null) {
+            loadFromFile();
+        }
     }
 
     /**
      * to mock tests.
      */
-    public DefaultConfiguration(Properties properties) {
+    public AppConfiguration(Properties properties) {
         this.properties = properties;
     }
 
-    private void load() {
-        try
-        {
-            try (InputStream stream = ClassLoader.getSystemResourceAsStream(mainPropertiesPath)) {
-                load(stream);
+    private void loadFromFile() {
+        try {
+            try (InputStream stream = new FileInputStream(mainPropertiesPath)) {
+                loadFromFile(stream);
             }
         } catch (FileNotFoundException e) {
             logger.info("Unable to load custom properties file: File '{}' does not exist. Using default properties.", mainPropertiesPath);
@@ -58,7 +60,7 @@ public class DefaultConfiguration {
         }
     }
 
-    private void load(InputStream inputStream) {
+    private void loadFromFile(InputStream inputStream) {
         try {
             if(inputStream != null) {
                 properties.load(inputStream);
@@ -88,8 +90,8 @@ public class DefaultConfiguration {
         return validation;
     }
 
-    public String getPackageName() {
-        return packageName;
+    public String getDefaultPropertiesFileName() {
+        return defaultPropertiesFileName;
     }
 
     public NetworkParameters getVeriblockNetworkParameters() {
@@ -164,14 +166,9 @@ public class DefaultConfiguration {
         return value;
     }
 
-    private void loadDefaults() {
-        try (InputStream stream = DefaultConfiguration.class
-                .getClassLoader()
-                .getResourceAsStream(defaultPropertiesPath)) {
-            defaultProperties.load(stream);
-        } catch (IOException e) {
-            logger.error("Unable to load default properties", e);
-        }
+    private Properties loadDefaults() {
+        Properties properties = FileUtils.loadProperty(defaultPropertiesPath);
+        return properties != null ? properties : new Properties();
     }
 
     public Properties getProperties() {

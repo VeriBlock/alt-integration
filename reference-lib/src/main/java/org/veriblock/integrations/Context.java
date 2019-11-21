@@ -13,7 +13,7 @@ import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.BlockStoreException;
-import org.veriblock.sdk.conf.DefaultConfiguration;
+import org.veriblock.sdk.conf.AppConfiguration;
 import org.veriblock.sdk.conf.NetworkParameters;
 import org.veriblock.sdk.util.Preconditions;
 
@@ -26,7 +26,7 @@ public class Context {
     private static BitcoinStore bitcoinStore;
     private static AuditorChangesStore changeStore;
     private static PoPTransactionsDBStore popTxDBStore;
-    private static DefaultConfiguration configuration;
+    private static AppConfiguration configuration;
 
     private Context() {
     }
@@ -47,7 +47,7 @@ public class Context {
         return changeStore;
     }
 
-    public static DefaultConfiguration getConfiguration(){
+    public static AppConfiguration getConfiguration(){
         return configuration;
     }
 
@@ -60,8 +60,8 @@ public class Context {
         popTxDBStore.clear();
     }
 
-    public static void init(DefaultConfiguration configurationArg, VeriBlockStore veriblockStoreArg,
-            BitcoinStore bitcoinStoreArg, AuditorChangesStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
+    public static void init(AppConfiguration configurationArg, VeriBlockStore veriblockStoreArg,
+                            BitcoinStore bitcoinStoreArg, AuditorChangesStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
         Preconditions.notNull(configurationArg, "Network parameters cannot be null");
         Preconditions.notNull(veriblockStoreArg, "VeriBlock store cannot be null");
         Preconditions.notNull(bitcoinStoreArg, "Bitcoin store cannot be null");
@@ -79,7 +79,7 @@ public class Context {
         if(networkParameters == null) {
             Properties properties = new Properties();
             properties.setProperty("veriblock.blockchain.minimumDifficulty", "900000000000");
-            init(new DefaultConfiguration(properties), new VeriBlockStore(), new BitcoinStore(),
+            init(new AppConfiguration(properties), new VeriBlockStore(), new BitcoinStore(),
                     new AuditorChangesStore(), new PoPTransactionsDBStore());
         }
     }
