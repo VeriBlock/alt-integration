@@ -33,6 +33,14 @@ public class VeriBlockStoreTest {
     private VeriBlockSecurity veriBlockSecurity;
     private VeriBlockStore store;
 
+    private final byte[] raw1 =  Utils.decodeHex("0001998300029690ACA425987B8B529BEC04654A16FCCE708F3F0DEED25E1D2513D05A3B17C49D8B3BCFEFC10CB2E9C4D473B2E25DB7F1BD040098960DE0E313");
+    private final VeriBlockBlock block1 = SerializeDeserializeService.parseVeriBlockBlock(raw1);
+    private final StoredVeriBlockBlock storedBlock1 = new StoredVeriBlockBlock(block1, BigInteger.TEN);
+
+    private final byte[] raw2 = Utils.decodeHex("000199840002A69BF9FE9B06E641B61699A9654A16FCCE708F3F0DEED25E1D2513D05A3B7D7F80EB5E94D01C6B3796DDE5647F135DB7F1DD040098960EA12045");
+    private final VeriBlockBlock block2 = SerializeDeserializeService.parseVeriBlockBlock(raw2);
+    private final StoredVeriBlockBlock storedBlock2 = new StoredVeriBlockBlock(block2, BigInteger.ONE);
+
     @Before
     public void setUp() throws Exception {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
@@ -47,14 +55,6 @@ public class VeriBlockStoreTest {
 
     @Test
     public void EraseCantSplitBlockchainTest() throws SQLException, IOException {
-            byte[] raw1 =  Utils.decodeHex("0001998300029690ACA425987B8B529BEC04654A16FCCE708F3F0DEED25E1D2513D05A3B17C49D8B3BCFEFC10CB2E9C4D473B2E25DB7F1BD040098960DE0E313");
-            VeriBlockBlock block1 = SerializeDeserializeService.parseVeriBlockBlock(raw1);
-            StoredVeriBlockBlock storedBlock1 = new StoredVeriBlockBlock(block1, BigInteger.TEN);
-
-            byte[] raw2 = Utils.decodeHex("000199840002A69BF9FE9B06E641B61699A9654A16FCCE708F3F0DEED25E1D2513D05A3B7D7F80EB5E94D01C6B3796DDE5647F135DB7F1DD040098960EA12045");
-            VeriBlockBlock block2 = SerializeDeserializeService.parseVeriBlockBlock(raw2);
-            StoredVeriBlockBlock storedBlock2 = new StoredVeriBlockBlock(block2, BigInteger.ONE);
-
             Assert.assertEquals(block2.getPreviousBlock(), block1.getHash().trimToPreviousBlockSize());
 
             store.put(storedBlock2);
@@ -245,6 +245,24 @@ public class VeriBlockStoreTest {
             Assert.assertEquals(replacedBlock, oldBlock);
 
             storedBlock = store.get(newBlock.getHash());
+            Assert.assertEquals(newBlock, storedBlock);
+    }
+
+    @Test
+    public void ReplaceReferencedBlockTest() throws SQLException, IOException {
+            Assert.assertEquals(block2.getPreviousBlock(), block1.getHash().trimToPreviousBlockSize());
+
+            store.put(storedBlock2);
+            store.put(storedBlock1);
+
+            StoredVeriBlockBlock newBlock = new StoredVeriBlockBlock(block1, BigInteger.ONE);
+            // StoredVeriBlockBlock.work should differ
+            Assert.assertNotEquals(newBlock, storedBlock1);
+
+            StoredVeriBlockBlock replacedBlock = store.replace(storedBlock1.getHash(), newBlock);
+            Assert.assertEquals(replacedBlock, storedBlock1);
+
+            StoredVeriBlockBlock storedBlock = store.get(storedBlock1.getHash());
             Assert.assertEquals(newBlock, storedBlock);
     }
 }

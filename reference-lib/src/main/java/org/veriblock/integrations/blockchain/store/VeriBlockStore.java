@@ -106,8 +106,8 @@ public class VeriBlockStore {
      }
 
     public StoredVeriBlockBlock replace(VBlakeHash hash, StoredVeriBlockBlock storedBlock) throws BlockStoreException, SQLException {
-        StoredVeriBlockBlock replaced = erase(hash);
-        put(storedBlock);
+        StoredVeriBlockBlock replaced = get(hash);
+        veriBlockRepository.save(storedBlock);
         return replaced;
     }
 

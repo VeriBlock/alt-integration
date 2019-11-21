@@ -105,8 +105,8 @@ public class BitcoinStore {
     }
 
     public StoredBitcoinBlock replace(Sha256Hash hash, StoredBitcoinBlock storedBlock) throws BlockStoreException, SQLException {
-        StoredBitcoinBlock replaced = erase(hash);
-        put(storedBlock);
+        StoredBitcoinBlock replaced = get(hash);
+        bitcoinRepository.save(storedBlock);
         return replaced;
     }
 
