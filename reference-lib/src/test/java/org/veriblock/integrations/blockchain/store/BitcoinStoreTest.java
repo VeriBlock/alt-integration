@@ -31,11 +31,28 @@ public class BitcoinStoreTest {
     private VeriBlockSecurity veriBlockSecurity;
     private BitcoinStore store;
 
+    private final BitcoinBlock block1 = new BitcoinBlock(766099456,
+            Sha256Hash.wrap("00000000000000000004dc9c42c22f489ade54a9349e3a47aee5b55069062afd"),
+            Sha256Hash.wrap("87839c0e4c6771557ef02a5076c8b46a7157e5532eff7153293791ca852d2e58"),
+            1572336145, 0x17148edf, 790109764);
+    private final StoredBitcoinBlock storedBlock1 = new StoredBitcoinBlock(block1, BigInteger.TEN, 0);
+
+    private final BitcoinBlock block2 = new BitcoinBlock(1073733632,
+            Sha256Hash.wrap("0000000000000000000faad7ae177b313ee4e3f1da519dbbf5b3ab58ccff6338"),
+            Sha256Hash.wrap("902e5a70c8fa99fb9ba6d0f855f5e84b8ffc3fe56b694889d07031d8adb6a0f8"),
+            1572336708, 0x17148edf, 344118374);
+    private final StoredBitcoinBlock storedBlock2 = new StoredBitcoinBlock(block2, BigInteger.ONE, 0);
+
     @Before
     public void setUp() throws Exception {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
         veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
         store = Context.getBitcoinStore();
+
+        Assert.assertEquals(block1.getHash(),
+                Sha256Hash.wrap("0000000000000000000faad7ae177b313ee4e3f1da519dbbf5b3ab58ccff6338"));
+        Assert.assertEquals(block2.getHash(),
+                Sha256Hash.wrap("00000000000000000001163c9e1130c26984d831cb16c16f994945a197550897"));
     }
 
     @After
@@ -45,24 +62,6 @@ public class BitcoinStoreTest {
 
     @Test
     public void EraseCantSplitBlockchainTest() throws SQLException, IOException {
-        BitcoinBlock block1 = new BitcoinBlock(766099456,
-                Sha256Hash.wrap("00000000000000000004dc9c42c22f489ade54a9349e3a47aee5b55069062afd"),
-                Sha256Hash.wrap("87839c0e4c6771557ef02a5076c8b46a7157e5532eff7153293791ca852d2e58"),
-                1572336145, 0x17148edf, 790109764);
-        Assert.assertEquals(block1.getHash(),
-                Sha256Hash.wrap("0000000000000000000faad7ae177b313ee4e3f1da519dbbf5b3ab58ccff6338"));
-
-        StoredBitcoinBlock storedBlock1 = new StoredBitcoinBlock(block1, BigInteger.TEN, 0);
-
-        BitcoinBlock block2 = new BitcoinBlock(1073733632,
-                Sha256Hash.wrap("0000000000000000000faad7ae177b313ee4e3f1da519dbbf5b3ab58ccff6338"),
-                Sha256Hash.wrap("902e5a70c8fa99fb9ba6d0f855f5e84b8ffc3fe56b694889d07031d8adb6a0f8"),
-                1572336708, 0x17148edf, 344118374);
-        Assert.assertEquals(block2.getHash(),
-                Sha256Hash.wrap("00000000000000000001163c9e1130c26984d831cb16c16f994945a197550897"));
-
-        StoredBitcoinBlock storedBlock2 = new StoredBitcoinBlock(block2, BigInteger.ONE, 0);
-
         store.put(storedBlock2);
         store.put(storedBlock1);
 
@@ -223,6 +222,24 @@ public class BitcoinStoreTest {
         Assert.assertEquals(replacedBlock, oldBlock);
 
         storedBlock = store.get(newBlock.getHash());
+        Assert.assertEquals(newBlock, storedBlock);
+    }
+
+    @Test
+    public void ReplaceReferencedBlockTest() throws SQLException, IOException {
+        Assert.assertEquals(block2.getPreviousBlock(), block1.getHash());
+
+        StoredBitcoinBlock newBlock = new StoredBitcoinBlock(block1, BigInteger.ONE, 0);
+        // StoredBitcoinBlock.work should differ
+        Assert.assertNotEquals(newBlock, storedBlock1);
+
+        store.put(storedBlock2);
+        store.put(storedBlock1);
+
+        StoredBitcoinBlock replacedBlock = store.replace(storedBlock1.getHash(), newBlock);
+        Assert.assertEquals(replacedBlock, storedBlock1);
+
+        StoredBitcoinBlock storedBlock = store.get(storedBlock1.getHash());
         Assert.assertEquals(newBlock, storedBlock);
     }
 
