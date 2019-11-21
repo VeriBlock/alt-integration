@@ -4,9 +4,7 @@ plugins {
 }
 
 repositories {
-    flatDir {
-        dirs '../libs'
-    }
+    maven { url 'https://jitpack.io' }
 }
 
 version = '0.1.2'
@@ -16,7 +14,7 @@ dependencies {
     
     compile group: 'io.grpc', name: 'grpc-protobuf', version: '1.23.0'
     compile group: 'io.grpc', name: 'grpc-stub', version: '1.23.0'
-    implementation name: 'alt-integration-proto-java-1.0-SNAPSHOT'
+    implementation 'com.github.VeriBlock:alt-integration-proto:v2'
     compile project(':core')
     compile project(':reference-lib')
 }
