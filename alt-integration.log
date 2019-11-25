@@ -1,0 +1,6 @@
+2019-11-21 15:29:21.017+0200 INFO [main] o.v.w.Application [Application.java:63] webservice-default 1.0.0
+2019-11-21 15:29:21.029+0200 INFO [main] o.v.i.s.ConnectionSelector [ConnectionSelector.java:31] SqlLite path: '.\data\database.sqlite'
+2019-11-21 15:29:22.296+0200 INFO [main] o.v.i.s.ConnectionSelector [ConnectionSelector.java:31] SqlLite path: '.\data\database.sqlite'
+2019-11-21 15:29:22.351+0200 INFO [main] o.v.i.s.ConnectionSelector [ConnectionSelector.java:31] SqlLite path: '.\data\database.sqlite'
+2019-11-21 15:29:22.394+0200 INFO [main] o.v.i.s.ConnectionSelector [ConnectionSelector.java:31] SqlLite path: '.\data\database.sqlite'
+2019-11-21 15:29:25.707+0200 INFO [main] o.v.w.Application [Application.java:121] Started API server at localhost:19011
