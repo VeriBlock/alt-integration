@@ -2,11 +2,7 @@ plugins {
     id "java"
     id "idea"
     id "java-library"
-    id "maven-publish"
-    id "com.jfrog.artifactory"
 }
-
-version = '0.1.4'
 
 dependencies {
     testImplementation 'junit:junit:4.12'
@@ -31,35 +27,6 @@ jar {
                 'Implementation-Title': 'org.veriblock.sdk',
                 'Implementation-Version': version,
                 'Implementation-Vendor': 'Xenios SEZC'
-    }
-}
-
-
-artifactory {
-    contextUrl = artifactory_url
-    publish {
-        repository {
-            repoKey = artifactory_repoKey
-            username = artifactory_user
-            password = artifactory_password
-            maven = true
-        }
-
-        defaults {
-            publications('mavenJava')
-            publishArtifacts = true
-        }
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId 'veriblock'
-            artifactId 'integrations-sdk'
-            version this.version
-            from components.java
-        }
     }
 }
 
