@@ -67,3 +67,16 @@ sourceSets {
         }
     }
 }
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['conf']
+            includes = ["**/*.properties"]
+        }
+
+        java {
+            srcDirs += ['conf']
+        }
+    }
+}
