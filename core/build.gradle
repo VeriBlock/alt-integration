@@ -7,8 +7,7 @@ plugins {
 dependencies {
     testImplementation 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.7.22'
-
-
+    
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.60'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
@@ -27,6 +26,19 @@ jar {
                 'Implementation-Title': 'org.veriblock.sdk',
                 'Implementation-Version': version,
                 'Implementation-Vendor': 'Xenios SEZC'
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['conf']
+            includes = ["**/*.properties"]
+        }
+
+        java {
+            srcDirs += ['conf']
+        }
     }
 }
 
