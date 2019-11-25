@@ -4,14 +4,13 @@ plugins {
     id "java-library"
 }
 
-version = '0.1.2'
-
 dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.7.22'
 
-    compile project(':core')
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.28.0'
+
+    compile project(':core')
 }
 
 sourceSets {
