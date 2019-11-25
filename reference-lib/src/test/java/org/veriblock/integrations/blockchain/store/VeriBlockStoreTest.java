@@ -70,7 +70,7 @@ public class VeriBlockStoreTest {
             Assert.assertEquals(store.erase(block2.getHash()), storedBlock2);
             Assert.assertEquals(store.erase(block1.getHash()), storedBlock1);
     }
-
+    
     @Test
     public void nonexistingBlockStoreTest() throws SQLException, IOException {
             VBlakeHash hash = VBlakeHash.hash("123".getBytes());
