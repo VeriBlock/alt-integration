@@ -258,4 +258,22 @@ public class BitcoinStoreTest {
         storedBlock = store.get(newBlock.getHash());
         Assert.assertEquals(newBlock, storedBlock);
     }
+
+    @Test
+    public void replaceWithDifferentHashTest() throws SQLException, IOException {
+        store.put(storedBlock1);
+
+        try {
+            store.replace(storedBlock1.getHash(), storedBlock2);
+            Assert.fail("Should throw a BlockStoreException");
+        } catch (BlockStoreException e) {
+            Assert.assertEquals(e.getMessage(), "The original and replacement block hashes must match");
+        }
+
+        StoredBitcoinBlock storedBlock = store.get(storedBlock1.getHash());
+        Assert.assertEquals(storedBlock, storedBlock1);
+
+        storedBlock = store.get(storedBlock2.getHash());
+        Assert.assertEquals(storedBlock, null);
+    }
 }
