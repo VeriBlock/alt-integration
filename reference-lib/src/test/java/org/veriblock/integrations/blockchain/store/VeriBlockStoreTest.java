@@ -70,7 +70,7 @@ public class VeriBlockStoreTest {
             Assert.assertEquals(store.erase(block2.getHash()), storedBlock2);
             Assert.assertEquals(store.erase(block1.getHash()), storedBlock1);
     }
-
+    
     @Test
     public void nonexistingBlockStoreTest() throws SQLException, IOException {
             VBlakeHash hash = VBlakeHash.hash("123".getBytes());
@@ -264,5 +264,23 @@ public class VeriBlockStoreTest {
 
             StoredVeriBlockBlock storedBlock = store.get(storedBlock1.getHash());
             Assert.assertEquals(newBlock, storedBlock);
+    }
+
+    @Test
+    public void replaceWithDifferentHashTest() throws SQLException, IOException {
+        store.put(storedBlock1);
+
+        try {
+            store.replace(storedBlock1.getHash(), storedBlock2);
+            Assert.fail("Should throw a BlockStoreException");
+        } catch (BlockStoreException e) {
+            Assert.assertEquals(e.getMessage(), "The original and replacement block hashes must match");
+        }
+
+        StoredVeriBlockBlock storedBlock = store.get(storedBlock1.getHash());
+        Assert.assertEquals(storedBlock, storedBlock1);
+
+        storedBlock = store.get(storedBlock2.getHash());
+        Assert.assertEquals(storedBlock, null);
     }
 }

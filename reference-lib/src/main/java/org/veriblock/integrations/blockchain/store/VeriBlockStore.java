@@ -106,6 +106,9 @@ public class VeriBlockStore {
      }
 
     public StoredVeriBlockBlock replace(VBlakeHash hash, StoredVeriBlockBlock storedBlock) throws BlockStoreException, SQLException {
+        if (hash != null && storedBlock != null && !hash.equals(storedBlock.getHash())) {
+            throw new BlockStoreException("The original and replacement block hashes must match");
+        }
         StoredVeriBlockBlock replaced = get(hash);
         veriBlockRepository.save(storedBlock);
         return replaced;

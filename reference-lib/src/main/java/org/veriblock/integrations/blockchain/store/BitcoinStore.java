@@ -105,6 +105,9 @@ public class BitcoinStore {
     }
 
     public StoredBitcoinBlock replace(Sha256Hash hash, StoredBitcoinBlock storedBlock) throws BlockStoreException, SQLException {
+        if (hash != null && storedBlock != null && !hash.equals(storedBlock.getHash())) {
+            throw new BlockStoreException("The original and replacement block hashes must match");
+        }
         StoredBitcoinBlock replaced = get(hash);
         bitcoinRepository.save(storedBlock);
         return replaced;

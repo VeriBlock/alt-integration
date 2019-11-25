@@ -15,7 +15,7 @@ plugins {
 
 apply plugin: 'nebula.release'
 
-version = '0.1.2'
+version = '0.0.2'
 
 allprojects {
     repositories {
@@ -50,11 +50,6 @@ subprojects {
 task printTCBuildNumber() {
     println "##teamcity[buildNumber \'${version}\']"
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10.2'
-}
-
 
 sonarqube {
     properties {
