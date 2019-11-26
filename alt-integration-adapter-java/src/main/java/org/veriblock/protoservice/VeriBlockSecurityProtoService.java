@@ -27,7 +27,6 @@ import org.veriblock.protoconverters.VBlakeHashProtoConverter;
 import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
 import org.veriblock.protoconverters.VeriBlockBlockchainBootstrapConfigProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
-import org.veriblock.sdk.auditor.Change;
 import org.veriblock.sdk.models.*;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.Context;
