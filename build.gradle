@@ -3,7 +3,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.netflix.nebula:nebula-release-plugin:6.0.0'
         classpath 'org.ajoberstar:grgit:1.1.0'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.3"
     }
@@ -12,11 +11,10 @@ buildscript {
 plugins {
     id "org.sonarqube" version "2.8"
     id "com.github.spotbugs" version "2.0.1"
+    id 'com.palantir.git-version' version '0.12.2'
 }
 
-apply plugin: 'nebula.release'
-
-version = '0.0.2'
+version = gitVersion()
 
 allprojects {
     repositories {
@@ -39,17 +37,8 @@ allprojects {
     }
 }
 
-nebulaRelease {
-    addReleaseBranchPattern(/develop/)
-    addReleaseBranchPattern(/(release(-|\/))?\d+(.\d+)?(.\d+)?/)
-}
-
 subprojects {
     version = version
-}
-
-task printTCBuildNumber() {
-    println "##teamcity[buildNumber \'${version}\']"
 }
 
 wrapper {
