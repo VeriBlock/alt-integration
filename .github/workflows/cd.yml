@@ -34,3 +34,4 @@ jobs:
           workdir: alt-integration-grpc-service
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          tag_names: true
