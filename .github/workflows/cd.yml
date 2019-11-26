@@ -1,10 +1,11 @@
-name: Java CI
+name: Docker CD
 
 on:
   push:
     branches:
       - master
       - develop
+      - feature/cd # for tests
     tags:
       # tags must start with v
       - v*
