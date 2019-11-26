@@ -15,6 +15,10 @@ plugins {
 }
 
 version = gitVersion()
+def v = versionDetails()
+if(v.branchName =~ (/master|develop/)) {
+    version = "${v.branchName}.${version}"
+}
 
 allprojects {
     repositories {
