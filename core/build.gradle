@@ -21,10 +21,10 @@ jar {
     manifest {
         attributes 'Name': 'org/veriblock/sdk',
                 'Specification-Title': 'VeriBlock Core Integration SDK',
-                'Specification-Version': version.toString().split(/-/)[0],
+                'Specification-Version': project.version,
                 'Specification-Vendor': 'Xenios SEZC',
                 'Implementation-Title': 'org.veriblock.sdk',
-                'Implementation-Version': version,
+                'Implementation-Version': project.version,
                 'Implementation-Vendor': 'Xenios SEZC'
     }
 }
