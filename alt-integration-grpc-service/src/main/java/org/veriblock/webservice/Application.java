@@ -30,9 +30,6 @@ import org.veriblock.integrations.rewards.PopRewardCalculator;
 import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
-import org.veriblock.sdk.conf.AppConfiguration;
-import org.veriblock.sdk.conf.AppInjector;
-import org.veriblock.sdk.exceptions.AltConfigurationException;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -40,8 +37,7 @@ import java.nio.file.Paths;
 public final class Application {
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
-
-    private static String DEFAULT_PROPERTY_FILE_NAME = "webservice-default";
+    public static final String packageName = "altservice";
     public Boolean terminated = false;
     private VeriBlockSecurity security = null;
     private Server server = null;
@@ -54,7 +50,7 @@ public final class Application {
 
     public static void main(String[] args) {
         try {
-            AppConfiguration configuration = new AppConfiguration(DEFAULT_PROPERTY_FILE_NAME);
+            AppConfiguration configuration = new AppConfiguration();
             Injector injector = Guice.createInjector(new AppInjector(configuration));
             Application app = injector.getInstance(Application.class);
 
@@ -65,19 +61,22 @@ public final class Application {
     }
 
     public void run(String[] args) {
-        log.info(appConfiguration.getDefaultPropertiesFileName() + " " + AppConstants.APP_VERSION);
+        log.info(packageName + " " + AppConstants.APP_VERSION);
         terminated = false;
 
         String databasePath = Paths.get(FileManager.getDataDirectory(), ConnectionSelector.defaultDatabaseName).toString();
+        ConfigurationParser config = null;
         try {
+            config = new ConfigurationParser(appConfiguration.getProperties());
+            
             VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
             BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
             AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
             PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
-            Context.init(appConfiguration, veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+            Context.init(config.getVeriblockNetworkParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+            
             security = new VeriBlockSecurity();
 
-            ConfigurationParser config = new ConfigurationParser(appConfiguration.getProperties());
             BitcoinBlockchainBootstrapConfig btcBootstrap = config.getBitcoinBlockchainBootstrapConfig();
             if (btcBootstrap != null) {
                 security.getBitcoinBlockchain().bootstrap(btcBootstrap);
@@ -114,7 +113,7 @@ public final class Application {
             return;
         }
 
-        server = ServerBuilder.forPort(appConfiguration.getApiPort())
+        server = ServerBuilder.forPort(config.getApiPort())
                 .addService(new IntegrationGrpcService(security))
                 .addService(new RewardsGrpcService())
                 .addService(new GrpcDeserializeService())
@@ -128,7 +127,7 @@ public final class Application {
             log.debug("Could not start GRPC server", e);
         }
 
-        log.info("Started API server at " + appConfiguration.getApiHost() + ":" + appConfiguration.getApiPort());
+        log.info("Started API server at " + config.getApiHost() + ":" + config.getApiPort());
 
         try {
             while(true) {
@@ -136,13 +135,13 @@ public final class Application {
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
-            log.warn(appConfiguration.getDefaultPropertiesFileName() + " terminated");
+            log.warn(packageName + " terminated");
             terminated = true;
         }
 
         shutdown();
 
-        log.warn(appConfiguration.getDefaultPropertiesFileName() + " stopped");
+        log.warn(packageName + " stopped");
     }
 
     public void shutdown() {
@@ -155,7 +154,7 @@ public final class Application {
                     Thread.sleep(1000);
                 }
             } catch (InterruptedException e) {
-                log.warn(appConfiguration.getDefaultPropertiesFileName() + " server terminated");
+                log.warn(packageName + " server terminated");
             }
 
             server = null;

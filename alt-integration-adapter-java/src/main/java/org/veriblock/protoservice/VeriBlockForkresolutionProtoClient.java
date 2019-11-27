@@ -8,18 +8,17 @@
 
 package org.veriblock.protoservice;
 
-import integration.api.grpc.ForkresolutionServiceGrpc;
-import integration.api.grpc.ForkresolutionServiceGrpc.ForkresolutionServiceBlockingStub;
-import integration.api.grpc.VeriBlockMessages;
-import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
+import java.util.List;
+
 import org.veriblock.protoconverters.AltChainBlockProtoConverter;
-import org.veriblock.protoconverters.ForkresolutionConfigProtoConverter;
 import org.veriblock.sdk.AltChainBlock;
 import org.veriblock.sdk.Pair;
 import org.veriblock.sdk.ValidationResult;
 
+import integration.api.grpc.ForkresolutionServiceGrpc;
+import integration.api.grpc.ForkresolutionServiceGrpc.ForkresolutionServiceBlockingStub;
+import integration.api.grpc.VeriBlockMessages;
 import io.grpc.Channel;
-import java.util.List;
 
 public class VeriBlockForkresolutionProtoClient {
 

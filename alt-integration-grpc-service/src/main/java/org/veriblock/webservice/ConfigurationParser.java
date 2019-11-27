@@ -16,6 +16,8 @@ import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
 import org.veriblock.integrations.rewards.PopRewardCurveConfig;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.conf.BitcoinNetworkParameters;
+import org.veriblock.sdk.conf.NetworkParameters;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
@@ -30,6 +32,105 @@ public class ConfigurationParser {
 
     public ConfigurationParser(Properties properties) {
         this.properties = properties;
+    }
+    
+    public int getApiPort() {
+        Integer port = Integer.valueOf(getPropertyOverrideOrDefault("app.api.port"));
+        return port;
+    }
+
+    public String getApiHost() {
+        String host = getPropertyOverrideOrDefault("app.api.host");
+        return host;
+    }
+
+    public boolean isValidateVBBlockDifficulty() {
+        Boolean validation = Boolean.valueOf(getPropertyOverrideOrDefault("validation.vb.block.difficulty"));
+        return validation;
+    }
+
+    public boolean isValidateBTCBlockDifficulty() {
+        Boolean validation = Boolean.valueOf(getPropertyOverrideOrDefault("validation.btc.block.difficulty"));
+        return validation;
+    }
+
+    public NetworkParameters getVeriblockNetworkParameters() {
+        String minDifficulty = properties.getProperty("veriblock.blockchain.minimumDifficulty");
+        String txMagicByte = properties.getProperty("veriblock.blockchain.transactionMagicByte");
+
+        byte[] magicBytes = txMagicByte == null ? new byte[0] : Utils.decodeHex(txMagicByte);
+
+        if (magicBytes.length > 1) {
+            throw new AltConfigurationException("veriblock.blockchain.transactionMagicByte must be empty or 2 hex digits");
+        }
+
+        Byte magicByte = magicBytes.length == 0 ? null : magicBytes[0];
+
+        if (minDifficulty == null) {
+            throw new AltConfigurationException("veriblock.blockchain.minimumDifficulty is required");
+        }
+
+        return new NetworkParameters() {
+                    public BigInteger getMinimumDifficulty() {
+                        return new BigInteger(minDifficulty);
+                    }
+                    public Byte getTransactionMagicByte() {
+                        return magicByte;
+                    }
+                };
+    }
+
+    public BitcoinNetworkParameters getBitcoinNetworkParameters() {
+        String powLimit = properties.getProperty("bitcoin.blockchain.powLimit");
+        String powTargetTimespan = properties.getProperty("bitcoin.blockchain.powTargetTimespan");
+        String powTargetSpacing = properties.getProperty("bitcoin.blockchain.powTargetSpacing");
+        String allowMinDifficultyBlocks = properties.getProperty("bitcoin.blockchain.allowMinDifficultyBlocks");
+        String powNoRetargeting = properties.getProperty("bitcoin.blockchain.powNoRetargeting");
+
+        if (powLimit == null){
+            throw new AltConfigurationException("bitcoin.blockchain.powLimit is required");
+        }
+
+        if (powTargetTimespan == null){
+            throw new AltConfigurationException("bitcoin.blockchain.powTargetTimespan is required");
+        }
+
+        if (powTargetSpacing == null){
+            throw new AltConfigurationException("bitcoin.blockchain.powTargetSpacing is required");
+        }
+
+        if (allowMinDifficultyBlocks == null){
+            throw new AltConfigurationException("bitcoin.blockchain.allowMinDifficultyBlocks is required");
+        }
+
+        if (powNoRetargeting == null){
+            throw new AltConfigurationException("bitcoin.blockchain.powNoRetargeting is required");
+        }
+
+        return new BitcoinNetworkParameters() {
+                    public BigInteger getPowLimit() {
+                        return new BigInteger(powLimit, 16);
+                    }
+                    public int getPowTargetTimespan() {
+                        return Integer.parseInt(powTargetTimespan);
+                    }
+                    public int getPowTargetSpacing() {
+                        return Integer.parseInt(powTargetSpacing);
+                    }
+                    public boolean getAllowMinDifficultyBlocks() {
+                        return Boolean.parseBoolean(allowMinDifficultyBlocks);
+                    }
+                    public boolean getPowNoRetargeting() {
+                        return Boolean.parseBoolean(powNoRetargeting);
+                    }
+                };
+    }
+
+    private String getPropertyOverrideOrDefault(final String name) {
+        String value = properties.getProperty(name);
+        if (value == null)
+            return "";
+        return value;
     }
 
     public AltChainParametersConfig getAltChainParametersConfig() {
