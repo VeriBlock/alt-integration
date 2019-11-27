@@ -7,12 +7,14 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-dependencies {
-    testImplementation 'junit:junit:4.12'
-    
+dependencies {    
     compile group: 'io.grpc', name: 'grpc-protobuf', version: '1.23.0'
     compile group: 'io.grpc', name: 'grpc-stub', version: '1.23.0'
+    
     implementation 'com.github.VeriBlock:alt-integration-proto:v2'
+    
     compile project(':core')
     compile project(':reference-lib')
+    
+    testCompile 'junit:junit:4.12'
 }
