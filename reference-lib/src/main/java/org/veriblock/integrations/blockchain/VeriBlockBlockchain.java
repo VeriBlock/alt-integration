@@ -10,7 +10,6 @@ package org.veriblock.integrations.blockchain;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.veriblock.integrations.Context;
 import org.veriblock.integrations.auditor.Change;
 import org.veriblock.integrations.blockchain.changes.AddVeriBlockBlockChange;
 import org.veriblock.integrations.blockchain.changes.SetVeriBlockHeadChange;
@@ -54,6 +53,8 @@ public class VeriBlockBlockchain {
     private final Map<VBlakeHash, StoredVeriBlockBlock> temporalStore;
     private final NetworkParameters networkParameters;
     private StoredVeriBlockBlock temporaryChainHead = null;
+    
+    private boolean skipValidateBlocksDifficulty = false; 
 
     private boolean hasTemporaryModifications() {
         return temporaryChainHead != null || temporalStore.size() > 0;
@@ -69,6 +70,14 @@ public class VeriBlockBlockchain {
         this.bitcoinStore = bitcoinStore;
         this.networkParameters = networkParameters;
         this.temporalStore = new HashMap<>();
+    }
+    
+    public boolean isValidateBlocksDifficulty() {
+        return !skipValidateBlocksDifficulty;
+    }
+    
+    public void setSkipValidateBlocksDifficulty(boolean skip) {
+        skipValidateBlocksDifficulty = skip;
     }
 
     public VeriBlockBlock get(VBlakeHash hash) throws BlockStoreException, SQLException {
@@ -576,7 +585,7 @@ public class VeriBlockBlockchain {
     }
 
     private void checkDifficulty(VeriBlockBlock block, StoredVeriBlockBlock previous, List<StoredVeriBlockBlock> context) throws VerificationException {
-        if(!Context.getConfiguration().isValidateVBBlockDifficulty()){
+        if(!isValidateBlocksDifficulty()){
             return;
         }
 

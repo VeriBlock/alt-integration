@@ -15,33 +15,33 @@ import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
-import org.veriblock.sdk.conf.AppConfiguration;
-import org.veriblock.sdk.conf.AppInjector;
+import org.veriblock.sdk.conf.NetworkParameters;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.Properties;
 
 ///TODO: this is not a test - move to helpers package
 public class VeriBlockIntegrationLibraryManager {
     private static VeriBlockSecurity security = null;
-    private static String PACKAGE_NAME = "test";
-    private AppInjector appInjector;
 
     //Should have public constructor.
     public VeriBlockIntegrationLibraryManager() {
-        Properties properties = new Properties();
-        properties.setProperty("veriblockNetwork", "test");
-        properties.setProperty("validation.vb.block.difficulty", "false");
-        properties.setProperty("validation.btc.block.difficulty", "false");
-        properties.setProperty("app.api.host", "localhost");
-        properties.setProperty("app.api.port", "19011");
-        properties.setProperty("veriblock.blockchain.minimumDifficulty", "900000000000");
+    }
+    
+    public NetworkParameters getVeriblockNetworkParameters() {
+        String minDifficulty = "900000000000";
+        Byte magicByte = null;
 
-        AppConfiguration configuration = new AppConfiguration(properties);
-        appInjector = new AppInjector(configuration);
-
+        return new NetworkParameters() {
+                    public BigInteger getMinimumDifficulty() {
+                        return new BigInteger(minDifficulty);
+                    }
+                    public Byte getTransactionMagicByte() {
+                        return magicByte;
+                    }
+                };
     }
 
     public VeriBlockSecurity init() throws SQLException, IOException {
@@ -67,7 +67,7 @@ public class VeriBlockIntegrationLibraryManager {
         AuditorChangesStore auditStore = new AuditorChangesStore(path);
         PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(path);
 
-        Context.init(appInjector.provideWallet(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Context.init(getVeriblockNetworkParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
     }
 
     @Test

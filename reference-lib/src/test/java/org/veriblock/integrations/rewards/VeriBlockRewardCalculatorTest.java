@@ -35,7 +35,6 @@ import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockMerklePath;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VeriBlockTransaction;
-import org.veriblock.sdk.conf.AppConfiguration;
 import org.veriblock.sdk.util.Utils;
 
 import java.io.IOException;
@@ -48,7 +47,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -71,9 +69,7 @@ public class VeriBlockRewardCalculatorTest {
         AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
         VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock popTxDBStore = new VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock();
 
-        Properties properties = new Properties();
-        properties.setProperty("veriblock.blockchain.minimumDifficulty", "900000000000");
-        Context.init(new AppConfiguration(properties), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Context.init(veriBlockIntegrationLibraryManager.getVeriblockNetworkParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
         securityMock = new VeriBlockRewardCalculatorTest.VeriBlockSecurityMock();
         PopRewardCalculator.setSecurity(securityMock);

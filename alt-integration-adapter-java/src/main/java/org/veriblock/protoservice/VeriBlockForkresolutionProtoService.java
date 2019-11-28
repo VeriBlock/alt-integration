@@ -8,17 +8,17 @@
 
 package org.veriblock.protoservice;
 
-import integration.api.grpc.VeriBlockMessages;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
 import org.veriblock.protoconverters.AltChainBlockProtoConverter;
-import org.veriblock.protoconverters.ForkresolutionConfigProtoConverter;
 import org.veriblock.sdk.AltChainBlock;
 import org.veriblock.sdk.ValidationResult;
 
-import java.sql.SQLException;
-import java.util.List;
+import integration.api.grpc.VeriBlockMessages;
 
 public class VeriBlockForkresolutionProtoService {
 

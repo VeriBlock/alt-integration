@@ -29,7 +29,6 @@ import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VeriBlockPoPTransaction;
 import org.veriblock.sdk.VeriBlockPublication;
 import org.veriblock.sdk.VeriBlockTransaction;
-import org.veriblock.sdk.conf.AppConfiguration;
 import org.veriblock.sdk.transactions.VeriBlockTransactionsAtv;
 import org.veriblock.sdk.transactions.VeriBlockTransactionsVtb;
 import org.veriblock.sdk.util.BitcoinUtils;
@@ -44,12 +43,12 @@ public final class Application {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
-    public static final String packageName = "webclient";
+    public static final String packageName = "altclient";
 
     public static final String version = AppConstants.APP_VERSION;
     public static Boolean terminated = false;
 
-    public static AppConfiguration config = new AppConfiguration(packageName);
+    public static AppConfiguration config = new AppConfiguration();
     public static int apiPort = config.getApiPort();
     public static String apiHost = "localhost";
     
