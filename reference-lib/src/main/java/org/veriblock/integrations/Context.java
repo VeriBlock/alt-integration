@@ -8,17 +8,16 @@
 
 package org.veriblock.integrations;
 
+import java.math.BigInteger;
+import java.sql.SQLException;
+
 import org.veriblock.integrations.auditor.store.AuditorChangesStore;
 import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.BlockStoreException;
-import org.veriblock.sdk.conf.AppConfiguration;
 import org.veriblock.sdk.conf.NetworkParameters;
 import org.veriblock.sdk.util.Preconditions;
-
-import java.sql.SQLException;
-import java.util.Properties;
 
 public class Context {
     private static NetworkParameters networkParameters;
@@ -26,7 +25,6 @@ public class Context {
     private static BitcoinStore bitcoinStore;
     private static AuditorChangesStore changeStore;
     private static PoPTransactionsDBStore popTxDBStore;
-    private static AppConfiguration configuration;
 
     private Context() {
     }
@@ -47,10 +45,6 @@ public class Context {
         return changeStore;
     }
 
-    public static AppConfiguration getConfiguration(){
-        return configuration;
-    }
-
     public static PoPTransactionsDBStore getPopTxDBStore() {return popTxDBStore;}
 
     public static void resetSecurity() throws SQLException {
@@ -60,26 +54,32 @@ public class Context {
         popTxDBStore.clear();
     }
 
-    public static void init(AppConfiguration configurationArg, VeriBlockStore veriblockStoreArg,
+    public static void init(NetworkParameters networkParametersArg, VeriBlockStore veriblockStoreArg,
                             BitcoinStore bitcoinStoreArg, AuditorChangesStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
-        Preconditions.notNull(configurationArg, "Network parameters cannot be null");
+        Preconditions.notNull(networkParametersArg, "Network parameters cannot be null");
         Preconditions.notNull(veriblockStoreArg, "VeriBlock store cannot be null");
         Preconditions.notNull(bitcoinStoreArg, "Bitcoin store cannot be null");
         Preconditions.notNull(changeStoreArg, "Change store cannot be null");
 
-        networkParameters = configurationArg.getVeriblockNetworkParameters();
+        networkParameters = networkParametersArg;
         veriblockStore = veriblockStoreArg;
         bitcoinStore = bitcoinStoreArg;
         changeStore = changeStoreArg;
         popTxDBStore = popTxDBRepoArg;
-        configuration = configurationArg;
     }
 
     public static void init() throws BlockStoreException, SQLException {
         if(networkParameters == null) {
-            Properties properties = new Properties();
-            properties.setProperty("veriblock.blockchain.minimumDifficulty", "900000000000");
-            init(new AppConfiguration(properties), new VeriBlockStore(), new BitcoinStore(),
+            NetworkParameters networkParameters = new NetworkParameters() {
+                public BigInteger getMinimumDifficulty() {
+                    return new BigInteger("900000000000");
+                }
+                public Byte getTransactionMagicByte() {
+                    return (byte) 0xAA;
+                }
+            };
+            
+            init(networkParameters, new VeriBlockStore(), new BitcoinStore(),
                     new AuditorChangesStore(), new PoPTransactionsDBStore());
         }
     }
