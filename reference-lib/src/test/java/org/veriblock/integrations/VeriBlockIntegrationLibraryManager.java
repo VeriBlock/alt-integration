@@ -15,7 +15,8 @@ import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.integrations.sqlite.ConnectionSelector;
 import org.veriblock.integrations.sqlite.FileManager;
-import org.veriblock.sdk.conf.NetworkParameters;
+import org.veriblock.sdk.conf.BitcoinNetworkParameters;
+import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -29,12 +30,13 @@ public class VeriBlockIntegrationLibraryManager {
     //Should have public constructor.
     public VeriBlockIntegrationLibraryManager() {
     }
-    
-    public NetworkParameters getVeriblockNetworkParameters() {
+
+    public VeriBlockNetworkParameters getVeriblockNetworkParameters() {
+        // mainnet
         String minDifficulty = "900000000000";
         Byte magicByte = null;
 
-        return new NetworkParameters() {
+        return new VeriBlockNetworkParameters() {
                     public BigInteger getMinimumDifficulty() {
                         return new BigInteger(minDifficulty);
                     }
@@ -42,6 +44,27 @@ public class VeriBlockIntegrationLibraryManager {
                         return magicByte;
                     }
                 };
+    }
+
+    public BitcoinNetworkParameters getBitcoinNetworkParameters() {
+        // mainnet
+        return new BitcoinNetworkParameters() {
+            public BigInteger getPowLimit() {
+                return new BigInteger("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
+            }
+            public int getPowTargetTimespan() {
+                return 1209600;
+            }
+            public int getPowTargetSpacing() {
+                return 600;
+            }
+            public boolean getAllowMinDifficultyBlocks() {
+                return false;
+            }
+            public boolean getPowNoRetargeting() {
+                return false;
+            }
+        };
     }
 
     public VeriBlockSecurity init() throws SQLException, IOException {
@@ -67,7 +90,8 @@ public class VeriBlockIntegrationLibraryManager {
         AuditorChangesStore auditStore = new AuditorChangesStore(path);
         PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(path);
 
-        Context.init(getVeriblockNetworkParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Context.init(getVeriblockNetworkParameters(), getBitcoinNetworkParameters(),
+                     veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
     }
 
     @Test

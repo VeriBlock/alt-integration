@@ -73,7 +73,8 @@ public final class Application {
             BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
             AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
             PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
-            Context.init(config.getVeriblockNetworkParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+            Context.init(config.getVeriblockNetworkParameters(), config.getBitcoinNetworkParameters(),
+                         veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
             
             security = new VeriBlockSecurity();
 

@@ -63,7 +63,7 @@ public class BitcoinBlockchainTest {
         store = Context.getBitcoinStore();
         store.clear();
         
-        blockchain = new BitcoinBlockchain(store);
+        blockchain = new BitcoinBlockchain(Context.getBitcoinNetworkParameters(), store);
 
         Assert.assertEquals(block1.getHash(),
                             Sha256Hash.wrap("0000000000000000000faad7ae177b313ee4e3f1da519dbbf5b3ab58ccff6338"));

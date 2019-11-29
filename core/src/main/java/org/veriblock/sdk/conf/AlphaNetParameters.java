@@ -10,7 +10,7 @@ package org.veriblock.sdk.conf;
 
 import java.math.BigInteger;
 
-public class AlphaNetParameters implements NetworkParameters {
+public class AlphaNetParameters implements VeriBlockNetworkParameters {
     private static final BigInteger MINIMUM_POW_DIFFICULTY = BigInteger.valueOf(9_999_872L);
 
     @Override

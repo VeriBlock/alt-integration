@@ -69,7 +69,9 @@ public class VeriBlockRewardCalculatorTest {
         AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
         VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock popTxDBStore = new VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock();
 
-        Context.init(veriBlockIntegrationLibraryManager.getVeriblockNetworkParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Context.init(veriBlockIntegrationLibraryManager.getVeriblockNetworkParameters(),
+                     veriBlockIntegrationLibraryManager.getBitcoinNetworkParameters(),
+                     veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
         securityMock = new VeriBlockRewardCalculatorTest.VeriBlockSecurityMock();
         PopRewardCalculator.setSecurity(securityMock);

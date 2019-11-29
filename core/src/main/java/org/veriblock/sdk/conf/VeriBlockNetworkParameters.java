@@ -10,7 +10,7 @@ package org.veriblock.sdk.conf;
 
 import java.math.BigInteger;
 
-public interface NetworkParameters {
+public interface VeriBlockNetworkParameters {
     BigInteger getMinimumDifficulty();
     Byte getTransactionMagicByte();
 }
