@@ -15,7 +15,6 @@ import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockIntegrationLibraryManager;
 import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.blockchain.BitcoinBlockchain;
-import org.veriblock.sdk.blockchain.BitcoinRegtestBlockData;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.models.BitcoinBlock;
