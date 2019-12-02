@@ -15,6 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
+import org.veriblock.integrations.auditor.BlockIdentifier;
+import org.veriblock.integrations.auditor.Change;
+import org.veriblock.integrations.auditor.Changeset;
 import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
 import org.veriblock.integrations.rewards.PopRewardCalculator;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
@@ -32,19 +35,12 @@ import org.veriblock.protoconverters.VBlakeHashProtoConverter;
 import org.veriblock.protoconverters.VeriBlockBlockchainBootstrapConfigProtoConverter;
 import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
-import org.veriblock.sdk.AltChainBlock;
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.BlockIndex;
-import org.veriblock.sdk.BlockStoreException;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VBlakeHash;
-import org.veriblock.sdk.ValidationResult;
-import org.veriblock.sdk.VeriBlockPublication;
-import org.veriblock.sdk.VerificationException;
+import org.veriblock.sdk.*;
+import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.util.Utils;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class VeriBlockSecurityProtoService {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockSecurityProtoService.class);
@@ -321,6 +317,49 @@ public class VeriBlockSecurityProtoService {
 
             result = ValidationResult.success();
         } catch (VerificationException | SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        return VeriBlockServiceCommon.validationResultToProto(result);
+    }
+
+    public static VeriBlockMessages.GeneralReply updateContext(VeriBlockMessages.UpdateContextRequest request) {
+        ValidationResult result = null;
+        List<Change> changes = new ArrayList<Change>();
+
+        try{
+            List<BitcoinBlock> bitcoinBlocks = new ArrayList<BitcoinBlock>(request.getBitcoinBlocksCount());
+            List<VeriBlockBlock> veriBlockBlocks = new ArrayList<VeriBlockBlock>(request.getVeriBlockBlocksCount());
+            for(String encodedBlock : request.getBitcoinBlocksList()) {
+                BitcoinBlock block = SerializeDeserializeService.parseBitcoinBlock(Base64.getDecoder().decode(encodedBlock));
+                bitcoinBlocks.add(block);
+            }
+
+            for(String encodedBlock : request.getVeriBlockBlocksList()) {
+                VeriBlockBlock block = SerializeDeserializeService.parseVeriBlockBlock(Base64.getDecoder().decode(encodedBlock));
+                veriBlockBlocks.add(block);
+            }
+
+            changes.addAll(security.getBitcoinBlockchain().addAll(bitcoinBlocks));
+            changes.addAll(security.getVeriBlockBlockchain().addAll(veriBlockBlocks));
+        }
+        catch(Exception e) {
+            Collections.reverse(changes);
+            Iterator<Change> changeIterator = changes.iterator();
+
+            try {
+                while (changeIterator.hasNext()) {
+                    Change change = changeIterator.next();
+                    security.getBitcoinBlockchain().rewind(Collections.singletonList(change));
+                    security.getVeriBlockBlockchain().rewind(Collections.singletonList(change));
+                }
+            }
+            catch (SQLException sqlException)
+            {
+                log.debug("Problem with rewind blocks", sqlException);
+            }
+
             result = ValidationResult.fail(e.getMessage());
             log.debug("Could not call VeriBlock security", e);
         }

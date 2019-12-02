@@ -12,7 +12,7 @@ dependencies {
     compile "org.codehaus.groovy:groovy:2.4.12"
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     
-    implementation 'com.github.VeriBlock:alt-integration-proto:v2'
+    implementation 'com.github.VeriBlock:alt-integration-proto:feature~ALT-99-SNAPSHOT'
     
     compile project(':core')
     compile project(':alt-integration-adapter-java')

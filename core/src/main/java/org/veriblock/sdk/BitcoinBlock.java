@@ -74,5 +74,4 @@ public class BitcoinBlock {
     public Sha256Hash getHash() {
         return this.hash;
     }
-
 }
