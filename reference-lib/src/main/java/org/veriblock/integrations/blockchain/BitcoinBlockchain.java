@@ -20,6 +20,7 @@ import org.veriblock.sdk.BlockStoreException;
 import org.veriblock.sdk.Constants;
 import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VerificationException;
+import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.BitcoinUtils;
 import org.veriblock.sdk.util.Preconditions;
@@ -41,6 +42,7 @@ public class BitcoinBlockchain {
     private static final int DIFFICULTY_ADJUST_BLOCK_COUNT = 2016;
 
     private final BitcoinStore store;
+    private final BitcoinNetworkParameters networkParameters;
     private final Map<Sha256Hash, StoredBitcoinBlock> temporalStore;
     private StoredBitcoinBlock temporaryChainHead = null;
     
@@ -50,11 +52,12 @@ public class BitcoinBlockchain {
         return temporaryChainHead != null || temporalStore.size() > 0;
     }
 
-    public BitcoinBlockchain(BitcoinStore store) {
+    public BitcoinBlockchain(BitcoinNetworkParameters networkParameters, BitcoinStore store) {
         Preconditions.notNull(store, "Store cannot be null");
 
         this.store = store;
         this.temporalStore = new HashMap<>();
+        this.networkParameters = networkParameters;
     }
     
     public boolean isValidateBlocksDifficulty() {
@@ -309,7 +312,7 @@ public class BitcoinBlockchain {
         }
 
         // Previous + 1 = height of block
-        if ((previous.getHeight() + 1) % 2016 > 0) {
+        if (networkParameters.getPowNoRetargeting() || (previous.getHeight() + 1) % 2016 > 0) {
             // Difficulty should be same as previous
             if (block.getBits() != previous.getBlock().getBits()) {
                 throw new VerificationException("Block does not match difficulty of previous block");

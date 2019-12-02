@@ -44,8 +44,8 @@ public class VeriBlockSecurity {
     private AltChainParametersConfig altChainParametersConfig;
 
     public VeriBlockSecurity() {
-        veriblockBlockchain = new VeriBlockBlockchain(Context.getNetworkParameters(), Context.getVeriblockStore(), Context.getBitcoinStore());
-        bitcoinBlockchain = new BitcoinBlockchain(Context.getBitcoinStore());
+        veriblockBlockchain = new VeriBlockBlockchain(Context.getVeriBlockNetworkParameters(), Context.getVeriblockStore(), Context.getBitcoinStore());
+        bitcoinBlockchain = new BitcoinBlockchain(Context.getBitcoinNetworkParameters(), Context.getBitcoinStore());
         journal = new AuditJournal(Context.getChangeStore());
         bitcoinStore = Context.getBitcoinStore();
         altChainParametersConfig = new AltChainParametersConfig();

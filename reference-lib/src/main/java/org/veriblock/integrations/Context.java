@@ -16,11 +16,13 @@ import org.veriblock.integrations.blockchain.store.BitcoinStore;
 import org.veriblock.integrations.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.integrations.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.BlockStoreException;
-import org.veriblock.sdk.conf.NetworkParameters;
+import org.veriblock.sdk.conf.BitcoinNetworkParameters;
+import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.util.Preconditions;
 
 public class Context {
-    private static NetworkParameters networkParameters;
+    private static VeriBlockNetworkParameters veriblockNetworkParameters;
+    private static BitcoinNetworkParameters bitcoinNetworkParameters;
     private static VeriBlockStore veriblockStore;
     private static BitcoinStore bitcoinStore;
     private static AuditorChangesStore changeStore;
@@ -29,8 +31,12 @@ public class Context {
     private Context() {
     }
 
-    public static NetworkParameters getNetworkParameters() {
-        return networkParameters;
+    public static VeriBlockNetworkParameters getVeriBlockNetworkParameters() {
+        return veriblockNetworkParameters;
+    }
+
+    public static BitcoinNetworkParameters getBitcoinNetworkParameters() {
+        return bitcoinNetworkParameters;
     }
 
     public static VeriBlockStore getVeriblockStore() {
@@ -54,14 +60,18 @@ public class Context {
         popTxDBStore.clear();
     }
 
-    public static void init(NetworkParameters networkParametersArg, VeriBlockStore veriblockStoreArg,
-                            BitcoinStore bitcoinStoreArg, AuditorChangesStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
-        Preconditions.notNull(networkParametersArg, "Network parameters cannot be null");
+    public static void init(VeriBlockNetworkParameters veriblockNetworkParametersArg,
+                            BitcoinNetworkParameters bitcoinNetworkParametersArg,
+                            VeriBlockStore veriblockStoreArg, BitcoinStore bitcoinStoreArg,
+                            AuditorChangesStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
+        Preconditions.notNull(veriblockNetworkParametersArg, "VeriBlock network parameters cannot be null");
+        Preconditions.notNull(bitcoinNetworkParametersArg, "Bitcoin network parameters cannot be null");
         Preconditions.notNull(veriblockStoreArg, "VeriBlock store cannot be null");
         Preconditions.notNull(bitcoinStoreArg, "Bitcoin store cannot be null");
         Preconditions.notNull(changeStoreArg, "Change store cannot be null");
 
-        networkParameters = networkParametersArg;
+        veriblockNetworkParameters = veriblockNetworkParametersArg;
+        bitcoinNetworkParameters = bitcoinNetworkParametersArg;
         veriblockStore = veriblockStoreArg;
         bitcoinStore = bitcoinStoreArg;
         changeStore = changeStoreArg;
@@ -69,18 +79,41 @@ public class Context {
     }
 
     public static void init() throws BlockStoreException, SQLException {
-        if(networkParameters == null) {
-            NetworkParameters networkParameters = new NetworkParameters() {
+        // check if the context is initialized as none of the parameters can be null
+        if(veriblockNetworkParameters == null) {
+
+            // mainnet
+            VeriBlockNetworkParameters vbkParameters = new VeriBlockNetworkParameters() {
                 public BigInteger getMinimumDifficulty() {
                     return new BigInteger("900000000000");
                 }
                 public Byte getTransactionMagicByte() {
-                    return (byte) 0xAA;
+                    return null;
                 }
             };
-            
-            init(networkParameters, new VeriBlockStore(), new BitcoinStore(),
-                    new AuditorChangesStore(), new PoPTransactionsDBStore());
+
+            // mainnet
+            BitcoinNetworkParameters btcParameters = new BitcoinNetworkParameters() {
+                public BigInteger getPowLimit() {
+                    return new BigInteger("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
+                }
+                public int getPowTargetTimespan() {
+                    return 1209600;
+                }
+                public int getPowTargetSpacing() {
+                    return 600;
+                }
+                public boolean getAllowMinDifficultyBlocks() {
+                    return false;
+                }
+                public boolean getPowNoRetargeting() {
+                    return false;
+                }
+            };
+
+            init(vbkParameters, btcParameters,
+                 new VeriBlockStore(), new BitcoinStore(),
+                 new AuditorChangesStore(), new PoPTransactionsDBStore());
         }
     }
 }

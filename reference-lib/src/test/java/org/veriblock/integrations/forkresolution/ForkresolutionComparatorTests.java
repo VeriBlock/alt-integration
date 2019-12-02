@@ -72,7 +72,9 @@ public class ForkresolutionComparatorTests {
         AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
         PoPTransactionsDBStoreMock popTxDBStore = new PoPTransactionsDBStoreMock();
 
-        Context.init(veriBlockIntegrationLibraryManager.getVeriblockNetworkParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Context.init(veriBlockIntegrationLibraryManager.getVeriblockNetworkParameters(),
+                     veriBlockIntegrationLibraryManager.getBitcoinNetworkParameters(),
+                     veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
         VeriBlockSecurity veriBlockSecuritySpy = Mockito.spy(new VeriBlockSecurity());
 
