@@ -144,5 +144,4 @@ public class IntegrationGrpcService extends IntegrationServiceImplBase {
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
-
 }

@@ -15,9 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.integrations.Context;
 import org.veriblock.integrations.VeriBlockSecurity;
-import org.veriblock.integrations.auditor.BlockIdentifier;
 import org.veriblock.integrations.auditor.Change;
-import org.veriblock.integrations.auditor.Changeset;
 import org.veriblock.integrations.forkresolution.ForkresolutionComparator;
 import org.veriblock.integrations.rewards.PopRewardCalculator;
 import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
@@ -37,8 +35,8 @@ import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
 import org.veriblock.sdk.*;
 import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.util.Utils;
 
+import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -331,13 +329,13 @@ public class VeriBlockSecurityProtoService {
         try{
             List<BitcoinBlock> bitcoinBlocks = new ArrayList<BitcoinBlock>(request.getBitcoinBlocksCount());
             List<VeriBlockBlock> veriBlockBlocks = new ArrayList<VeriBlockBlock>(request.getVeriBlockBlocksCount());
-            for(String encodedBlock : request.getBitcoinBlocksList()) {
-                BitcoinBlock block = SerializeDeserializeService.parseBitcoinBlock(Base64.getDecoder().decode(encodedBlock));
+            for(ByteString encodedBlock : request.getBitcoinBlocksList()) {
+                BitcoinBlock block = SerializeDeserializeService.parseBitcoinBlockWithLength(ByteBuffer.wrap(encodedBlock.toByteArray()));
                 bitcoinBlocks.add(block);
             }
 
-            for(String encodedBlock : request.getVeriBlockBlocksList()) {
-                VeriBlockBlock block = SerializeDeserializeService.parseVeriBlockBlock(Base64.getDecoder().decode(encodedBlock));
+            for(ByteString encodedBlock : request.getVeriBlockBlocksList()) {
+                VeriBlockBlock block = SerializeDeserializeService.parseVeriBlockBlock(ByteBuffer.wrap(encodedBlock.toByteArray()));
                 veriBlockBlocks.add(block);
             }
 
