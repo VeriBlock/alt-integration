@@ -8,15 +8,13 @@
 
 package org.veriblock.protoconverters;
 
+import com.google.protobuf.ByteString;
+import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.Sha256Hash;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.Sha256Hash;
-
-import com.google.protobuf.ByteString;
-
-import integration.api.grpc.VeriBlockMessages;
 
 public final class BitcoinBlockProtoConverter {
 

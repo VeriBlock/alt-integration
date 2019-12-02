@@ -8,23 +8,23 @@
 
 package org.veriblock.sdk.transactions;
 
-import org.veriblock.sdk.Address;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.BitcoinTransaction;
-import org.veriblock.sdk.MerklePath;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VBlakeHash;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockMerklePath;
-import org.veriblock.sdk.VeriBlockPoPTransaction;
-import org.veriblock.sdk.VeriBlockPublication;
+import org.veriblock.sdk.models.Address;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.BitcoinTransaction;
+import org.veriblock.sdk.models.MerklePath;
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VBlakeHash;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.models.VeriBlockMerklePath;
+import org.veriblock.sdk.models.VeriBlockPoPTransaction;
+import org.veriblock.sdk.models.VeriBlockPublication;
 import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.util.BitcoinUtils;
 import org.veriblock.sdk.transactions.bitcoin.BitcoinMerklePath;
 import org.veriblock.sdk.transactions.bitcoin.BitcoinMerkleTree;
 import org.veriblock.sdk.transactions.bitcoin.VeriBlockBitcoinTransactions;
 import org.veriblock.sdk.transactions.signature.VeriBlockSignatureKeys;
 import org.veriblock.sdk.transactions.signature.VeriBlockTransactionSigner;
+import org.veriblock.sdk.util.BitcoinUtils;
 
 import java.security.SignatureException;
 import java.util.ArrayList;

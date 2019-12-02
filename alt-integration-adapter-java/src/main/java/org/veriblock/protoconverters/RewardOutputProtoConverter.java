@@ -8,13 +8,12 @@
 
 package org.veriblock.protoconverters;
 
+import com.google.protobuf.ByteString;
+import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.rewards.PopRewardOutput;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.protobuf.ByteString;
-import org.veriblock.integrations.rewards.PopRewardOutput;
-
-import integration.api.grpc.VeriBlockMessages;
 
 public final class RewardOutputProtoConverter {
 

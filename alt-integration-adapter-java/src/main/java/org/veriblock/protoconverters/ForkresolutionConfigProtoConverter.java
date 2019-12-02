@@ -9,7 +9,7 @@
 package org.veriblock.protoconverters;
 
 import integration.api.grpc.VeriBlockMessages;
-import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
+import org.veriblock.sdk.forkresolution.ForkresolutionConfig;
 
 public class ForkresolutionConfigProtoConverter {
 

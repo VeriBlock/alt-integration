@@ -8,7 +8,7 @@
 
 package org.veriblock.sdk.transactions;
 
-import org.veriblock.sdk.Sha256Hash;
+import org.veriblock.sdk.models.Sha256Hash;
 
 public class BlockMetaPackage {
     private final Sha256Hash hash;

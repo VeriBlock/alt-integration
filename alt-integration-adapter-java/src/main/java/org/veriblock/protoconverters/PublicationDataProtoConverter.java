@@ -10,7 +10,7 @@ package org.veriblock.protoconverters;
 
 import com.google.protobuf.ByteString;
 import integration.api.grpc.VeriBlockMessages;
-import org.veriblock.sdk.PublicationData;
+import org.veriblock.sdk.models.PublicationData;
 
 public class PublicationDataProtoConverter {
 

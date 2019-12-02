@@ -8,9 +8,9 @@
 
 package org.veriblock.sdk.util;
 
-import org.veriblock.sdk.MerklePath;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VeriBlockMerklePath;
+import org.veriblock.sdk.models.MerklePath;
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VeriBlockMerklePath;
 
 import java.util.List;
 

@@ -8,24 +8,45 @@
 
 package org.veriblock.protoservice;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.veriblock.integrations.AltChainParametersConfig;
-import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
-import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
-import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
-import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
-import org.veriblock.protoconverters.*;
-import org.veriblock.sdk.*;
-
 import integration.api.grpc.IntegrationServiceGrpc;
 import integration.api.grpc.IntegrationServiceGrpc.IntegrationServiceBlockingStub;
 import integration.api.grpc.VeriBlockMessages;
 import integration.api.grpc.VeriBlockMessages.EmptyRequest;
 import integration.api.grpc.VeriBlockMessages.GeneralReply;
 import io.grpc.Channel;
+import org.veriblock.protoconverters.AltChainBlockProtoConverter;
+import org.veriblock.protoconverters.AltChainParametersConfigProtoConverter;
+import org.veriblock.protoconverters.AltPublicationProtoConverter;
+import org.veriblock.protoconverters.BitcoinBlockProtoConverter;
+import org.veriblock.protoconverters.BitcoinBlockchainBootstrapConfigProtoConverter;
+import org.veriblock.protoconverters.BlockIndexProtoConverter;
+import org.veriblock.protoconverters.CalculatorConfigProtoConverter;
+import org.veriblock.protoconverters.ForkresolutionConfigProtoConverter;
+import org.veriblock.protoconverters.PoPTransactionDataProtoConverter;
+import org.veriblock.protoconverters.Sha256HashProtoConverter;
+import org.veriblock.protoconverters.VBlakeHashProtoConverter;
+import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
+import org.veriblock.protoconverters.VeriBlockBlockchainBootstrapConfigProtoConverter;
+import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
+import org.veriblock.sdk.AltChainParametersConfig;
+import org.veriblock.sdk.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.sdk.blockchain.VeriBlockBlockchainBootstrapConfig;
+import org.veriblock.sdk.forkresolution.ForkresolutionConfig;
+import org.veriblock.sdk.models.AltChainBlock;
+import org.veriblock.sdk.models.AltPublication;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.BlockIndex;
+import org.veriblock.sdk.models.Pair;
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VBlakeHash;
+import org.veriblock.sdk.models.ValidationResult;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.models.VeriBlockPublication;
+import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
+import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
+
+import java.util.Collections;
+import java.util.List;
 
 public class VeriBlockSecurityProtoClient implements IVeriBlockSecurity {    
     private final IntegrationServiceBlockingStub service;
@@ -53,7 +74,7 @@ public class VeriBlockSecurityProtoClient implements IVeriBlockSecurity {
     }
     
     @Override
-    public ValidationResult addPayloads(BlockIndex blockIndex, List<AltPublication> altPublications, List<VeriBlockPublication> vtbPublications) {        
+    public ValidationResult addPayloads(BlockIndex blockIndex, List<AltPublication> altPublications, List<VeriBlockPublication> vtbPublications) {
         VeriBlockMessages.AddPayloadsRequest request = VeriBlockMessages.AddPayloadsRequest.newBuilder()
                 .setBlockIndex(BlockIndexProtoConverter.toProto(blockIndex))
                 .addAllAltPublications(AltPublicationProtoConverter.toProto(VeriBlockServiceCommon.nullToEmptyList(altPublications)))

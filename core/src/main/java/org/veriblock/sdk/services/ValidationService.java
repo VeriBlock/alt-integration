@@ -8,16 +8,16 @@
 
 package org.veriblock.sdk.services;
 
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.Constants;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VBlakeHash;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockPoPTransaction;
-import org.veriblock.sdk.VeriBlockPublication;
-import org.veriblock.sdk.VeriBlockTransaction;
-import org.veriblock.sdk.VerificationException;
+import org.veriblock.sdk.models.AltPublication;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.Constants;
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VBlakeHash;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.models.VeriBlockPoPTransaction;
+import org.veriblock.sdk.models.VeriBlockPublication;
+import org.veriblock.sdk.models.VeriBlockTransaction;
+import org.veriblock.sdk.models.VerificationException;
 import org.veriblock.sdk.util.BitcoinUtils;
 import org.veriblock.sdk.util.MerklePathUtil;
 import org.veriblock.sdk.util.Utils;

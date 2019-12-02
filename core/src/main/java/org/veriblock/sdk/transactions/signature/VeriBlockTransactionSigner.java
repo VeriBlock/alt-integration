@@ -8,13 +8,13 @@
 
 package org.veriblock.sdk.transactions.signature;
 
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VeriBlockPoPTransaction;
+import org.veriblock.sdk.models.VeriBlockTransaction;
+import org.veriblock.sdk.services.SerializeDeserializeService;
+
 import java.security.KeyPair;
 import java.security.SignatureException;
-
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VeriBlockPoPTransaction;
-import org.veriblock.sdk.VeriBlockTransaction;
-import org.veriblock.sdk.services.SerializeDeserializeService;
 
 public class VeriBlockTransactionSigner {
 
