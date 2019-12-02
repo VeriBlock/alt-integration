@@ -56,7 +56,7 @@ public class VeriBlockBlockchainTest {
         BitcoinStore btcStore = Context.getBitcoinStore();
         btcStore.clear();
         
-        blockchain = new VeriBlockBlockchain(Context.getNetworkParameters(), store, btcStore);
+        blockchain = new VeriBlockBlockchain(Context.getVeriBlockNetworkParameters(), store, btcStore);
     }
 
     @After

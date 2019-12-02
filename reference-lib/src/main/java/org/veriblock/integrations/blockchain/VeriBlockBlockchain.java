@@ -24,7 +24,7 @@ import org.veriblock.sdk.Sha256Hash;
 import org.veriblock.sdk.VBlakeHash;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.VerificationException;
-import org.veriblock.sdk.conf.NetworkParameters;
+import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.BitcoinUtils;
 import org.veriblock.sdk.util.Preconditions;
@@ -51,7 +51,7 @@ public class VeriBlockBlockchain {
     private final VeriBlockStore store;
     private final BitcoinStore bitcoinStore;
     private final Map<VBlakeHash, StoredVeriBlockBlock> temporalStore;
-    private final NetworkParameters networkParameters;
+    private final VeriBlockNetworkParameters networkParameters;
     private StoredVeriBlockBlock temporaryChainHead = null;
     
     private boolean skipValidateBlocksDifficulty = false; 
@@ -60,7 +60,7 @@ public class VeriBlockBlockchain {
         return temporaryChainHead != null || temporalStore.size() > 0;
     }
 
-    public VeriBlockBlockchain(NetworkParameters networkParameters,
+    public VeriBlockBlockchain(VeriBlockNetworkParameters networkParameters,
             VeriBlockStore store, BitcoinStore bitcoinStore) {
         Preconditions.notNull(store, "Store cannot be null");
         Preconditions.notNull(bitcoinStore, "Bitcoin store cannot be null");

@@ -17,7 +17,7 @@ import org.veriblock.integrations.rewards.PopRewardCurveConfig;
 import org.veriblock.sdk.BitcoinBlock;
 import org.veriblock.sdk.VeriBlockBlock;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
-import org.veriblock.sdk.conf.NetworkParameters;
+import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
@@ -54,7 +54,7 @@ public class ConfigurationParser {
         return validation;
     }
 
-    public NetworkParameters getVeriblockNetworkParameters() {
+    public VeriBlockNetworkParameters getVeriblockNetworkParameters() {
         String minDifficulty = properties.getProperty("veriblock.blockchain.minimumDifficulty");
         String txMagicByte = properties.getProperty("veriblock.blockchain.transactionMagicByte");
 
@@ -70,7 +70,7 @@ public class ConfigurationParser {
             throw new AltConfigurationException("veriblock.blockchain.minimumDifficulty is required");
         }
 
-        return new NetworkParameters() {
+        return new VeriBlockNetworkParameters() {
                     public BigInteger getMinimumDifficulty() {
                         return new BigInteger(minDifficulty);
                     }
