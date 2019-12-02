@@ -304,6 +304,10 @@ public class Sha256Hash implements Comparable<Sha256Hash> {
         return Utils.reverseBytes(bytes);
     }
 
+    public Sha256Hash getReversed() {
+        return new Sha256Hash(Utils.reverseBytes(bytes), bytes.length);
+    }
+
     public Sha256Hash trim(int length) {
         Preconditions.argument(bytes.length >= length, "Invalid trim length");
 
