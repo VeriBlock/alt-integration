@@ -29,7 +29,6 @@ import java.util.List;
 //FIXME: split this into tests of BitcoinBlockRepository and KeyValueRepository
 public class SqliteBitcoinBlocksTableTest {
     
-    private static final String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
     private static Connection connection;
     private static BitcoinBlockRepository bitcoinBlocks;
     private static KeyValueRepository keyValue;
@@ -38,7 +37,7 @@ public class SqliteBitcoinBlocksTableTest {
 
     @Before
     public void setUp() throws SQLException {
-        connection = ConnectionSelector.setConnection(databasePath);
+        connection = ConnectionSelector.setConnectionInMemory();
         bitcoinBlocks = new BitcoinBlockRepository(connection);
         keyValue = new KeyValueRepository(connection);
     }

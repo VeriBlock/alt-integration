@@ -28,12 +28,24 @@ public class ConnectionSelector {
 
     public static Connection setConnection(String databasePath) throws SQLException
     {
-        logger.info("SqlLite path: '{}'", databasePath);
-        String url = String.format("jdbc:sqlite:%s", databasePath);
+        String url;
+
+        if (databasePath == null) {
+            logger.info("Using SqlLite in-memory store");
+            url = "jdbc:sqlite:file:memdb1?mode=memory&cache=shared";
+        } else {Thread.currentThread().dumpStack();
+            logger.info("SqlLite path: '{}'", databasePath);
+            url = String.format("jdbc:sqlite:%s", databasePath);
+        }
 
         DriverManager.registerDriver(new JDBC());
         Connection connection = DriverManager.getConnection(url);
         return connection;
+    }
+
+    public static Connection setConnectionInMemory() throws SQLException
+    {
+        return setConnection(null);
     }
 
     public static Connection setConnectionDefault() throws SQLException

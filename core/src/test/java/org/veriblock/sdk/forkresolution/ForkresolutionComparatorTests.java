@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+
 import org.veriblock.sdk.AltChainParametersConfig;
 import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockIntegrationLibraryManager;
@@ -34,8 +35,6 @@ import org.veriblock.sdk.models.VeriBlockBlock;
 import org.veriblock.sdk.models.VeriBlockMerklePath;
 import org.veriblock.sdk.models.VeriBlockPublication;
 import org.veriblock.sdk.models.VeriBlockTransaction;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
-import org.veriblock.sdk.sqlite.FileManager;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.util.Utils;
 
@@ -65,11 +64,9 @@ public class ForkresolutionComparatorTests {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
         veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
 
-        String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
-
-        VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
-        BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
-        AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
+        VeriBlockStore veriBlockStore = new VeriBlockStore(null);
+        BitcoinStore bitcoinStore = new BitcoinStore(null);
+        AuditorChangesStore auditStore = new AuditorChangesStore(null);
         PoPTransactionsDBStoreMock popTxDBStore = new PoPTransactionsDBStoreMock();
 
         Context.init(veriBlockIntegrationLibraryManager.getVeriblockNetworkParameters(),
@@ -659,6 +656,7 @@ public class ForkresolutionComparatorTests {
         private Map<String, List<AltPublication>> endoresedAltPublication;
 
         public PoPTransactionsDBStoreMock() throws SQLException {
+            super(null);
             this.containingAltPublication = new TreeMap<>();
             this.containingVeriBlockPublication = new TreeMap<>();
             this.endoresedAltPublication = new TreeMap<>();
