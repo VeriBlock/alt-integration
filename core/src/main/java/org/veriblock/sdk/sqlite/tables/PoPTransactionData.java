@@ -18,10 +18,10 @@ public class PoPTransactionData {
      public AltPublication altPublication;
      public List<VeriBlockPublication> veriBlockPublications;
 
-     public PoPTransactionData(String hash, AltPublication altPublciation, List<VeriBlockPublication> veriBlockPublications)
+     public PoPTransactionData(String hash, AltPublication altPublication, List<VeriBlockPublication> veriBlockPublications)
      {
           this.txHash = hash;
-          this.altPublication = altPublciation;
+          this.altPublication = altPublication;
           this.veriBlockPublications = veriBlockPublications;
      }
 }

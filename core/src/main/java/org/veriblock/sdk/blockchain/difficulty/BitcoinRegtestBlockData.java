@@ -7,7 +7,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.sdk.blockchain;
+package org.veriblock.sdk.blockchain.difficulty;
 
 import java.util.Arrays;
 import java.util.List;

@@ -54,7 +54,7 @@ public class VeriBlockStoreTest {
     }
 
     @Test
-    public void EraseCantSplitBlockchainTest() throws SQLException, IOException {
+    public void eraseCantSplitBlockchainTest() throws SQLException, IOException {
             Assert.assertEquals(block2.getPreviousBlock(), block1.getHash().trimToPreviousBlockSize());
 
             store.put(storedBlock2);
@@ -177,7 +177,7 @@ public class VeriBlockStoreTest {
     }
 
     @Test
-    public void EraseTest() throws SQLException, IOException {
+    public void eraseTest() throws SQLException, IOException {
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock expectedBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
 
@@ -193,7 +193,7 @@ public class VeriBlockStoreTest {
     }
 
     @Test
-    public void EraseNonexistentTest() throws SQLException, IOException {
+    public void eraseNonexistentTest() throws SQLException, IOException {
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock expectedBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
 
@@ -205,7 +205,7 @@ public class VeriBlockStoreTest {
     }
 
     @Test
-    public void ReplaceBlockTest() throws SQLException, IOException {
+    public void replaceBlockTest() throws SQLException, IOException {
             byte[] rawBlockOfProof = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
             StoredBitcoinBlock blockOfProof = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(rawBlockOfProof), BigInteger.TEN, 0);
 
@@ -233,7 +233,7 @@ public class VeriBlockStoreTest {
     }
 
     @Test
-    public void ReplaceNonexistentTest() throws SQLException, IOException {
+    public void replaceNonexistentTest() throws SQLException, IOException {
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock newBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);
             StoredVeriBlockBlock oldBlock = null;
@@ -249,7 +249,7 @@ public class VeriBlockStoreTest {
     }
 
     @Test
-    public void ReplaceReferencedBlockTest() throws SQLException, IOException {
+    public void replaceReferencedBlockTest() throws SQLException, IOException {
             Assert.assertEquals(block2.getPreviousBlock(), block1.getHash().trimToPreviousBlockSize());
 
             store.put(storedBlock2);

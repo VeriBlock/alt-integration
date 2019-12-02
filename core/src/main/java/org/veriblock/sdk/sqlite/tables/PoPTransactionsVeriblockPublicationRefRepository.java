@@ -19,7 +19,7 @@ public class PoPTransactionsVeriblockPublicationRefRepository {
 
     public static final String tableName = "PoPTransactionsVeriblockPublicationRef";
     public static final String txHashColumnName = "txHash";
-    public static final String veriBlockPublciationHashColumnName = "veriBlockPublicationHash";
+    public static final String veriBlockPublicationHashColumnName = "veriBlockPublicationHash";
 
     public PoPTransactionsVeriblockPublicationRefRepository(Connection connection) throws SQLException
     {
@@ -31,11 +31,11 @@ public class PoPTransactionsVeriblockPublicationRefRepository {
             stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName
                     + "(\n "
                     + txHashColumnName + " TEXT NOT NULL,\n "
-                    + veriBlockPublciationHashColumnName + " TEXT NOT NULL,\n "
-                    + " PRIMARY KEY (" + txHashColumnName + "," + veriBlockPublciationHashColumnName + ")\n "
+                    + veriBlockPublicationHashColumnName + " TEXT NOT NULL,\n "
+                    + " PRIMARY KEY (" + txHashColumnName + "," + veriBlockPublicationHashColumnName + ")\n "
                     + " FOREIGN KEY (" + txHashColumnName + ")\n "
                     + " REFERENCES " + PoPTransactionsRepository.tableName + " (" + PoPTransactionsRepository.txHashColumnName + ")\n "
-                    + " FOREIGN KEY (" + veriBlockPublciationHashColumnName + ")\n "
+                    + " FOREIGN KEY (" + veriBlockPublicationHashColumnName + ")\n "
                     + " REFERENCES " + VeriBlockPublicationRepository.tableName + " (" + VeriBlockPublicationRepository.veriBlockPublicationHashColumnName + ")\n "
                     + ");");
         }
@@ -71,7 +71,7 @@ public class PoPTransactionsVeriblockPublicationRefRepository {
     {
         PreparedStatement stmt = null;
         try {
-            stmt = connectionSource.prepareStatement("REPLACE INTO " + tableName + " ('" + txHashColumnName + "', '" + veriBlockPublciationHashColumnName + "') " +
+            stmt = connectionSource.prepareStatement("REPLACE INTO " + tableName + " ('" + txHashColumnName + "', '" + veriBlockPublicationHashColumnName + "') " +
                     "VALUES(?, ?)");
             int i = 0;
             stmt.setObject(++i, txHash);

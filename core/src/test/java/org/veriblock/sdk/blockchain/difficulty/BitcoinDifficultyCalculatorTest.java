@@ -8,6 +8,13 @@
 
 package org.veriblock.sdk.blockchain.difficulty;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,19 +22,11 @@ import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockIntegrationLibraryManager;
 import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.blockchain.BitcoinBlockchain;
-import org.veriblock.sdk.blockchain.BitcoinRegtestBlockData;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class BitcoinDifficultyCalculatorTest {
     private BitcoinStore store;
@@ -84,7 +83,7 @@ public class BitcoinDifficultyCalculatorTest {
     }
 
     @Test
-    public void RegtestTest() throws SQLException, IOException {
+    public void regtestTest() throws SQLException, IOException {
         BitcoinBlockchain blockchain = new BitcoinBlockchain(bitcoinRegtestNetworkParameters, store);
         addBlockDataToBlockchain(BitcoinRegtestBlockData.headers,
                                  BitcoinRegtestBlockData.firstBlockHeight,

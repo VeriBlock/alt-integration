@@ -45,7 +45,7 @@ public class GetLastKnownBlocksTest {
     }
 
     @Test
-    public void GetLastKnownVBKBlocksTest() throws SQLException {
+    public void getLastKnownVBKBlocksTest() throws SQLException {
         byte[] raw1 = Utils.decodeHex("0001998300029690ACA425987B8B529BEC04654A16FCCE708F3F0DEED25E1D2513D05A3B17C49D8B3BCFEFC10CB2E9C4D473B2E25DB7F1BD040098960DE0E313");
         StoredVeriBlockBlock newBlock1 = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw1), BigInteger.TEN);
 
@@ -72,7 +72,7 @@ public class GetLastKnownBlocksTest {
     }
 
     @Test
-    public void GetLastKnownBTCBlocksTest() throws SQLException {
+    public void getLastKnownBTCBlocksTest() throws SQLException {
         BitcoinBlock block1 = new BitcoinBlock(766099456,
                                     Sha256Hash.wrap("00000000000000000004dc9c42c22f489ade54a9349e3a47aee5b55069062afd"),
                                     Sha256Hash.wrap("87839c0e4c6771557ef02a5076c8b46a7157e5532eff7153293791ca852d2e58"),

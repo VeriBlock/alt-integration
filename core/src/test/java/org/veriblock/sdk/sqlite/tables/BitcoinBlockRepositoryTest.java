@@ -71,18 +71,18 @@ public class BitcoinBlockRepositoryTest {
     }
     
     @Test
-    public void GetNonexistentBlockTest() throws SQLException, IOException {
+    public void getNonexistentBlockTest() throws SQLException, IOException {
         StoredBitcoinBlock block = repo.get(newBlock.getHash());
         Assert.assertNull(block);
     }
 
     @Test
-    public void DeleteNonexistentBlockTest() throws SQLException, IOException {
+    public void deleteNonexistentBlockTest() throws SQLException, IOException {
         repo.delete(newBlock.getHash());
     }
 
     @Test
-    public void DeleteBlockTest() throws SQLException, IOException {
+    public void deleteBlockTest() throws SQLException, IOException {
         repo.save(newBlock);
         repo.delete(newBlock.getHash());
 
@@ -91,14 +91,14 @@ public class BitcoinBlockRepositoryTest {
     }
 
     @Test
-    public void AddGetBlockTest() throws SQLException, IOException {
+    public void addGetBlockTest() throws SQLException, IOException {
         repo.save(newBlock);
         StoredBitcoinBlock block = repo.get(newBlock.getHash());
         Assert.assertEquals(block, newBlock);
     }
 
     @Test
-    public void AddGetEndsWithIdBlockTest() throws SQLException, IOException {
+    public void addGetEndsWithIdBlockTest() throws SQLException, IOException {
         repo.save(newBlock);
         List<StoredBitcoinBlock> blocks = repo.getEndsWithId(newBlock.getHash());
         Assert.assertFalse(blocks.isEmpty());
@@ -106,7 +106,7 @@ public class BitcoinBlockRepositoryTest {
     }
 
     @Test
-    public void ClearTest() throws SQLException, IOException {
+    public void clearTest() throws SQLException, IOException {
         repo.save(newBlock);
         repo.save(newBlock2);
         repo.save(newBlock3);
@@ -118,13 +118,13 @@ public class BitcoinBlockRepositoryTest {
     }
 
     @Test
-    public void GetAllEmptyRepoTest() throws SQLException, IOException {
+    public void getAllEmptyRepoTest() throws SQLException, IOException {
         List<StoredBitcoinBlock> blocks = repo.getAll();
         Assert.assertTrue(blocks.isEmpty());
     }
 
     @Test
-    public void GetAllTest() throws SQLException, IOException {
+    public void getAllTest() throws SQLException, IOException {
         Comparator<StoredBitcoinBlock> comparator = (b1, b2) -> b1.getHash().toString().compareTo(b2.getHash().toString());
 
         repo.save(newBlock);
@@ -144,7 +144,7 @@ public class BitcoinBlockRepositoryTest {
     }
 
     @Test
-    public void IsInUseTest() throws SQLException, IOException {
+    public void isInUseTest() throws SQLException, IOException {
         repo.save(newBlock2);
         repo.save(newBlock3);
 
