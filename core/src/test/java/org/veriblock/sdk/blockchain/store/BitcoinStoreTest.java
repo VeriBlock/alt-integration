@@ -149,15 +149,15 @@ public class BitcoinStoreTest {
     @Test
     public void multipleChainsStoreTest() throws SQLException, IOException {
         BitcoinBlock block1 = new BitcoinBlock(1, Sha256Hash.ZERO_HASH, Sha256Hash.ZERO_HASH, 1, 1, 1);
-        StoredBitcoinBlock storedBlock = new StoredBitcoinBlock(block1, BigInteger.ONE, 0);
+        StoredBitcoinBlock storedBlock = new StoredBitcoinBlock(block1, BigInteger.ONE, 1);
         store.put(storedBlock);
 
         BitcoinBlock block2 = new BitcoinBlock(1, block1.getHash(), Sha256Hash.ZERO_HASH, 1, 1, 1);
-        storedBlock = new StoredBitcoinBlock(block2, BigInteger.ONE, 0);
+        storedBlock = new StoredBitcoinBlock(block2, BigInteger.ONE, 2);
         store.put(storedBlock);
 
         BitcoinBlock block3 = new BitcoinBlock(1, block1.getHash(), Sha256Hash.ZERO_HASH, 1, 1, 2);
-        storedBlock = new StoredBitcoinBlock(block3, BigInteger.ONE, 0);
+        storedBlock = new StoredBitcoinBlock(block3, BigInteger.ONE, 3);
         store.put(storedBlock);
 
         store.setChainHead(storedBlock);
