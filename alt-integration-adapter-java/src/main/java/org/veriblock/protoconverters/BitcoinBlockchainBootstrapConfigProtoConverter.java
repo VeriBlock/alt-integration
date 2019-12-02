@@ -8,12 +8,11 @@
 
 package org.veriblock.protoconverters;
 
-import integration.api.grpc.VeriBlockMessages;
-import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.services.SerializeDeserializeService;
-
 import com.google.protobuf.ByteString;
+import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.services.SerializeDeserializeService;
 
 public class BitcoinBlockchainBootstrapConfigProtoConverter {
 

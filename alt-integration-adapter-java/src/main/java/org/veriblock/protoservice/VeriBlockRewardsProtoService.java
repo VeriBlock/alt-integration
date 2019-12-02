@@ -8,23 +8,22 @@
 
 package org.veriblock.protoservice;
 
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.List;
-
+import integration.api.grpc.VeriBlockMessages;
+import integration.api.grpc.VeriBlockMessages.GeneralReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.veriblock.integrations.rewards.PopPayoutRound;
-import org.veriblock.integrations.rewards.PopRewardCalculator;
-import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
 import org.veriblock.protoconverters.AltChainBlockProtoConverter;
 import org.veriblock.protoconverters.CalculatorConfigProtoConverter;
 import org.veriblock.protoconverters.RewardOutputProtoConverter;
-import org.veriblock.sdk.AltChainBlock;
-import org.veriblock.sdk.ValidationResult;
+import org.veriblock.sdk.models.AltChainBlock;
+import org.veriblock.sdk.models.ValidationResult;
+import org.veriblock.sdk.rewards.PopPayoutRound;
+import org.veriblock.sdk.rewards.PopRewardCalculator;
+import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
 
-import integration.api.grpc.VeriBlockMessages;
-import integration.api.grpc.VeriBlockMessages.GeneralReply;
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.List;
 
 public class VeriBlockRewardsProtoService {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockSecurityProtoService.class);

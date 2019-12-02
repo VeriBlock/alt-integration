@@ -1,9 +1,9 @@
 package org.veriblock.protoconverters;
 
 import integration.api.grpc.VeriBlockMessages;
-import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.VeriBlockPublication;
+import org.veriblock.sdk.models.AltPublication;
+import org.veriblock.sdk.models.VeriBlockPublication;
+import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 
 import java.util.List;
 

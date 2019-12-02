@@ -8,16 +8,16 @@
 
 package org.veriblock.webservice;
 
-import org.veriblock.integrations.AltChainParametersConfig;
-import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
-import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
-import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
-import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-import org.veriblock.integrations.rewards.PopRewardCurveConfig;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.AltChainParametersConfig;
+import org.veriblock.sdk.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.sdk.blockchain.VeriBlockBlockchainBootstrapConfig;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
+import org.veriblock.sdk.forkresolution.ForkresolutionConfig;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
+import org.veriblock.sdk.rewards.PopRewardCurveConfig;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 

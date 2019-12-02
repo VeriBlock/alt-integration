@@ -8,12 +8,11 @@
 
 package org.veriblock.protoconverters;
 
+import com.google.protobuf.ByteString;
+import org.veriblock.sdk.models.VBlakeHash;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.veriblock.sdk.VBlakeHash;
-
-import com.google.protobuf.ByteString;
 
 public final class VBlakeHashProtoConverter {
 

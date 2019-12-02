@@ -16,7 +16,7 @@ import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPoPTransactionProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
 import org.veriblock.protoconverters.VeriBlockTransactionProtoConverter;
-import org.veriblock.sdk.VerificationException;
+import org.veriblock.sdk.models.VerificationException;
 import org.veriblock.sdk.services.ValidationService;
 
 public class VeriBlockValidationProtoService extends ValidationServiceGrpc.ValidationServiceImplBase {

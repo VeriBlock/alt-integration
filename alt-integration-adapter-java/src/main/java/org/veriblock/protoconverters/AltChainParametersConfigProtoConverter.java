@@ -9,7 +9,7 @@
 package org.veriblock.protoconverters;
 
 import integration.api.grpc.VeriBlockMessages;
-import org.veriblock.integrations.AltChainParametersConfig;
+import org.veriblock.sdk.AltChainParametersConfig;
 
 public class AltChainParametersConfigProtoConverter {
 

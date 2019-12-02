@@ -10,6 +10,7 @@ package org.veriblock.sdk;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.veriblock.sdk.models.BitcoinTransaction;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 

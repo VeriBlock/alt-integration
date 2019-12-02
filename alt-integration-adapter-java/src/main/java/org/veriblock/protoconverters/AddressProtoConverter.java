@@ -8,9 +8,8 @@
 
 package org.veriblock.protoconverters;
 
-import org.veriblock.sdk.Address;
-
 import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.Address;
 
 public final class AddressProtoConverter {
 
