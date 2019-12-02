@@ -8,16 +8,18 @@
 
 package org.veriblock.sdk;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Base64;
-
 import org.junit.Assert;
 import org.junit.Test;
+import org.veriblock.sdk.models.Constants;
+import org.veriblock.sdk.models.PublicationData;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Base58;
 import org.veriblock.sdk.util.StreamUtils;
 import org.veriblock.sdk.util.Utils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 
 public class PublicationDataTests {
     @Test

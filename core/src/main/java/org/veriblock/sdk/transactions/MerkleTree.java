@@ -8,10 +8,11 @@
 
 package org.veriblock.sdk.transactions;
 
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VeriBlockMerklePath;
-import org.veriblock.sdk.VeriBlockPoPTransaction;
-import org.veriblock.sdk.VeriBlockTransaction;
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VeriBlockMerklePath;
+import org.veriblock.sdk.models.VeriBlockPoPTransaction;
+import org.veriblock.sdk.models.VeriBlockTransaction;
+import org.veriblock.sdk.models.VerificationException;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 
 import java.util.ArrayList;
@@ -61,6 +62,16 @@ public class MerkleTree {
         }
 
         return false;
+    }
+
+    public static MerkleTree of(FullBlock block) {
+        MerkleTree tree = buildTree(block.getMetaPackage(), block.getPoPTransactions(), block.getNormalTransactions());
+
+        if(!block.getMerkleRoot().equals(tree.merkleRoot.getHash().trim(Sha256Hash.VERIBLOCK_MERKLE_ROOT_LENGTH))) {
+            throw new VerificationException("Block Merkle Root does not match the calculated tree Merkle Root");
+        }
+
+        return tree;
     }
 
 

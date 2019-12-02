@@ -8,15 +8,14 @@
 
 package org.veriblock.protoconverters;
 
+import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.AltPublication;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.models.VeriBlockMerklePath;
+import org.veriblock.sdk.models.VeriBlockTransaction;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockMerklePath;
-import org.veriblock.sdk.VeriBlockTransaction;
-
-import integration.api.grpc.VeriBlockMessages;
 
 public final class AltPublicationProtoConverter {
 

@@ -8,14 +8,13 @@
 
 package org.veriblock.protoconverters;
 
+import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
+import org.veriblock.sdk.rewards.PopRewardCurveConfig;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-
-import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-import org.veriblock.integrations.rewards.PopRewardCurveConfig;
-
-import integration.api.grpc.VeriBlockMessages;
 
 public final class CalculatorConfigProtoConverter {
 

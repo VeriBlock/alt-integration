@@ -8,12 +8,11 @@
 
 package org.veriblock.protoconverters;
 
+import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.Output;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.veriblock.sdk.Output;
-
-import integration.api.grpc.VeriBlockMessages;
 
 public final class OutputsProtoConverter {
 

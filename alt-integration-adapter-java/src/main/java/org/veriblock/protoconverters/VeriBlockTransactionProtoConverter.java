@@ -8,13 +8,15 @@
 
 package org.veriblock.protoconverters;
 
-import java.util.List;
-
-import org.veriblock.sdk.*;
-
 import com.google.protobuf.ByteString;
-
 import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.Address;
+import org.veriblock.sdk.models.Coin;
+import org.veriblock.sdk.models.Output;
+import org.veriblock.sdk.models.PublicationData;
+import org.veriblock.sdk.models.VeriBlockTransaction;
+
+import java.util.List;
 
 public final class VeriBlockTransactionProtoConverter {
 

@@ -8,13 +8,12 @@
 
 package org.veriblock.webservice;
 
-import org.veriblock.integrations.VeriBlockSecurity;
-import org.veriblock.protoservice.VeriBlockSecurityProtoService;
-
 import integration.api.grpc.IntegrationServiceGrpc.IntegrationServiceImplBase;
 import integration.api.grpc.VeriBlockMessages;
 import integration.api.grpc.VeriBlockMessages.GeneralReply;
 import io.grpc.stub.StreamObserver;
+import org.veriblock.protoservice.VeriBlockSecurityProtoService;
+import org.veriblock.sdk.VeriBlockSecurity;
 
 public class IntegrationGrpcService extends IntegrationServiceImplBase {
     

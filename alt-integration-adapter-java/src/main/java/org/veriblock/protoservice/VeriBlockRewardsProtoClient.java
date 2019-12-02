@@ -8,26 +8,25 @@
 
 package org.veriblock.protoservice;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-
-import org.veriblock.integrations.rewards.PopPayoutRound;
-import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-import org.veriblock.integrations.rewards.PopRewardOutput;
-import org.veriblock.protoconverters.AltChainBlockProtoConverter;
-import org.veriblock.protoconverters.CalculatorConfigProtoConverter;
-import org.veriblock.protoconverters.RewardOutputProtoConverter;
-import org.veriblock.sdk.AltChainBlock;
-import org.veriblock.sdk.Pair;
-import org.veriblock.sdk.ValidationResult;
-
 import integration.api.grpc.RewardsServiceGrpc;
+import integration.api.grpc.RewardsServiceGrpc.RewardsServiceBlockingStub;
 import integration.api.grpc.VeriBlockMessages;
 import integration.api.grpc.VeriBlockMessages.EmptyRequest;
 import integration.api.grpc.VeriBlockMessages.GeneralReply;
-import integration.api.grpc.RewardsServiceGrpc.RewardsServiceBlockingStub;
 import io.grpc.Channel;
+import org.veriblock.protoconverters.AltChainBlockProtoConverter;
+import org.veriblock.protoconverters.CalculatorConfigProtoConverter;
+import org.veriblock.protoconverters.RewardOutputProtoConverter;
+import org.veriblock.sdk.models.AltChainBlock;
+import org.veriblock.sdk.models.Pair;
+import org.veriblock.sdk.models.ValidationResult;
+import org.veriblock.sdk.rewards.PopPayoutRound;
+import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
+import org.veriblock.sdk.rewards.PopRewardOutput;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 
 public class VeriBlockRewardsProtoClient implements IVeriBlockRewards {    
     private final RewardsServiceBlockingStub service;

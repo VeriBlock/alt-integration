@@ -10,6 +10,7 @@ package org.veriblock.sdk;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.veriblock.sdk.models.Address;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 
 import java.nio.ByteBuffer;

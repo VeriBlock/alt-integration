@@ -8,24 +8,24 @@
 
 package org.veriblock.protoservice;
 
-import java.util.List;
+import org.veriblock.sdk.AltChainParametersConfig;
+import org.veriblock.sdk.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.sdk.blockchain.VeriBlockBlockchainBootstrapConfig;
+import org.veriblock.sdk.forkresolution.ForkresolutionConfig;
+import org.veriblock.sdk.models.AltChainBlock;
+import org.veriblock.sdk.models.AltPublication;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.BlockIndex;
+import org.veriblock.sdk.models.Pair;
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VBlakeHash;
+import org.veriblock.sdk.models.ValidationResult;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.models.VeriBlockPublication;
+import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
+import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 
-import org.veriblock.integrations.AltChainParametersConfig;
-import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
-import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
-import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
-import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-import org.veriblock.integrations.sqlite.tables.PoPTransactionData;
-import org.veriblock.sdk.AltChainBlock;
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.BlockIndex;
-import org.veriblock.sdk.Pair;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VBlakeHash;
-import org.veriblock.sdk.ValidationResult;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockPublication;
+import java.util.List;
 
 public interface IVeriBlockSecurity {    
     

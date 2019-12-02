@@ -10,7 +10,7 @@ package org.veriblock.sdk.util;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.veriblock.sdk.BitcoinBlock;
+import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 
 import java.math.BigInteger;

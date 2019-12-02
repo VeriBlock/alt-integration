@@ -8,9 +8,8 @@
 
 package org.veriblock.protoconverters;
 
-import org.veriblock.sdk.VeriBlockMerklePath;
-
 import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.VeriBlockMerklePath;
 
 public final class VeriBlockMerklePathProtoConverter {
 
