@@ -323,7 +323,6 @@ public class VeriBlockSecurityProtoService {
 
     public static VeriBlockMessages.GeneralReply updateContext(VeriBlockMessages.UpdateContextRequest request) {
         ValidationResult result = null;
-        List<Change> changes = new ArrayList<Change>();
 
         try{
             List<BitcoinBlock> bitcoinBlocks = new ArrayList<BitcoinBlock>(request.getBitcoinBlocksCount());
@@ -338,25 +337,10 @@ public class VeriBlockSecurityProtoService {
                 veriBlockBlocks.add(block);
             }
 
-            changes.addAll(security.getBitcoinBlockchain().addAll(bitcoinBlocks));
-            changes.addAll(security.getVeriBlockBlockchain().addAll(veriBlockBlocks));
+            security.updateContext(bitcoinBlocks, veriBlockBlocks);
             result = ValidationResult.success();
         }
         catch(Exception e) {
-            Collections.reverse(changes);
-            Iterator<Change> changeIterator = changes.iterator();
-
-            try {
-                while (changeIterator.hasNext()) {
-                    Change change = changeIterator.next();
-                    security.getBitcoinBlockchain().rewind(Collections.singletonList(change));
-                    security.getVeriBlockBlockchain().rewind(Collections.singletonList(change));
-                }
-            }
-            catch (SQLException sqlException)
-            {
-                log.debug("Problem with rewind blocks", sqlException);
-            }
 
             result = ValidationResult.fail(e.getMessage());
             log.debug("Could not call VeriBlock security", e);
