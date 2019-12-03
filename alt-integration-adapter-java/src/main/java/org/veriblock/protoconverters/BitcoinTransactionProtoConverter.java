@@ -8,11 +8,9 @@
 
 package org.veriblock.protoconverters;
 
-import org.veriblock.sdk.BitcoinTransaction;
-
 import com.google.protobuf.ByteString;
-
 import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.BitcoinTransaction;
 
 public final class BitcoinTransactionProtoConverter {
 

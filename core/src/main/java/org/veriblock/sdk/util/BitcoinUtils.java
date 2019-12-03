@@ -8,10 +8,10 @@
 
 package org.veriblock.sdk.util;
 
+import org.veriblock.sdk.models.Sha256Hash;
+
 import java.math.BigInteger;
 import java.util.Arrays;
-
-import org.veriblock.sdk.Sha256Hash;
 
 /**
  * <p>

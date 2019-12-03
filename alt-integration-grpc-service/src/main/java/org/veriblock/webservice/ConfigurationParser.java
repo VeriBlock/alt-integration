@@ -8,16 +8,22 @@
 
 package org.veriblock.webservice;
 
-import org.veriblock.integrations.AltChainParametersConfig;
-import org.veriblock.integrations.blockchain.BitcoinBlockchainBootstrapConfig;
-import org.veriblock.integrations.blockchain.VeriBlockBlockchainBootstrapConfig;
-import org.veriblock.integrations.forkresolution.ForkresolutionConfig;
-import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-import org.veriblock.integrations.rewards.PopRewardCurveConfig;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.AltChainParametersConfig;
+import org.veriblock.sdk.blockchain.BitcoinBlockchainBootstrapConfig;
+import org.veriblock.sdk.blockchain.VeriBlockBlockchainBootstrapConfig;
+import org.veriblock.sdk.conf.AlphaNetParameters;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
+import org.veriblock.sdk.conf.BitcoinMainNetParameters;
+import org.veriblock.sdk.conf.BitcoinRegTestParameters;
+import org.veriblock.sdk.conf.BitcoinTestNetParameters;
+import org.veriblock.sdk.conf.MainNetParameters;
+import org.veriblock.sdk.conf.TestNetParameters;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
+import org.veriblock.sdk.forkresolution.ForkresolutionConfig;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
+import org.veriblock.sdk.rewards.PopRewardCurveConfig;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
@@ -55,6 +61,21 @@ public class ConfigurationParser {
     }
 
     public VeriBlockNetworkParameters getVeriblockNetworkParameters() {
+        String preset = properties.getProperty("veriblock.blockchain.network");
+        if (preset.equalsIgnoreCase("main")) {
+            return new MainNetParameters();
+        } else if (preset.equalsIgnoreCase("test")) {
+            return new TestNetParameters();
+        } else if (preset.equalsIgnoreCase("alpha")) {
+            return new AlphaNetParameters();
+        } else if (preset.equalsIgnoreCase("custom")) {
+            return getCustomVeriblockNetworkParameters();
+        }
+
+        throw new IllegalArgumentException("Unknown VeriBlock network name");
+    }
+
+    private VeriBlockNetworkParameters getCustomVeriblockNetworkParameters() {
         String minDifficulty = properties.getProperty("veriblock.blockchain.minimumDifficulty");
         String txMagicByte = properties.getProperty("veriblock.blockchain.transactionMagicByte");
 
@@ -81,6 +102,21 @@ public class ConfigurationParser {
     }
 
     public BitcoinNetworkParameters getBitcoinNetworkParameters() {
+        String preset = properties.getProperty("veriblock.blockchain.network");
+        if (preset.equalsIgnoreCase("main")) {
+            return new BitcoinMainNetParameters();
+        } else if (preset.equalsIgnoreCase("test")) {
+            return new BitcoinTestNetParameters();
+        } else if (preset.equalsIgnoreCase("regtest")) {
+            return new BitcoinRegTestParameters();
+        } else if (preset.equalsIgnoreCase("custom")) {
+            return getCustomBitcoinNetworkParameters();
+        }
+
+        throw new IllegalArgumentException("Unknown Bitcoin network name");
+    }
+
+    private BitcoinNetworkParameters getCustomBitcoinNetworkParameters() {
         String powLimit = properties.getProperty("bitcoin.blockchain.powLimit");
         String powTargetTimespan = properties.getProperty("bitcoin.blockchain.powTargetTimespan");
         String powTargetSpacing = properties.getProperty("bitcoin.blockchain.powTargetSpacing");

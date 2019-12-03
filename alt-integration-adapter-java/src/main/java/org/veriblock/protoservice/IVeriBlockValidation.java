@@ -8,13 +8,13 @@
 
 package org.veriblock.protoservice;
 
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.ValidationResult;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockPoPTransaction;
-import org.veriblock.sdk.VeriBlockPublication;
-import org.veriblock.sdk.VeriBlockTransaction;
+import org.veriblock.sdk.models.AltPublication;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.ValidationResult;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.models.VeriBlockPoPTransaction;
+import org.veriblock.sdk.models.VeriBlockPublication;
+import org.veriblock.sdk.models.VeriBlockTransaction;
 
 public interface IVeriBlockValidation {
 

@@ -8,9 +8,8 @@
 
 package org.veriblock.protoconverters;
 
-import org.veriblock.sdk.BlockIndex;
-
 import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.BlockIndex;
 
 public final class BlockIndexProtoConverter {
 

@@ -8,18 +8,16 @@
 
 package org.veriblock.protoconverters;
 
-import java.util.List;
-
-import org.veriblock.sdk.Address;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.BitcoinTransaction;
-import org.veriblock.sdk.MerklePath;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockPoPTransaction;
-
 import com.google.protobuf.ByteString;
-
 import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.Address;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.BitcoinTransaction;
+import org.veriblock.sdk.models.MerklePath;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.models.VeriBlockPoPTransaction;
+
+import java.util.List;
 
 public final class VeriBlockPoPTransactionProtoConverter {
 

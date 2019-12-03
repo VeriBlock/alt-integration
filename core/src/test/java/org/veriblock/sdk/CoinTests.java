@@ -8,15 +8,16 @@
 
 package org.veriblock.sdk;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import org.junit.Assert;
 import org.junit.Test;
+import org.veriblock.sdk.models.Coin;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.StreamUtils;
 import org.veriblock.sdk.util.Utils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class CoinTests {
     @Test

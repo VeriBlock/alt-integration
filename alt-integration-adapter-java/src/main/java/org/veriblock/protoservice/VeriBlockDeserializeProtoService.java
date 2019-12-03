@@ -8,6 +8,8 @@
 
 package org.veriblock.protoservice;
 
+import integration.api.grpc.VeriBlockMessages;
+import integration.api.grpc.VeriBlockMessages.GeneralReply;
 import org.veriblock.protoconverters.AddressProtoConverter;
 import org.veriblock.protoconverters.AltPublicationProtoConverter;
 import org.veriblock.protoconverters.BitcoinBlockProtoConverter;
@@ -20,24 +22,21 @@ import org.veriblock.protoconverters.VeriBlockMerklePathProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPoPTransactionProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
 import org.veriblock.protoconverters.VeriBlockTransactionProtoConverter;
-import org.veriblock.sdk.Address;
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.BitcoinTransaction;
-import org.veriblock.sdk.MerklePath;
-import org.veriblock.sdk.Output;
-import org.veriblock.sdk.PublicationData;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.ValidationResult;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockMerklePath;
-import org.veriblock.sdk.VeriBlockPoPTransaction;
-import org.veriblock.sdk.VeriBlockPublication;
-import org.veriblock.sdk.VeriBlockTransaction;
+import org.veriblock.sdk.models.Address;
+import org.veriblock.sdk.models.AltPublication;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.BitcoinTransaction;
+import org.veriblock.sdk.models.MerklePath;
+import org.veriblock.sdk.models.Output;
+import org.veriblock.sdk.models.PublicationData;
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.ValidationResult;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.models.VeriBlockMerklePath;
+import org.veriblock.sdk.models.VeriBlockPoPTransaction;
+import org.veriblock.sdk.models.VeriBlockPublication;
+import org.veriblock.sdk.models.VeriBlockTransaction;
 import org.veriblock.sdk.services.SerializeDeserializeService;
-
-import integration.api.grpc.VeriBlockMessages;
-import integration.api.grpc.VeriBlockMessages.GeneralReply;
 
 public class VeriBlockDeserializeProtoService {
     public static VeriBlockMessages.AltPublicationReply parseAltPublication(VeriBlockMessages.BytesArrayRequest request) {

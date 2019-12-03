@@ -14,7 +14,6 @@ dependencies {
     implementation 'com.github.VeriBlock:alt-integration-proto:feature~ALT-99-SNAPSHOT'
 
     compile project(':core')
-    compile project(':reference-lib')
-    
+
     testCompile 'junit:junit:4.12'
 }

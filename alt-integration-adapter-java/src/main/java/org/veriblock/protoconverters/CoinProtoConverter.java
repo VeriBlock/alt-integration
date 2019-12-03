@@ -8,9 +8,8 @@
 
 package org.veriblock.protoconverters;
 
-import org.veriblock.sdk.Coin;
-
 import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.Coin;
 
 public final class CoinProtoConverter {
 

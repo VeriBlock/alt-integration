@@ -8,10 +8,10 @@
 
 package org.veriblock.sdk.transactions.bitcoin;
 
-import org.veriblock.sdk.Address;
-import org.veriblock.sdk.BitcoinTransaction;
-import org.veriblock.sdk.Sha256Hash;
-import org.veriblock.sdk.VeriBlockBlock;
+import org.veriblock.sdk.models.Address;
+import org.veriblock.sdk.models.BitcoinTransaction;
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VeriBlockBlock;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 

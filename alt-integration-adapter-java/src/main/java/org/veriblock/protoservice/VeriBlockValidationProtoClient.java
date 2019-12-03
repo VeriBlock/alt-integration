@@ -8,22 +8,21 @@
 
 package org.veriblock.protoservice;
 
+import integration.api.grpc.ValidationServiceGrpc;
+import io.grpc.Channel;
 import org.veriblock.protoconverters.AltPublicationProtoConverter;
 import org.veriblock.protoconverters.BitcoinBlockProtoConverter;
 import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPoPTransactionProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
 import org.veriblock.protoconverters.VeriBlockTransactionProtoConverter;
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.BitcoinBlock;
-import org.veriblock.sdk.ValidationResult;
-import org.veriblock.sdk.VeriBlockBlock;
-import org.veriblock.sdk.VeriBlockPoPTransaction;
-import org.veriblock.sdk.VeriBlockPublication;
-import org.veriblock.sdk.VeriBlockTransaction;
-
-import integration.api.grpc.ValidationServiceGrpc;
-import io.grpc.Channel;
+import org.veriblock.sdk.models.AltPublication;
+import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.ValidationResult;
+import org.veriblock.sdk.models.VeriBlockBlock;
+import org.veriblock.sdk.models.VeriBlockPoPTransaction;
+import org.veriblock.sdk.models.VeriBlockPublication;
+import org.veriblock.sdk.models.VeriBlockTransaction;
 
 public class VeriBlockValidationProtoClient implements IVeriBlockValidation {
 

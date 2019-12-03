@@ -10,6 +10,13 @@ package org.veriblock.sdk;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.veriblock.sdk.models.Address;
+import org.veriblock.sdk.models.Coin;
+import org.veriblock.sdk.models.Output;
+import org.veriblock.sdk.models.PublicationData;
+import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VeriBlockTransaction;
+import org.veriblock.sdk.models.VerificationException;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.Utils;

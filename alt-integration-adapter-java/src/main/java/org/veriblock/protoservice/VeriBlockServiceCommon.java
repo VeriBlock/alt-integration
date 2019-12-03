@@ -8,12 +8,11 @@
 
 package org.veriblock.protoservice;
 
+import integration.api.grpc.VeriBlockMessages.GeneralReply;
+import org.veriblock.sdk.models.ValidationResult;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.veriblock.sdk.ValidationResult;
-
-import integration.api.grpc.VeriBlockMessages.GeneralReply;
 
 public class VeriBlockServiceCommon {    
     private VeriBlockServiceCommon() { }

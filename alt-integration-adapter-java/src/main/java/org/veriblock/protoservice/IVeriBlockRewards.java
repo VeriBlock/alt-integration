@@ -8,14 +8,14 @@
 
 package org.veriblock.protoservice;
 
+import org.veriblock.sdk.models.AltChainBlock;
+import org.veriblock.sdk.models.Pair;
+import org.veriblock.sdk.models.ValidationResult;
+import org.veriblock.sdk.rewards.PopPayoutRound;
+import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
+
 import java.math.BigDecimal;
 import java.util.List;
-
-import org.veriblock.integrations.rewards.PopPayoutRound;
-import org.veriblock.integrations.rewards.PopRewardCalculatorConfig;
-import org.veriblock.sdk.AltChainBlock;
-import org.veriblock.sdk.Pair;
-import org.veriblock.sdk.ValidationResult;
 
 public interface IVeriBlockRewards {    
     

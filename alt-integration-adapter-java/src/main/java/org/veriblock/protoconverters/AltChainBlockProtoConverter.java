@@ -8,12 +8,11 @@
 
 package org.veriblock.protoconverters;
 
+import integration.api.grpc.VeriBlockMessages;
+import org.veriblock.sdk.models.AltChainBlock;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.veriblock.sdk.AltChainBlock;
-
-import integration.api.grpc.VeriBlockMessages;
 
 public class AltChainBlockProtoConverter {
 
