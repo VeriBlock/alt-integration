@@ -19,7 +19,7 @@ public class SqliteDefaultConnectorTest {
 
     @Test
     public void createConnectionTest() throws IOException, SQLException {
-        Connection connection = ConnectionSelector.setConnectionDefault();
+        Connection connection = ConnectionSelector.setConnectionInMemory();
         Assert.assertTrue(connection != null);
         connection.close();
     }
