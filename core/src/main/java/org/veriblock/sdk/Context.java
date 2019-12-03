@@ -12,7 +12,9 @@ import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
+import org.veriblock.sdk.conf.BitcoinMainNetParameters;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
+import org.veriblock.sdk.conf.MainNetParameters;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.models.BlockStoreException;
 import org.veriblock.sdk.util.Preconditions;
@@ -81,37 +83,7 @@ public class Context {
     public static void init() throws BlockStoreException, SQLException {
         // check if the context is initialized as none of the parameters can be null
         if(veriblockNetworkParameters == null) {
-
-            // mainnet
-            VeriBlockNetworkParameters vbkParameters = new VeriBlockNetworkParameters() {
-                public BigInteger getMinimumDifficulty() {
-                    return new BigInteger("900000000000");
-                }
-                public Byte getTransactionMagicByte() {
-                    return null;
-                }
-            };
-
-            // mainnet
-            BitcoinNetworkParameters btcParameters = new BitcoinNetworkParameters() {
-                public BigInteger getPowLimit() {
-                    return new BigInteger("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
-                }
-                public int getPowTargetTimespan() {
-                    return 1209600;
-                }
-                public int getPowTargetSpacing() {
-                    return 600;
-                }
-                public boolean getAllowMinDifficultyBlocks() {
-                    return false;
-                }
-                public boolean getPowNoRetargeting() {
-                    return false;
-                }
-            };
-
-            init(vbkParameters, btcParameters,
+            init(new MainNetParameters(), new BitcoinMainNetParameters(),
                  new VeriBlockStore(), new BitcoinStore(),
                  new AuditorChangesStore(), new PoPTransactionsDBStore());
         }
