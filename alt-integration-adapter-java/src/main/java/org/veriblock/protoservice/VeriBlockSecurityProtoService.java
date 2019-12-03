@@ -330,17 +330,18 @@ public class VeriBlockSecurityProtoService {
             List<BitcoinBlock> bitcoinBlocks = new ArrayList<BitcoinBlock>(request.getBitcoinBlocksCount());
             List<VeriBlockBlock> veriBlockBlocks = new ArrayList<VeriBlockBlock>(request.getVeriBlockBlocksCount());
             for(ByteString encodedBlock : request.getBitcoinBlocksList()) {
-                BitcoinBlock block = SerializeDeserializeService.parseBitcoinBlockWithLength(ByteBuffer.wrap(encodedBlock.toByteArray()));
+                BitcoinBlock block = SerializeDeserializeService.parseBitcoinBlock(encodedBlock.toByteArray());
                 bitcoinBlocks.add(block);
             }
 
             for(ByteString encodedBlock : request.getVeriBlockBlocksList()) {
-                VeriBlockBlock block = SerializeDeserializeService.parseVeriBlockBlock(ByteBuffer.wrap(encodedBlock.toByteArray()));
+                VeriBlockBlock block = SerializeDeserializeService.parseVeriBlockBlock(encodedBlock.toByteArray());
                 veriBlockBlocks.add(block);
             }
 
             changes.addAll(security.getBitcoinBlockchain().addAll(bitcoinBlocks));
             changes.addAll(security.getVeriBlockBlockchain().addAll(veriBlockBlocks));
+            result = ValidationResult.success();
         }
         catch(Exception e) {
             Collections.reverse(changes);
