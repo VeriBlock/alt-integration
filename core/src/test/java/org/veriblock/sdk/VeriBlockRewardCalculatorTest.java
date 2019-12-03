@@ -63,11 +63,9 @@ public class VeriBlockRewardCalculatorTest {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
         veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
 
-        String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
-
-        VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
-        BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
-        AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
+        VeriBlockStore veriBlockStore = new VeriBlockStore(null);
+        BitcoinStore bitcoinStore = new BitcoinStore(null);
+        AuditorChangesStore auditStore = new AuditorChangesStore(null);
         VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock popTxDBStore = new VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock();
 
         Context.init(veriBlockIntegrationLibraryManager.getVeriblockNetworkParameters(),
@@ -564,6 +562,7 @@ public class VeriBlockRewardCalculatorTest {
         private Map<String, List<AltPublication>> endoresedAltPublication;
 
         public PoPTransactionsDBStoreMock() throws SQLException {
+            super(null);
         }
 
         {

@@ -59,7 +59,7 @@ public class BitcoinBlockRepositoryTest {
         newBlock2 = new StoredBitcoinBlock(block2, BigInteger.ONE, 0);
         newBlock3 = new StoredBitcoinBlock(block3, BigInteger.ZERO, 0);
 
-        connection = ConnectionSelector.setConnectionDefault();
+        connection = ConnectionSelector.setConnectionInMemory();
         repo = new BitcoinBlockRepository(connection);
         repo.clear();
     }

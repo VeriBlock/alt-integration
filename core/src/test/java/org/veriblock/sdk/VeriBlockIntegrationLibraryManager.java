@@ -68,14 +68,13 @@ public class VeriBlockIntegrationLibraryManager {
     }
 
     public VeriBlockSecurity init() throws SQLException, IOException {
-        String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
-        initContext(databasePath);
+        initContext(null);
         Context.resetSecurity();
 
         security = new VeriBlockSecurity();
         return security;
     }
-    
+
     public void shutdown() throws SQLException {
         if(security != null) {
             security.shutdown();
