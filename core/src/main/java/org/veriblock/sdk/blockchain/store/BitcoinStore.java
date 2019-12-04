@@ -149,13 +149,13 @@ public class BitcoinStore {
         if(current == null) return null;
         
         Sha256Hash currentHash = current.getHash();
-        
         while(true) {
             if(currentHash.compareTo(hash) == 0) return current;
             // check if the block exists
-            if(current == null) return null;
+            if(current == null)
+                return null;
             // check if we found the Genesis block
-            if(currentHash.toBigInteger().compareTo(BigInteger.ZERO) == 0) return null;
+            if(current.getHeight() == 0) return null;
             
             currentHash = current.getBlock().getPreviousBlock();
             current = get(currentHash);

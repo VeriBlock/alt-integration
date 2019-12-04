@@ -1,3 +1,4 @@
+// This file has been automatically generated using scripts/btc_header_downloader.py
 
 // VeriBlock Blockchain Project
 // Copyright 2017-2018 VeriBlock, Inc

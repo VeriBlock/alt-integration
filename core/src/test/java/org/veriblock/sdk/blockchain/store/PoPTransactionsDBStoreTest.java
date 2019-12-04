@@ -27,8 +27,6 @@ import org.veriblock.sdk.models.VeriBlockPoPTransaction;
 import org.veriblock.sdk.models.VeriBlockPublication;
 import org.veriblock.sdk.models.VeriBlockTransaction;
 import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
-import org.veriblock.sdk.sqlite.FileManager;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.util.Utils;
 
@@ -42,7 +40,6 @@ import java.util.List;
 
 public class PoPTransactionsDBStoreTest {
 
-    private static final String databasePath = Paths.get(FileManager.getTempDirectory(), ConnectionSelector.defaultDatabaseName).toString();
     private static PoPTransactionsDBStore popTxDBStore;
 
     private static AltPublication generateATV()
@@ -103,7 +100,7 @@ public class PoPTransactionsDBStoreTest {
     @Before
     public void setUp() throws SQLException
     {
-        popTxDBStore = new PoPTransactionsDBStore(databasePath);
+        popTxDBStore = new PoPTransactionsDBStore(null);
     }
 
     @After

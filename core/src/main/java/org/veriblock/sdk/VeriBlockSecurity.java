@@ -294,4 +294,24 @@ public class VeriBlockSecurity {
             throw new VerificationException("Publication does not connect to Bitcoin blockchain");
         }
     }
+
+    public void updateContext(List<BitcoinBlock> bitcoinBlocks, List<VeriBlockBlock> veriBlockBlocks) throws SQLException, VerificationException
+    {
+        List<Change> changes = new ArrayList<Change>();
+        try {
+            changes.addAll(bitcoinBlockchain.addAll(bitcoinBlocks));
+            changes.addAll(veriblockBlockchain.addAll(veriBlockBlocks));
+        }
+        catch (VerificationException e)
+        {
+            Collections.reverse(changes);
+            Iterator<Change> changeIterator = changes.iterator();
+            while (changeIterator.hasNext()) {
+                Change change = changeIterator.next();
+                bitcoinBlockchain.rewind(Collections.singletonList(change));
+                veriblockBlockchain.rewind(Collections.singletonList(change));
+            }
+            throw e;
+        }
+    }
 }
