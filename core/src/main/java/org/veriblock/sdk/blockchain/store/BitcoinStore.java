@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BitcoinStore {
+public class BitcoinStore implements BlockStore<StoredBitcoinBlock, Sha256Hash> {
     //private static final int DEFAULT_NUM_HEADERS = 5000;
     private static final Logger log = LoggerFactory.getLogger(BitcoinStore.class);
     
@@ -54,7 +54,7 @@ public class BitcoinStore {
             log.debug("Error closing database connection", e);
         }
     }
-    
+
     public void clear() throws SQLException {
         bitcoinRepository.clear();
         keyValueRepository.clear();

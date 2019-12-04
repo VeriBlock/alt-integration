@@ -18,8 +18,10 @@ import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.auditor.BlockIdentifier;
 import org.veriblock.sdk.auditor.Change;
 import org.veriblock.sdk.auditor.Changeset;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
+import org.veriblock.sdk.blockchain.store.BlockStore;
+import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
+import org.veriblock.sdk.models.Sha256Hash;
 import org.veriblock.sdk.models.VeriBlockBlock;
 import org.veriblock.sdk.models.VerificationException;
 import org.veriblock.sdk.services.SerializeDeserializeService;
@@ -53,7 +55,7 @@ public class VeriBlockBlockchainTest {
         store = Context.getVeriblockStore();
         store.clear();
         
-        BitcoinStore btcStore = Context.getBitcoinStore();
+        BlockStore<StoredBitcoinBlock, Sha256Hash> btcStore = Context.getBitcoinStore();
         btcStore.clear();
         
         blockchain = new VeriBlockBlockchain(Context.getVeriBlockNetworkParameters(), store, btcStore);
