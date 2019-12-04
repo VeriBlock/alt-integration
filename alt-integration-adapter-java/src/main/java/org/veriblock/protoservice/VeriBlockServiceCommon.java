@@ -8,6 +8,7 @@
 
 package org.veriblock.protoservice;
 
+import integration.api.grpc.VeriBlockMessages.CheckReply;
 import integration.api.grpc.VeriBlockMessages.GeneralReply;
 import org.veriblock.sdk.models.ValidationResult;
 
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VeriBlockServiceCommon {    
+
     private VeriBlockServiceCommon() { }
     
     public static GeneralReply validationResultToProto(ValidationResult data) {
@@ -26,6 +28,11 @@ public class VeriBlockServiceCommon {
             return ValidationResult.success();
         }
         return ValidationResult.fail(data.getResultMessage());
+    }
+
+    public static CheckReply validationResultToCheckReplyProto(ValidationResult data)
+    {
+        return CheckReply.newBuilder().setResult(data.isValid()).build();
     }
     
     public static <T> List<T> nullToEmptyList(List<T> publications) {
