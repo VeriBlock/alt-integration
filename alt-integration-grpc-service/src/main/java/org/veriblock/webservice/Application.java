@@ -121,6 +121,7 @@ public final class Application {
                 .addService(new GrpcSerializeService())
                 .addService(new GrpcValidationService())
                 .addService(new ForkresolutionGrpcService())
+                .addService(new GrpcPopService(security))
                 .build();
         try {
             server.start();
