@@ -8,7 +8,7 @@
 
 package org.veriblock.sdk.blockchain;
 
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
+import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.models.BlockStoreException;
 import org.veriblock.sdk.models.Sha256Hash;
@@ -43,7 +43,7 @@ public class VeriBlockPublicationUtilities {
      * @throws SQLException 
      * @throws BlockStoreException 
      */
-    public static List<VeriBlockPublication> simplifyVeriBlockPublications(List<VeriBlockPublication> publications, BitcoinStore bitcoinStore) throws BlockStoreException, SQLException {
+    public static List<VeriBlockPublication> simplifyVeriBlockPublications(List<VeriBlockPublication> publications, BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStore) throws BlockStoreException, SQLException {
         if (publications == null) {
             throw new IllegalArgumentException("simplifyVeriBlockPublications cannot be called with a null list!");
         }
@@ -112,7 +112,7 @@ public class VeriBlockPublicationUtilities {
      * @throws SQLException 
      * @throws BlockStoreException 
      */
-    private static VeriBlockPublication getBestVTBWhichConnectsAParticularKeystone(List<VeriBlockPublication> publications, BitcoinStore bitcoinStore) throws BlockStoreException, SQLException {
+    private static VeriBlockPublication getBestVTBWhichConnectsAParticularKeystone(List<VeriBlockPublication> publications, BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStore) throws BlockStoreException, SQLException {
         List<VeriBlockPublication> bestBlockOfProofPublications = new ArrayList<>();
 
         // Step 1: Find the publications in the earliest block of proof

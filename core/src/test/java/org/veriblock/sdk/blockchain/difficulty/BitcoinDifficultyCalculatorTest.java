@@ -22,14 +22,16 @@ import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockIntegrationLibraryManager;
 import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.blockchain.BitcoinBlockchain;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
+import org.veriblock.sdk.blockchain.store.BlockStore;
+import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.models.BitcoinBlock;
+import org.veriblock.sdk.models.Sha256Hash;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
 public class BitcoinDifficultyCalculatorTest {
-    private BitcoinStore store;
+    private BlockStore<StoredBitcoinBlock, Sha256Hash> store;
     private VeriBlockSecurity veriBlockSecurity;
 
     private static final BitcoinNetworkParameters bitcoinRegtestNetworkParameters = new BitcoinNetworkParameters() {
