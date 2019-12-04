@@ -43,7 +43,7 @@ public class PopServiceProto {
         return VeriBlockServiceCommon.validationResultToCheckReplyProto(result);
     }
 
-    static public VeriBlockMessages.RewardsOutputsReply rewardsCalculateOutputs(VeriBlockMessages.RewardsCalculateRequest request) throws Exception
+    static public VeriBlockMessages.RewardsCalculateReply rewardsCalculateOutputs(VeriBlockMessages.RewardsCalculateRequest request) throws Exception
     {
         AltChainBlock endorsedBlock = AltChainBlockProtoConverter.fromProto(request.getEndorsedBlock());
         List<AltChainBlock> endorsmentBlocks = AltChainBlockProtoConverter.fromProto(request.getEndorsmentBlocksList());
@@ -52,7 +52,7 @@ public class PopServiceProto {
         BigDecimal difficulty = PopRewardCalculator.calculatePopDifficultyForBlock(difficultyBlocks);
         PopPayoutRound payout = PopRewardCalculator.calculatePopPayoutRound(request.getBlockAltHeight(), endorsedBlock, endorsmentBlocks, difficulty);
 
-        return VeriBlockMessages.RewardsOutputsReply.newBuilder()
+        return VeriBlockMessages.RewardsCalculateReply.newBuilder()
                 .addAllOutputs(RewardOutputProtoConverter.toProto(payout.getOutputsToPopMiners()))
                 .setBlockReward(Long.toString(payout.getPopBlockReward()))
                 .setTotalReward(Long.toString(payout.getTotalRewardPaidOut()))

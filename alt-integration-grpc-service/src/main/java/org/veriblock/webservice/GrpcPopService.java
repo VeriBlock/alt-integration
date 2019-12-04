@@ -40,10 +40,10 @@ public class GrpcPopService extends PopServiceImplBase {
     }
 
     @Override
-    public void rewardsCalculateOutputs(VeriBlockMessages.RewardsCalculateRequest request, StreamObserver<VeriBlockMessages.RewardsOutputsReply> responseObserver)
+    public void rewardsCalculateOutputs(VeriBlockMessages.RewardsCalculateRequest request, StreamObserver<VeriBlockMessages.RewardsCalculateReply> responseObserver)
     {
         try {
-            VeriBlockMessages.RewardsOutputsReply reply = PopServiceProto.rewardsCalculateOutputs(request);
+            VeriBlockMessages.RewardsCalculateReply reply = PopServiceProto.rewardsCalculateOutputs(request);
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         }
