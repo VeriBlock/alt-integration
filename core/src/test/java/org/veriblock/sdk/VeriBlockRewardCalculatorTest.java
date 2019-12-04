@@ -573,7 +573,7 @@ public class VeriBlockRewardCalculatorTest {
 
 
         @Override
-        public List<AltPublication> getAltPublciationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
+        public List<AltPublication> getAltPublicationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
             Set<AltPublication> altPublications1 = new HashSet<AltPublication>();
             for (AltChainBlock block : containBlocks) {
                 if(containingAltPublication.get(block.getHash()) != null) {

@@ -55,7 +55,7 @@ public class VeriBlockBootstrapBlockCornerCaseTest {
     }
 
     @Test
-    public void AddBootstrapBlockTest() throws SQLException {
+    public void addBootstrapBlockTest() throws SQLException {
         blockchain.bootstrap(Arrays.asList(block1, block2));
 
         blockchain.add(block1);

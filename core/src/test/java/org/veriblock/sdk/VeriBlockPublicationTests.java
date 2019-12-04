@@ -28,9 +28,6 @@ import java.util.Base64;
 import java.util.Collections;
 
 public class VeriBlockPublicationTests {
-
-
-
     @Test
     public void verify_WhenValid() {
         VeriBlockPoPTransaction tx = new VeriBlockPoPTransaction(

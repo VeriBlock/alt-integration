@@ -94,7 +94,7 @@ public class PoPTransactionsDBStore {
         }
     }
 
-    public List<AltPublication> getAltPublciationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException
+    public List<AltPublication> getAltPublicationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException
     {
         List<AltPublication> resultData = new ArrayList<AltPublication>();
 
@@ -170,7 +170,7 @@ public class PoPTransactionsDBStore {
         try{
             stmt = connectionResource.prepareStatement( " SELECT DISTINCT " + VeriBlockPublicationRepository.tableName + "." + VeriBlockPublicationRepository.veriBlockPublicationDataColumnName +
                     " FROM " + VeriBlockPublicationRepository.tableName + " LEFT JOIN " + PoPTransactionsVeriblockPublicationRefRepository.tableName +
-                    " ON " + PoPTransactionsVeriblockPublicationRefRepository.tableName + "." + PoPTransactionsVeriblockPublicationRefRepository.veriBlockPublciationHashColumnName +
+                    " ON " + PoPTransactionsVeriblockPublicationRefRepository.tableName + "." + PoPTransactionsVeriblockPublicationRefRepository.veriBlockPublicationHashColumnName +
                     " = " + VeriBlockPublicationRepository.tableName + "." + VeriBlockPublicationRepository.veriBlockPublicationHashColumnName +
                     " LEFT JOIN " + ContainRepository.tableName +
                     " ON " + PoPTransactionsVeriblockPublicationRefRepository.tableName + "." + PoPTransactionsVeriblockPublicationRefRepository.txHashColumnName +

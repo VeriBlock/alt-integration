@@ -169,7 +169,7 @@ public class PopRewardCalculator {
     public static BigDecimal calculatePopScoreFromEndorsements(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks) throws SQLException {
         BigDecimal totalScore = BigDecimal.ZERO;
 
-        List<AltPublication> endorsements = popTxDBStore.getAltPublciationsEndorse(endorsedBlock, endorsementBlocks);
+        List<AltPublication> endorsements = popTxDBStore.getAltPublicationsEndorse(endorsedBlock, endorsementBlocks);
 
         int bestPublication = getBestPublicationHeight(endorsements);
 
@@ -281,7 +281,7 @@ public class PopRewardCalculator {
         if(endorsementBlocks.size() != config.popRewardSettlementInterval)
             throw new IllegalArgumentException("The amount of endorsementBlocks must be equal to popRewardSettlementInterval");
 
-        List<AltPublication> endorsements = popTxDBStore.getAltPublciationsEndorse(endorsedBlock, endorsementBlocks);
+        List<AltPublication> endorsements = popTxDBStore.getAltPublicationsEndorse(endorsedBlock, endorsementBlocks);
 
         int veriBlockLowestHeight = getBestPublicationHeight(endorsements);
         BigDecimal scoreForThisBlock = calculatePopScoreFromEndorsements(endorsements, veriBlockLowestHeight);

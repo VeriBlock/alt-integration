@@ -151,7 +151,7 @@ public class ForkresolutionComparatorTests {
     }
 
     @Test
-    public void GetBestPublicationHeightSimpleTest() throws SQLException {
+    public void getBestPublicationHeightSimpleTest() throws SQLException {
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -180,7 +180,7 @@ public class ForkresolutionComparatorTests {
     }
 
     @Test
-    public void GetBestPublicationHeightWithOneBlockInFutureTest() throws SQLException {
+    public void getBestPublicationHeightWithOneBlockInFutureTest() throws SQLException {
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
 
@@ -209,7 +209,7 @@ public class ForkresolutionComparatorTests {
     }
 
     @Test
-    public void GetBestPublicationHeightWithFirstBlockIsNotKeystoneTest() throws SQLException
+    public void getBestPublicationHeightWithFirstBlockIsNotKeystoneTest() throws SQLException
     {
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
@@ -239,7 +239,7 @@ public class ForkresolutionComparatorTests {
     }
 
     @Test
-    public void GetBestPublicationHeightWithAllBlockInTheFutureTest() throws SQLException
+    public void getBestPublicationHeightWithAllBlockInTheFutureTest() throws SQLException
     {
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
@@ -270,7 +270,7 @@ public class ForkresolutionComparatorTests {
 
 
     @Test
-    public void GetReducedPublciationViewSimpleTest() throws SQLException
+    public void getReducedPublicationViewSimpleTest() throws SQLException
     {
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
@@ -354,7 +354,7 @@ public class ForkresolutionComparatorTests {
     }
 
     @Test
-    public void GetReducedPublciationViewWithFailFinalityDelayTest() throws SQLException
+    public void getReducedPublicationViewWithFailFinalityDelayTest() throws SQLException
     {
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
@@ -437,7 +437,7 @@ public class ForkresolutionComparatorTests {
     }
 
     @Test
-    public void SimpleCompareTwoBranchesLeftForkPriorityTest() throws SQLException
+    public void simpleCompareTwoBranchesLeftForkPriorityTest() throws SQLException
     {
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
@@ -499,7 +499,7 @@ public class ForkresolutionComparatorTests {
     }
 
     @Test
-    public void SimpleCompareTwoBranchesRightForkPriorityTest() throws SQLException
+    public void simpleCompareTwoBranchesRightForkPriorityTest() throws SQLException
     {
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
@@ -560,7 +560,7 @@ public class ForkresolutionComparatorTests {
     }
 
     @Test
-    public void SimpleCompareTwoBranchesForksEqualTest() throws SQLException
+    public void simpleCompareTwoBranchesForksEqualTest() throws SQLException
     {
         PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
         int timestamp = 100;
@@ -663,7 +663,7 @@ public class ForkresolutionComparatorTests {
         }
 
         @Override
-        public List<AltPublication> getAltPublciationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
+        public List<AltPublication> getAltPublicationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
             Set<AltPublication> altPublications1 = new HashSet<AltPublication>();
             for (AltChainBlock block : containBlocks) {
                 altPublications1.addAll(containingAltPublication.get(block.getHash()));

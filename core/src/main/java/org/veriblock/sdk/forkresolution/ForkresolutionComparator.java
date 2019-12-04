@@ -63,18 +63,18 @@ public class ForkresolutionComparator {
 
         for(int keystoneForConsideration = 0; keystoneForConsideration < lastKs; keystoneForConsideration++)
         {
-            int leftForkKeystonePublciation = -1;
-            int rigthForkKeystonePublciation = -1;
+            int leftForkKeystonePublication = -1;
+            int rigthForkKeystonePublication = -1;
 
             if(leftReducedPublicationView.size() > keystoneForConsideration)
-                leftForkKeystonePublciation = leftReducedPublicationView.get(keystoneForConsideration);
+                leftForkKeystonePublication = leftReducedPublicationView.get(keystoneForConsideration);
             if(rightReducedPublicationView.size() > keystoneForConsideration)
-                rigthForkKeystonePublciation = rightReducedPublicationView.get(keystoneForConsideration);
+                rigthForkKeystonePublication = rightReducedPublicationView.get(keystoneForConsideration);
 
-            int lowestKeystonePublication = Math.min(leftForkKeystonePublciation, rigthForkKeystonePublciation);
+            int lowestKeystonePublication = Math.min(leftForkKeystonePublication, rigthForkKeystonePublication);
 
-            leftScore += getPublicationScore(lowestKeystonePublication, leftForkKeystonePublciation);
-            rigthScore += getPublicationScore(lowestKeystonePublication, rigthForkKeystonePublciation);
+            leftScore += getPublicationScore(lowestKeystonePublication, leftForkKeystonePublication);
+            rigthScore += getPublicationScore(lowestKeystonePublication, rigthForkKeystonePublication);
         }
 
         if(leftScore > rigthScore)
@@ -98,24 +98,24 @@ public class ForkresolutionComparator {
 
     protected static List<Integer> getReducedPublicationView(List<AltChainBlock> blocks) throws SQLException
     {
-        List<Integer> reducedPublciationView = new ArrayList<Integer>();
+        List<Integer> reducedPublicationView = new ArrayList<Integer>();
         for(int i =0; i < blocks.size(); i++)
         {
             if(blocks.get(i).isKeystone(security.getAltChainParametersConfig().keystoneInterval))
             {
                 int bestPublication = getBestPublicationHeight(blocks.subList(i, blocks.size()));
 
-                if(reducedPublciationView.size() != 0)
+                if(reducedPublicationView.size() != 0)
                 {
-                    int publicationDelay = bestPublication - reducedPublciationView.get(0);
+                    int publicationDelay = bestPublication - reducedPublicationView.get(0);
                     if(bestPublication == -1 || publicationDelay > forkresolutionConfig.keystoneFinalityDelay )
-                        return reducedPublciationView;
+                        return reducedPublicationView;
                 }
 
-                reducedPublciationView.add(bestPublication);
+                reducedPublicationView.add(bestPublication);
             }
         }
-        return reducedPublciationView;
+        return reducedPublicationView;
     }
 
     // return -1 when it is something wrong
@@ -137,7 +137,7 @@ public class ForkresolutionComparator {
             AltChainBlock workingBlock = blockSequence.get(i);
 
             if(workingBlock.getHeight() < keystoneBlock.getHeight() + security.getAltChainParametersConfig().keystoneInterval) {
-                List<AltPublication> publications = popTxDBStore.getAltPublciationsEndorse(workingBlock, blockSequence.subList(i, blockSequence.size()));
+                List<AltPublication> publications = popTxDBStore.getAltPublicationsEndorse(workingBlock, blockSequence.subList(i, blockSequence.size()));
 
                 for(AltPublication publication: publications) {
                     ValidationResult fsuccess = security.checkATVAgainstView(publication);
