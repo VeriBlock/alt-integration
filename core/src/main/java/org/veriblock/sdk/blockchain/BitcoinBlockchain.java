@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.veriblock.sdk.auditor.Change;
 import org.veriblock.sdk.blockchain.changes.AddBitcoinBlockChange;
 import org.veriblock.sdk.blockchain.changes.SetBitcoinHeadChange;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
+import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.models.BitcoinBlock;
@@ -41,7 +41,7 @@ public class BitcoinBlockchain {
     private static final int MINIMUM_TIMESTAMP_BLOCK_COUNT = 11;
     private static final int DIFFICULTY_ADJUST_BLOCK_COUNT = 2016;
 
-    private final BitcoinStore store;
+    private final BlockStore<StoredBitcoinBlock, Sha256Hash> store;
     private final BitcoinNetworkParameters networkParameters;
     private final Map<Sha256Hash, StoredBitcoinBlock> temporalStore;
     private StoredBitcoinBlock temporaryChainHead = null;
@@ -52,7 +52,7 @@ public class BitcoinBlockchain {
         return temporaryChainHead != null || temporalStore.size() > 0;
     }
 
-    public BitcoinBlockchain(BitcoinNetworkParameters networkParameters, BitcoinStore store) {
+    public BitcoinBlockchain(BitcoinNetworkParameters networkParameters, BlockStore<StoredBitcoinBlock, Sha256Hash> store) {
         Preconditions.notNull(store, "Store cannot be null");
 
         this.store = store;

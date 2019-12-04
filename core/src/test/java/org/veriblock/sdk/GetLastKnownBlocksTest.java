@@ -12,7 +12,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
+import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.blockchain.store.StoredVeriBlockBlock;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
@@ -98,7 +98,7 @@ public class GetLastKnownBlocksTest {
         StoredBitcoinBlock newBlock3 = new StoredBitcoinBlock(block3, BigInteger.ZERO, 0);
 
 
-        BitcoinStore store = Context.getBitcoinStore();
+        BlockStore<StoredBitcoinBlock, Sha256Hash> store = Context.getBitcoinStore();
 
         store.put(newBlock1);
         store.put(newBlock2);

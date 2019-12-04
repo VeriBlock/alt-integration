@@ -18,7 +18,8 @@ import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.auditor.BlockIdentifier;
 import org.veriblock.sdk.auditor.Change;
 import org.veriblock.sdk.auditor.Changeset;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
+import org.veriblock.sdk.blockchain.store.BlockStore;
+import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.models.Sha256Hash;
 import org.veriblock.sdk.models.VerificationException;
@@ -31,7 +32,7 @@ import java.util.Iterator;
 
 public class BitcoinBlockchainTest {
     private BitcoinBlockchain blockchain;
-    private BitcoinStore store;
+    private BlockStore<StoredBitcoinBlock, Sha256Hash> store;
     private VeriBlockSecurity veriBlockSecurity;
 
     private final static BitcoinBlock block1  = new BitcoinBlock(

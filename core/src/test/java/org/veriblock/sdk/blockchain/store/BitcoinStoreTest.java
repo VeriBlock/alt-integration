@@ -29,7 +29,7 @@ import java.util.List;
 public class BitcoinStoreTest {
 
     private VeriBlockSecurity veriBlockSecurity;
-    private BitcoinStore store;
+    private BlockStore<StoredBitcoinBlock, Sha256Hash> store;
 
     private final BitcoinBlock block1 = new BitcoinBlock(766099456,
             Sha256Hash.wrap("00000000000000000004dc9c42c22f489ade54a9349e3a47aee5b55069062afd"),
