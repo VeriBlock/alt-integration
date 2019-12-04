@@ -102,7 +102,7 @@ public class ConfigurationParser {
     }
 
     public BitcoinNetworkParameters getBitcoinNetworkParameters() {
-        String preset = properties.getProperty("veriblock.blockchain.network");
+        String preset = properties.getProperty("bitcoin.blockchain.network");
         if (preset.equalsIgnoreCase("main")) {
             return new BitcoinMainNetParameters();
         } else if (preset.equalsIgnoreCase("test")) {
