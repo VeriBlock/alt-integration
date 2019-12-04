@@ -15,7 +15,6 @@ import org.veriblock.sdk.rewards.PopRewardCalculator;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 
 
