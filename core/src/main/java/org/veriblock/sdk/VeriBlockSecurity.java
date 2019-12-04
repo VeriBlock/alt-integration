@@ -15,7 +15,7 @@ import org.veriblock.sdk.auditor.Changeset;
 import org.veriblock.sdk.blockchain.BitcoinBlockchain;
 import org.veriblock.sdk.blockchain.VeriBlockBlockchain;
 import org.veriblock.sdk.blockchain.VeriBlockPublicationUtilities;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
+import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.models.BlockIndex;
@@ -40,14 +40,12 @@ public class VeriBlockSecurity {
     private final VeriBlockBlockchain veriblockBlockchain;
     private final BitcoinBlockchain bitcoinBlockchain;
     private final AuditJournal journal;
-    private final BitcoinStore bitcoinStore;
     private AltChainParametersConfig altChainParametersConfig;
 
     public VeriBlockSecurity() {
         veriblockBlockchain = new VeriBlockBlockchain(Context.getVeriBlockNetworkParameters(), Context.getVeriblockStore(), Context.getBitcoinStore());
         bitcoinBlockchain = new BitcoinBlockchain(Context.getBitcoinNetworkParameters(), Context.getBitcoinStore());
         journal = new AuditJournal(Context.getChangeStore());
-        bitcoinStore = Context.getBitcoinStore();
         altChainParametersConfig = new AltChainParametersConfig();
     }
     
@@ -203,7 +201,8 @@ public class VeriBlockSecurity {
     }
 
     public List<VeriBlockPublication> simplifyVTBs(List<VeriBlockPublication> publications) throws BlockStoreException, SQLException {
-        return VeriBlockPublicationUtilities.simplifyVeriBlockPublications(publications, bitcoinStore);
+        return VeriBlockPublicationUtilities.simplifyVeriBlockPublications(
+                    publications, Context.getBitcoinStore());
     }
 
     public ValidationResult checkATVAgainstView(AltPublication publication) throws BlockStoreException, SQLException {
