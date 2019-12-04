@@ -20,7 +20,6 @@ import org.veriblock.sdk.sqlite.tables.KeyValueRepository;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Base64;

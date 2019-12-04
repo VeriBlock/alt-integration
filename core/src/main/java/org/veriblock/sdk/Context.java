@@ -19,7 +19,6 @@ import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.models.BlockStoreException;
 import org.veriblock.sdk.util.Preconditions;
 
-import java.math.BigInteger;
 import java.sql.SQLException;
 
 public class Context {

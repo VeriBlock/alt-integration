@@ -8,30 +8,28 @@
 
 package org.veriblock.webservice;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import org.veriblock.sdk.AltChainParametersConfig;
 import org.veriblock.sdk.blockchain.BitcoinBlockchainBootstrapConfig;
 import org.veriblock.sdk.blockchain.VeriBlockBlockchainBootstrapConfig;
 import org.veriblock.sdk.conf.AlphaNetParameters;
-import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.conf.BitcoinMainNetParameters;
+import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.conf.BitcoinRegTestParameters;
 import org.veriblock.sdk.conf.BitcoinTestNetParameters;
 import org.veriblock.sdk.conf.MainNetParameters;
 import org.veriblock.sdk.conf.TestNetParameters;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.forkresolution.ForkresolutionConfig;
-import org.veriblock.sdk.models.BitcoinBlock;
-import org.veriblock.sdk.models.VeriBlockBlock;
 import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
 import org.veriblock.sdk.rewards.PopRewardCurveConfig;
-import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.util.ParseBlocks;
 import org.veriblock.sdk.util.Utils;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 public class ConfigurationParser {
     private final Properties properties;
@@ -102,7 +100,7 @@ public class ConfigurationParser {
     }
 
     public BitcoinNetworkParameters getBitcoinNetworkParameters() {
-        String preset = properties.getProperty("veriblock.blockchain.network");
+        String preset = properties.getProperty("bitcoin.blockchain.network");
         if (preset.equalsIgnoreCase("main")) {
             return new BitcoinMainNetParameters();
         } else if (preset.equalsIgnoreCase("test")) {
@@ -298,18 +296,7 @@ public class ConfigurationParser {
             return null;
         }
 
-        return new VeriBlockBlockchainBootstrapConfig(parseVeriBlockBlockList(blocks));
-    }
-
-    private static List<VeriBlockBlock> parseVeriBlockBlockList(String str) {
-        String[] items = str.split(",", 0);
-
-        List<VeriBlockBlock> result = new ArrayList<VeriBlockBlock>(items.length);
-        for(String item : items) {
-            result.add(SerializeDeserializeService.parseVeriBlockBlock(Utils.decodeHex(item)));
-        }
-
-        return result;
+        return new VeriBlockBlockchainBootstrapConfig(ParseBlocks.parseVeriBlockBlockList(blocks));
     }
 
     public BitcoinBlockchainBootstrapConfig getBitcoinBlockchainBootstrapConfig() {
@@ -324,17 +311,6 @@ public class ConfigurationParser {
             throw new IllegalArgumentException("Must specify either all of none of the BitcoinBlockchainBootstrap config values");
         }
 
-        return new BitcoinBlockchainBootstrapConfig(parseBitcoinBlockList(blocks), Integer.parseInt(firstBlockHeight));
-    }
-
-    private static List<BitcoinBlock> parseBitcoinBlockList(String str) {
-        String[] items = str.split(",", 0);
-
-        List<BitcoinBlock> result = new ArrayList<BitcoinBlock>(items.length);
-        for(String item : items) {
-            result.add(SerializeDeserializeService.parseBitcoinBlock(Utils.decodeHex(item)));
-        }
-
-        return result;
+        return new BitcoinBlockchainBootstrapConfig(ParseBlocks.parseBitcoinBlockList(blocks), Integer.parseInt(firstBlockHeight));
     }
 }

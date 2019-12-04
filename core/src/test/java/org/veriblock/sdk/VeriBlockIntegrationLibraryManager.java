@@ -8,6 +8,10 @@
 
 package org.veriblock.sdk;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.sql.SQLException;
+
 import org.junit.Test;
 import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
@@ -15,13 +19,6 @@ import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
-import org.veriblock.sdk.sqlite.FileManager;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.file.Paths;
-import java.sql.SQLException;
 
 ///TODO: this is not a test - move to helpers package
 public class VeriBlockIntegrationLibraryManager {

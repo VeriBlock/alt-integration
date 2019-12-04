@@ -33,7 +33,7 @@ public class ConnectionSelector {
         if (databasePath == null) {
             logger.info("Using SqlLite in-memory store");
             url = "jdbc:sqlite:file:memdb1?mode=memory&cache=shared";
-        } else {Thread.currentThread().dumpStack();
+        } else {
             logger.info("SqlLite path: '{}'", databasePath);
             url = String.format("jdbc:sqlite:%s", databasePath);
         }

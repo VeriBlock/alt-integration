@@ -20,8 +20,6 @@ dependencies {
     
     compile project(':core')
     compile project(':alt-integration-adapter-java')
-    
-    testCompile 'junit:junit:4.12'
 }
 
 sourceSets {
