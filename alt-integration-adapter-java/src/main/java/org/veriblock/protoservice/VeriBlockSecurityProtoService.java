@@ -27,24 +27,17 @@ import org.veriblock.protoconverters.VBlakeHashProtoConverter;
 import org.veriblock.protoconverters.VeriBlockBlockProtoConverter;
 import org.veriblock.protoconverters.VeriBlockBlockchainBootstrapConfigProtoConverter;
 import org.veriblock.protoconverters.VeriBlockPublicationProtoConverter;
+import org.veriblock.sdk.auditor.Change;
+import org.veriblock.sdk.models.*;
+import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.forkresolution.ForkresolutionComparator;
-import org.veriblock.sdk.models.AltChainBlock;
-import org.veriblock.sdk.models.AltPublication;
-import org.veriblock.sdk.models.BlockIndex;
-import org.veriblock.sdk.models.BlockStoreException;
-import org.veriblock.sdk.models.Sha256Hash;
-import org.veriblock.sdk.models.VBlakeHash;
-import org.veriblock.sdk.models.ValidationResult;
-import org.veriblock.sdk.models.VeriBlockPublication;
-import org.veriblock.sdk.models.VerificationException;
 import org.veriblock.sdk.rewards.PopRewardCalculator;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class VeriBlockSecurityProtoService {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockSecurityProtoService.class);
@@ -321,6 +314,34 @@ public class VeriBlockSecurityProtoService {
 
             result = ValidationResult.success();
         } catch (VerificationException | SQLException e) {
+            result = ValidationResult.fail(e.getMessage());
+            log.debug("Could not call VeriBlock security", e);
+        }
+
+        return VeriBlockServiceCommon.validationResultToProto(result);
+    }
+
+    public static VeriBlockMessages.GeneralReply updateContext(VeriBlockMessages.UpdateContextRequest request) {
+        ValidationResult result = null;
+
+        try{
+            List<BitcoinBlock> bitcoinBlocks = new ArrayList<BitcoinBlock>(request.getBitcoinBlocksCount());
+            List<VeriBlockBlock> veriBlockBlocks = new ArrayList<VeriBlockBlock>(request.getVeriBlockBlocksCount());
+            for(ByteString encodedBlock : request.getBitcoinBlocksList()) {
+                BitcoinBlock block = SerializeDeserializeService.parseBitcoinBlock(encodedBlock.toByteArray());
+                bitcoinBlocks.add(block);
+            }
+
+            for(ByteString encodedBlock : request.getVeriBlockBlocksList()) {
+                VeriBlockBlock block = SerializeDeserializeService.parseVeriBlockBlock(encodedBlock.toByteArray());
+                veriBlockBlocks.add(block);
+            }
+
+            security.updateContext(bitcoinBlocks, veriBlockBlocks);
+            result = ValidationResult.success();
+        }
+        catch(Exception e) {
+
             result = ValidationResult.fail(e.getMessage());
             log.debug("Could not call VeriBlock security", e);
         }
