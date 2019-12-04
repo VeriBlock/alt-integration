@@ -3,15 +3,21 @@ package org.veriblock.protoservice;
 import integration.api.grpc.VeriBlockMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.veriblock.integrations.VeriBlockSecurity;
 import org.veriblock.protoconverters.AltChainBlockProtoConverter;
-import org.veriblock.sdk.AltChainBlock;
-import org.veriblock.sdk.AltPublication;
-import org.veriblock.sdk.ValidationResult;
-import org.veriblock.sdk.VeriBlockPublication;
+import org.veriblock.protoconverters.RewardOutputProtoConverter;
+import org.veriblock.sdk.VeriBlockSecurity;
+import org.veriblock.sdk.models.AltChainBlock;
+import org.veriblock.sdk.models.AltPublication;
+import org.veriblock.sdk.models.ValidationResult;
+import org.veriblock.sdk.models.VeriBlockPublication;
+import org.veriblock.sdk.rewards.PopPayoutRound;
+import org.veriblock.sdk.rewards.PopRewardCalculator;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 
+import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
+
 
 public class PopServiceProto {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockForkresolutionProtoService.class);
@@ -43,7 +49,13 @@ public class PopServiceProto {
         List<AltChainBlock> endorsmentBlocks = AltChainBlockProtoConverter.fromProto(request.getEndorsmentBlocksList());
         List<AltChainBlock> difficultyBlocks = AltChainBlockProtoConverter.fromProto(request.getDifficultyBlocksList());
 
+        BigDecimal difficulty = PopRewardCalculator.calculatePopDifficultyForBlock(difficultyBlocks);
+        PopPayoutRound payout = PopRewardCalculator.calculatePopPayoutRound(request.getBlockAltHeight(), endorsedBlock, endorsmentBlocks, difficulty);
 
-
+        return VeriBlockMessages.RewardsOutputsReply.newBuilder()
+                .addAllOutputs(RewardOutputProtoConverter.toProto(payout.getOutputsToPopMiners()))
+                .setBlockReward(Long.toString(payout.getPopBlockReward()))
+                .setTotalReward(Long.toString(payout.getTotalRewardPaidOut()))
+                .build();
     }
 }
