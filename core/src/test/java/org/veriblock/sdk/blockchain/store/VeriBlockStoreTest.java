@@ -31,7 +31,7 @@ import java.util.List;
 public class VeriBlockStoreTest {
 
     private VeriBlockSecurity veriBlockSecurity;
-    private VeriBlockStore store;
+    private BlockStore<StoredVeriBlockBlock, VBlakeHash> store;
 
     private final byte[] raw1 =  Utils.decodeHex("0001998300029690ACA425987B8B529BEC04654A16FCCE708F3F0DEED25E1D2513D05A3B17C49D8B3BCFEFC10CB2E9C4D473B2E25DB7F1BD040098960DE0E313");
     private final VeriBlockBlock block1 = SerializeDeserializeService.parseVeriBlockBlock(raw1);

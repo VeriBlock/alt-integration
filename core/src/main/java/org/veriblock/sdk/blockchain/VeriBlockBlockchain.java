@@ -17,7 +17,6 @@ import org.veriblock.sdk.blockchain.changes.SetVeriBlockProofChange;
 import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.blockchain.store.StoredVeriBlockBlock;
-import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.models.BlockStoreException;
 import org.veriblock.sdk.models.Constants;
@@ -48,7 +47,7 @@ public class VeriBlockBlockchain {
     private static final int BITCOIN_FINALITY = 11;
     private static final int[] POP_CONSENSUS_WEIGHTS_BY_RELATIVE_BITCOIN_INDEX = new int[]{100, 100, 95, 89, 80, 69, 56, 40, 21};
 
-    private final VeriBlockStore store;
+    private final BlockStore<StoredVeriBlockBlock, VBlakeHash> store;
     private final BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStore;
     private final Map<VBlakeHash, StoredVeriBlockBlock> temporalStore;
     private final VeriBlockNetworkParameters networkParameters;
@@ -61,7 +60,7 @@ public class VeriBlockBlockchain {
     }
 
     public VeriBlockBlockchain(VeriBlockNetworkParameters networkParameters,
-                               VeriBlockStore store,
+                               BlockStore<StoredVeriBlockBlock, VBlakeHash> store,
                                BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStore) {
         Preconditions.notNull(store, "Store cannot be null");
         Preconditions.notNull(bitcoinStore, "Bitcoin store cannot be null");
