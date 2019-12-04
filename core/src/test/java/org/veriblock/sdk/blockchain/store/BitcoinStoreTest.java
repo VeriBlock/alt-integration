@@ -61,7 +61,7 @@ public class BitcoinStoreTest {
     }
 
     @Test
-    public void EraseCantSplitBlockchainTest() throws SQLException, IOException {
+    public void eraseCantSplitBlockchainTest() throws SQLException, IOException {
         store.put(storedBlock2);
         store.put(storedBlock1);
 
@@ -177,7 +177,7 @@ public class BitcoinStoreTest {
     }
 
     @Test
-    public void EraseTest() throws SQLException, IOException {
+    public void eraseTest() throws SQLException, IOException {
         byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
         StoredBitcoinBlock expectedBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);
 
@@ -193,7 +193,7 @@ public class BitcoinStoreTest {
     }
 
     @Test
-    public void EraseNonexistentTest() throws SQLException, IOException {
+    public void eraseNonexistentTest() throws SQLException, IOException {
         byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
         StoredBitcoinBlock expectedBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);
 
@@ -209,7 +209,7 @@ public class BitcoinStoreTest {
     // with them. Thus, a replacement block that has the same hash
     // also has identical data/metadata
     @Test
-    public void ReplaceBlockTest() throws SQLException, IOException {
+    public void replaceBlockTest() throws SQLException, IOException {
         byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
         StoredBitcoinBlock newBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);
         StoredBitcoinBlock oldBlock = newBlock;
@@ -226,7 +226,7 @@ public class BitcoinStoreTest {
     }
 
     @Test
-    public void ReplaceReferencedBlockTest() throws SQLException, IOException {
+    public void replaceReferencedBlockTest() throws SQLException, IOException {
         Assert.assertEquals(block2.getPreviousBlock(), block1.getHash());
 
         StoredBitcoinBlock newBlock = new StoredBitcoinBlock(block1, BigInteger.ONE, 0);
@@ -244,7 +244,7 @@ public class BitcoinStoreTest {
     }
 
     @Test
-    public void ReplaceNonexistentTest() throws SQLException, IOException {
+    public void replaceNonexistentTest() throws SQLException, IOException {
         byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
         StoredBitcoinBlock newBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);
         StoredBitcoinBlock oldBlock = null;

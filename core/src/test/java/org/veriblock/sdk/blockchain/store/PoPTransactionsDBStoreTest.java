@@ -110,7 +110,7 @@ public class PoPTransactionsDBStoreTest {
     }
 
     @Test
-    public void GetAltPublciationsEndorsedTest() throws SQLException
+    public void getAltPublicationsEndorsedTest() throws SQLException
     {
         int timestamp = 1200000000;
         AltChainBlock endorsedBlock = new AltChainBlock("endorsedBlockHash", 45, timestamp);
@@ -132,7 +132,7 @@ public class PoPTransactionsDBStoreTest {
             popTxDBStore.addPoPTransaction(popTxData, containBlocks.get(i), endorsedBlock);
         }
 
-        List<AltPublication> altPublications = popTxDBStore.getAltPublciationsEndorse(endorsedBlock, containBlocks);
+        List<AltPublication> altPublications = popTxDBStore.getAltPublicationsEndorse(endorsedBlock, containBlocks);
 
         Assert.assertEquals(altPublications.size(), 1);
 
@@ -140,7 +140,7 @@ public class PoPTransactionsDBStoreTest {
     }
 
     @Test
-    public void GetAltPublicationsFromBlockTest() throws SQLException
+    public void getAltPublicationsFromBlockTest() throws SQLException
     {
         int timestamp = 1200000000;
         AltChainBlock containBlock = new AltChainBlock("containBlockHash", 50, timestamp);
@@ -160,7 +160,7 @@ public class PoPTransactionsDBStoreTest {
     }
 
     @Test
-    public void GetVeriBlockPublicationsFromBlockTest() throws SQLException
+    public void getVeriBlockPublicationsFromBlockTest() throws SQLException
     {
         int timestamp = 1200000000;
         AltChainBlock containBlock = new AltChainBlock("containBlockHash", 50, timestamp);

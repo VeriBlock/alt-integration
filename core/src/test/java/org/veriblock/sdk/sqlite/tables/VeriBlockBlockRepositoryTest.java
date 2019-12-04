@@ -57,24 +57,24 @@ public class VeriBlockBlockRepositoryTest {
     }
     
     @Test
-    public void GetEndsWithIdNonexistentBlockTest() throws SQLException, IOException {
+    public void getEndsWithIdNonexistentBlockTest() throws SQLException, IOException {
         List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(newBlock.getHash());
         Assert.assertTrue(blocks.isEmpty());
     }
 
     @Test
-    public void GetNonexistentBlockTest() throws SQLException, IOException {
+    public void getNonexistentBlockTest() throws SQLException, IOException {
         StoredVeriBlockBlock block = repo.get(newBlock.getHash());
         Assert.assertEquals(block, null);
     }
 
     @Test
-    public void DeleteNonexistentBlockTest() throws SQLException, IOException {
+    public void deleteNonexistentBlockTest() throws SQLException, IOException {
         repo.delete(newBlock.getHash());
     }
 
     @Test
-    public void DeleteBlockTest() throws SQLException, IOException {
+    public void deleteBlockTest() throws SQLException, IOException {
         repo.save(newBlock);
         repo.delete(newBlock.getHash());
 
@@ -83,14 +83,14 @@ public class VeriBlockBlockRepositoryTest {
     }
 
     @Test
-    public void AddGetBlockTest() throws SQLException, IOException {
+    public void addGetBlockTest() throws SQLException, IOException {
         repo.save(newBlock);
         StoredVeriBlockBlock block = repo.get(newBlock.getHash());
         Assert.assertEquals(block, newBlock);
     }
 
     @Test
-    public void AddGetEndsWithIdBlockTest() throws SQLException, IOException {
+    public void addGetEndsWithIdBlockTest() throws SQLException, IOException {
         repo.save(newBlock);
         List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(newBlock.getHash());
         Assert.assertFalse(blocks.isEmpty());
@@ -98,7 +98,7 @@ public class VeriBlockBlockRepositoryTest {
     }
 
     @Test
-    public void AddBlockWithBlockOfProofTest() throws SQLException, IOException {
+    public void addBlockWithBlockOfProofTest() throws SQLException, IOException {
         Sha256Hash blockOfProof = Sha256Hash.wrap("00000000000000b345b7bbf29bda1507a679b97967f99a10ab0088899529def7");
         newBlock.setBlockOfProof(blockOfProof);
 
@@ -109,7 +109,7 @@ public class VeriBlockBlockRepositoryTest {
     }
 
     @Test
-    public void ClearTest() throws SQLException, IOException {
+    public void clearTest() throws SQLException, IOException {
         repo.save(newBlock);
         repo.save(newBlock2);
         repo.save(newBlock3);
@@ -121,13 +121,13 @@ public class VeriBlockBlockRepositoryTest {
     }
 
     @Test
-    public void GetAllEmptyRepoTest() throws SQLException, IOException {
+    public void getAllEmptyRepoTest() throws SQLException, IOException {
         List<StoredVeriBlockBlock> blocks = repo.getAll();
         Assert.assertTrue(blocks.isEmpty());
     }
 
     @Test
-    public void GetAllTest() throws SQLException, IOException {
+    public void getAllTest() throws SQLException, IOException {
         Comparator<StoredVeriBlockBlock> comparator = (b1, b2) -> b1.getHash().toString().compareTo(b2.getHash().toString());
 
         repo.save(newBlock);
@@ -147,7 +147,7 @@ public class VeriBlockBlockRepositoryTest {
     }
 
     @Test
-    public void AddGetBlockTrimmedTest() throws SQLException, IOException {
+    public void addGetBlockTrimmedTest() throws SQLException, IOException {
         repo.save(newBlock);
         List<StoredVeriBlockBlock> blocks = repo.getEndsWithId(newBlock.getHash().trimToPreviousBlockSize());
         Assert.assertFalse(blocks.isEmpty());
