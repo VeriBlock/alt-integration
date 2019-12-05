@@ -16,16 +16,7 @@ import org.veriblock.sdk.blockchain.BitcoinBlockchain;
 import org.veriblock.sdk.blockchain.VeriBlockBlockchain;
 import org.veriblock.sdk.blockchain.VeriBlockPublicationUtilities;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
-import org.veriblock.sdk.models.AltPublication;
-import org.veriblock.sdk.models.BitcoinBlock;
-import org.veriblock.sdk.models.BlockIndex;
-import org.veriblock.sdk.models.BlockStoreException;
-import org.veriblock.sdk.models.Sha256Hash;
-import org.veriblock.sdk.models.VBlakeHash;
-import org.veriblock.sdk.models.ValidationResult;
-import org.veriblock.sdk.models.VeriBlockBlock;
-import org.veriblock.sdk.models.VeriBlockPublication;
-import org.veriblock.sdk.models.VerificationException;
+import org.veriblock.sdk.models.*;
 import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.Utils;
 

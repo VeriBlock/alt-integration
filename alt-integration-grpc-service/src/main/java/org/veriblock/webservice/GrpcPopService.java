@@ -51,4 +51,44 @@ public class GrpcPopService extends PopServiceImplBase {
             responseObserver.onError(e);
         }
     }
+
+    @Override
+    public void savePopTxToDatabase(VeriBlockMessages.SavePopTxRequest request, StreamObserver<VeriBlockMessages.Empty> responseObserver)
+    {
+        try {
+            VeriBlockMessages.Empty reply = PopServiceProto.savePopTxToDatabase(request);
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
+        }
+        catch (Exception e) {
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void updateContext(VeriBlockMessages.UpdateContextRequest request, StreamObserver<VeriBlockMessages.Empty> responseObserver)
+    {
+        try {
+            VeriBlockMessages.Empty reply = PopServiceProto.updateContext(request);
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
+        }
+        catch (Exception e) {
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void compareTwoBranches(VeriBlockMessages.TwoBranchesRequest request, StreamObserver<VeriBlockMessages.CompareTwoBranchesReply> responseObserver)
+    {
+        try {
+            VeriBlockMessages.CompareTwoBranchesReply reply = PopServiceProto.compareTwoBranches(request);
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
+        }
+        catch (Exception e) {
+            responseObserver.onError(e);
+        }
+    }
+
 }
