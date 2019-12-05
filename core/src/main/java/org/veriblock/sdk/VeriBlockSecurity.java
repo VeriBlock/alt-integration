@@ -30,22 +30,28 @@ public class VeriBlockSecurity {
     private final VeriBlockBlockchain veriblockBlockchain;
     private final BitcoinBlockchain bitcoinBlockchain;
     private final AuditJournal journal;
+    private final Context context;
     private AltChainParametersConfig altChainParametersConfig;
 
-    public VeriBlockSecurity() {
-        veriblockBlockchain = new VeriBlockBlockchain(Context.getVeriBlockNetworkParameters(), Context.getVeriblockStore(), Context.getBitcoinStore());
-        bitcoinBlockchain = new BitcoinBlockchain(Context.getBitcoinNetworkParameters(), Context.getBitcoinStore());
-        journal = new AuditJournal(Context.getChangeStore());
+    public VeriBlockSecurity(Context context) {
+        this.context = context;
+        veriblockBlockchain = new VeriBlockBlockchain(context.getVeriBlockNetworkParameters(), context.getVeriblockStore(), context.getBitcoinStore());
+        bitcoinBlockchain = new BitcoinBlockchain(context.getBitcoinNetworkParameters(), context.getBitcoinStore());
+        journal = new AuditJournal(context.getChangeStore());
         altChainParametersConfig = new AltChainParametersConfig();
     }
     
     public void shutdown() {
-        Context.getBitcoinStore().shutdown();
-        Context.getVeriblockStore().shutdown();
-        Context.getChangeStore().shutdown();
-        Context.getPopTxStore().shutdown();
+        context.getBitcoinStore().shutdown();
+        context.getVeriblockStore().shutdown();
+        context.getChangeStore().shutdown();
+        context.getPopTxStore().shutdown();
     }
-    
+
+    public Context getContext() {
+        return context;
+    }
+
     public VeriBlockBlockchain getVeriBlockBlockchain() {
         return veriblockBlockchain;
     }
@@ -192,7 +198,7 @@ public class VeriBlockSecurity {
 
     public List<VeriBlockPublication> simplifyVTBs(List<VeriBlockPublication> publications) throws BlockStoreException, SQLException {
         return VeriBlockPublicationUtilities.simplifyVeriBlockPublications(
-                    publications, Context.getBitcoinStore());
+                    publications, context.getBitcoinStore());
     }
 
     public ValidationResult checkATVAgainstView(AltPublication publication) throws BlockStoreException, SQLException {

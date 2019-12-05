@@ -47,7 +47,7 @@ public class BitcoinStoreTest {
     public void setUp() throws Exception {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
         veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
-        store = Context.getBitcoinStore();
+        store = veriBlockSecurity.getContext().getBitcoinStore();
 
         Assert.assertEquals(block1.getHash(),
                 Sha256Hash.wrap("0000000000000000000faad7ae177b313ee4e3f1da519dbbf5b3ab58ccff6338"));

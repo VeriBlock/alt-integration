@@ -35,7 +35,7 @@ public class PopRewardCalculator {
     public static void setSecurity(VeriBlockSecurity security)
     {
         PopRewardCalculator.security = security;
-        PopRewardCalculator.popTxStore = Context.getPopTxStore();
+        PopRewardCalculator.popTxStore = security.getContext().getPopTxStore();
     }
 
     public static PopRewardCalculatorConfig getCalculatorConfig() {

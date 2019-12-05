@@ -38,7 +38,7 @@ public class ChangeStoreTest {
     public void setUp() throws Exception {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
         veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
-        changeStore = Context.getChangeStore();
+        changeStore = veriBlockSecurity.getContext().getChangeStore();
     }
 
     @After
