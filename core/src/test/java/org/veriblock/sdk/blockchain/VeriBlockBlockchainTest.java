@@ -20,8 +20,9 @@ import org.veriblock.sdk.auditor.Change;
 import org.veriblock.sdk.auditor.Changeset;
 import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
-import org.veriblock.sdk.blockchain.store.VeriBlockStore;
+import org.veriblock.sdk.blockchain.store.StoredVeriBlockBlock;
 import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VBlakeHash;
 import org.veriblock.sdk.models.VeriBlockBlock;
 import org.veriblock.sdk.models.VerificationException;
 import org.veriblock.sdk.services.SerializeDeserializeService;
@@ -35,7 +36,7 @@ import java.util.Iterator;
 
 public class VeriBlockBlockchainTest {
     private VeriBlockBlockchain blockchain;
-    private VeriBlockStore store;
+    private BlockStore<StoredVeriBlockBlock, VBlakeHash> store;
     private VeriBlockSecurity veriBlockSecurity;
 
     private static final byte[] raw1 =  Utils.decodeHex("0001998300029690ACA425987B8B529BEC04654A16FCCE708F3F0DEED25E1D2513D05A3B17C49D8B3BCFEFC10CB2E9C4D473B2E25DB7F1BD040098960DE0E313");
