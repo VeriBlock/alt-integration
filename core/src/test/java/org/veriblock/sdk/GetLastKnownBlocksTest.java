@@ -55,7 +55,7 @@ public class GetLastKnownBlocksTest {
         byte[] raw3 = Utils.decodeHex("000199850002461DB458CD6258D3571D4A2A654A16FCCE708F3F0DEED25E1D2513D05A3BB0B8A658CBFFCFBE9185AFDE789841EC5DB7F2360400989610B1662B");
         StoredVeriBlockBlock newBlock3 = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw3), BigInteger.ZERO);
 
-        VeriBlockStore store = Context.getVeriblockStore();
+        BlockStore<StoredVeriBlockBlock, VBlakeHash> store = Context.getVeriblockStore();
 
         store.put(newBlock1);
         store.put(newBlock2);

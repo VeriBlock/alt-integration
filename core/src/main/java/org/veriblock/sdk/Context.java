@@ -13,6 +13,7 @@ import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
+import org.veriblock.sdk.blockchain.store.StoredVeriBlockBlock;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.BitcoinMainNetParameters;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
@@ -20,6 +21,7 @@ import org.veriblock.sdk.conf.MainNetParameters;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.models.BlockStoreException;
 import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VBlakeHash;
 import org.veriblock.sdk.util.Preconditions;
 
 import java.math.BigInteger;
@@ -28,7 +30,7 @@ import java.sql.SQLException;
 public class Context {
     private static VeriBlockNetworkParameters veriblockNetworkParameters;
     private static BitcoinNetworkParameters bitcoinNetworkParameters;
-    private static VeriBlockStore veriblockStore;
+    private static BlockStore<StoredVeriBlockBlock, VBlakeHash> veriblockStore;
     private static BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStore;
     private static AuditorChangesStore changeStore;
     private static PoPTransactionsDBStore popTxDBStore;
@@ -44,7 +46,7 @@ public class Context {
         return bitcoinNetworkParameters;
     }
 
-    public static VeriBlockStore getVeriblockStore() {
+    public static BlockStore<StoredVeriBlockBlock, VBlakeHash> getVeriblockStore() {
         return veriblockStore;
     }
 
@@ -67,7 +69,7 @@ public class Context {
 
     public static void init(VeriBlockNetworkParameters veriblockNetworkParametersArg,
                             BitcoinNetworkParameters bitcoinNetworkParametersArg,
-                            VeriBlockStore veriblockStoreArg,
+                            BlockStore<StoredVeriBlockBlock, VBlakeHash> veriblockStoreArg,
                             BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStoreArg,
                             AuditorChangesStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
         Preconditions.notNull(veriblockNetworkParametersArg, "VeriBlock network parameters cannot be null");
