@@ -9,6 +9,7 @@
 package org.veriblock.sdk;
 
 import org.veriblock.sdk.auditor.store.AuditorChangesStore;
+import org.veriblock.sdk.auditor.store.ChangeStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
@@ -32,7 +33,7 @@ public class Context {
     private static BitcoinNetworkParameters bitcoinNetworkParameters;
     private static BlockStore<StoredVeriBlockBlock, VBlakeHash> veriblockStore;
     private static BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStore;
-    private static AuditorChangesStore changeStore;
+    private static ChangeStore changeStore;
     private static PoPTransactionsDBStore popTxDBStore;
 
     private Context() {
@@ -54,7 +55,7 @@ public class Context {
         return bitcoinStore;
     }
 
-    public static AuditorChangesStore getChangeStore() {
+    public static ChangeStore getChangeStore() {
         return changeStore;
     }
 
@@ -71,7 +72,7 @@ public class Context {
                             BitcoinNetworkParameters bitcoinNetworkParametersArg,
                             BlockStore<StoredVeriBlockBlock, VBlakeHash> veriblockStoreArg,
                             BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStoreArg,
-                            AuditorChangesStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
+                            ChangeStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
         Preconditions.notNull(veriblockNetworkParametersArg, "VeriBlock network parameters cannot be null");
         Preconditions.notNull(bitcoinNetworkParametersArg, "Bitcoin network parameters cannot be null");
         Preconditions.notNull(veriblockStoreArg, "VeriBlock store cannot be null");
