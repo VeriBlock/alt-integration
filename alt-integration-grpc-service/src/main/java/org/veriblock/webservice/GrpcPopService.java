@@ -53,7 +53,7 @@ public class GrpcPopService extends PopServiceImplBase {
     }
 
     @Override
-    public void savePopTxToDatabase(VeriBlockMessages.SavePopTxRequest request, StreamObserver<VeriBlockMessages.Empty> responseObserver)
+    public void savePopTxToDatabase(VeriBlockMessages.SaveBlockPopTxRequest request, StreamObserver<VeriBlockMessages.Empty> responseObserver)
     {
         try {
             VeriBlockMessages.Empty reply = PopServiceProto.savePopTxToDatabase(request);

@@ -59,9 +59,8 @@ public class PopServiceProto {
                 .build();
     }
 
-    static public VeriBlockMessages.Empty savePopTxToDatabase(VeriBlockMessages.SavePopTxRequest request) throws Exception {
+    static public VeriBlockMessages.Empty savePopTxToDatabase(VeriBlockMessages.SaveBlockPopTxRequest request) throws Exception {
         AltChainBlock containingBlock = AltChainBlockProtoConverter.fromProto(request.getContainingBlock());
-
         for(VeriBlockMessages.PopTxData popData : request.getpopDataList())
         {
             AltChainBlock endorsedBlock = AltChainBlockProtoConverter.fromProto(popData.getEndorsedBlock());
