@@ -25,7 +25,6 @@ import org.veriblock.sdk.models.Sha256Hash;
 import org.veriblock.sdk.models.VBlakeHash;
 import org.veriblock.sdk.util.Preconditions;
 
-import java.math.BigInteger;
 import java.sql.SQLException;
 
 public class Context {

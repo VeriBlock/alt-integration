@@ -38,7 +38,8 @@ public final class Application {
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     public static final String packageName = "altservice";
-    public Boolean terminated = false;
+    public boolean terminated = false;
+    private boolean running = false;
     private VeriBlockSecurity security = null;
     private Server server = null;
     private AppConfiguration appConfiguration;
@@ -129,6 +130,7 @@ public final class Application {
             log.debug("Could not start GRPC server", e);
         }
 
+        running = true;
         log.info("Started API server at " + config.getApiHost() + ":" + config.getApiPort());
 
         try {
@@ -147,6 +149,8 @@ public final class Application {
     }
 
     public void shutdown() {
+        running = false;
+        
         if(server != null) {
             server.shutdown();
 
@@ -167,6 +171,10 @@ public final class Application {
         }
 
         security = null;
+    }
+    
+    public boolean isRunning() {
+        return running;
     }
 
     public VeriBlockSecurity getSecurity() {
