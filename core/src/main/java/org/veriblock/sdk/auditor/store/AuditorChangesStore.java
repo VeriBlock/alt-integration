@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AuditorChangesStore {
+public class AuditorChangesStore implements ChangeStore {
     //private static final int DEFAULT_NUM_HEADERS = 90000;
     private static final Logger log = LoggerFactory.getLogger(AuditorChangesStore.class);
 
