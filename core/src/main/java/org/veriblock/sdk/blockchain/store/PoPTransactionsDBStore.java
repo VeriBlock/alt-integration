@@ -30,7 +30,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PoPTransactionsDBStore {
+public class PoPTransactionsDBStore implements PoPTransactionStore {
     private static final Logger log = LoggerFactory.getLogger(AuditorChangesStore.class);
 
     private Connection connectionResource;

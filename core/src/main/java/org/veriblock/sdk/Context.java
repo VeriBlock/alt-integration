@@ -13,6 +13,7 @@ import org.veriblock.sdk.auditor.store.ChangeStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.blockchain.store.StoredVeriBlockBlock;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
@@ -33,7 +34,7 @@ public class Context {
     private static BlockStore<StoredVeriBlockBlock, VBlakeHash> veriblockStore;
     private static BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStore;
     private static ChangeStore changeStore;
-    private static PoPTransactionsDBStore popTxDBStore;
+    private static PoPTransactionStore popTxStore;
 
     private Context() {
     }
@@ -58,33 +59,35 @@ public class Context {
         return changeStore;
     }
 
-    public static PoPTransactionsDBStore getPopTxDBStore() {return popTxDBStore;}
+    public static PoPTransactionStore getPopTxStore() {
+        return popTxStore;
+    }
 
     public static void resetSecurity() throws SQLException {
         veriblockStore.clear();
         bitcoinStore.clear();
         changeStore.clear();
-        popTxDBStore.clear();
+        popTxStore.clear();
     }
 
     public static void init(VeriBlockNetworkParameters veriblockNetworkParametersArg,
                             BitcoinNetworkParameters bitcoinNetworkParametersArg,
                             BlockStore<StoredVeriBlockBlock, VBlakeHash> veriblockStoreArg,
                             BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStoreArg,
-                            ChangeStore changeStoreArg, PoPTransactionsDBStore popTxDBRepoArg) {
+                            ChangeStore changeStoreArg, PoPTransactionStore popTxStoreArg) {
         Preconditions.notNull(veriblockNetworkParametersArg, "VeriBlock network parameters cannot be null");
         Preconditions.notNull(bitcoinNetworkParametersArg, "Bitcoin network parameters cannot be null");
         Preconditions.notNull(veriblockStoreArg, "VeriBlock store cannot be null");
         Preconditions.notNull(bitcoinStoreArg, "Bitcoin store cannot be null");
         Preconditions.notNull(changeStoreArg, "Change store cannot be null");
-        Preconditions.notNull(popTxDBRepoArg, "popTxDBRepo cannot be null");
+        Preconditions.notNull(popTxStoreArg, "popTxStore cannot be null");
 
         veriblockNetworkParameters = veriblockNetworkParametersArg;
         bitcoinNetworkParameters = bitcoinNetworkParametersArg;
         veriblockStore = veriblockStoreArg;
         bitcoinStore = bitcoinStoreArg;
         changeStore = changeStoreArg;
-        popTxDBStore = popTxDBRepoArg;
+        popTxStore = popTxStoreArg;
     }
 
     public static void init() throws BlockStoreException, SQLException {

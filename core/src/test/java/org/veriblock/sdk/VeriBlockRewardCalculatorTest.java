@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.models.Address;
 import org.veriblock.sdk.models.AltChainBlock;
@@ -99,7 +100,7 @@ public class VeriBlockRewardCalculatorTest {
     
     @Test
     public void ratiosForEndorsement() throws SQLException {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
 
         // we store a single endorsed block in the first (relative to our calculator) VeriBlock block
         String payoutInfo = "payout1";
@@ -185,7 +186,7 @@ public class VeriBlockRewardCalculatorTest {
 
     @Test
     public void popDifficultyCalculateTest() throws SQLException, IllegalArgumentException {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
 
         // simple case where we don't have any publication for this sequence of blocks
         AltChainBlock block1 = new AltChainBlock("blockHash1", 10, 100);
@@ -365,7 +366,7 @@ public class VeriBlockRewardCalculatorTest {
 
     @Test
     public void popRewardBlocks() throws SQLException {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
 
         int blockNumber = 1;
         // let's start with hardcoded difficulty
