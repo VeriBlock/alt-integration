@@ -83,11 +83,11 @@ public class VeriBlockIntegrationLibraryManager {
     private void initContext(String path) throws SQLException {
         VeriBlockStore veriBlockStore = new VeriBlockStore(path);
         BitcoinStore bitcoinStore = new BitcoinStore(path);
-        AuditorChangesStore auditStore = new AuditorChangesStore(path);
+        AuditorChangesStore changeStore = new AuditorChangesStore(path);
         PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(path);
 
         Context.init(getVeriblockNetworkParameters(), getBitcoinNetworkParameters(),
-                     veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+                     veriBlockStore, bitcoinStore, changeStore, popTxDBStore);
     }
 
     @Test
