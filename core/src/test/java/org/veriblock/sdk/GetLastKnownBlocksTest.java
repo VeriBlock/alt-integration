@@ -8,6 +8,13 @@
 
 package org.veriblock.sdk;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,19 +22,11 @@ import org.junit.Test;
 import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.blockchain.store.StoredVeriBlockBlock;
-import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.models.Sha256Hash;
 import org.veriblock.sdk.models.VBlakeHash;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 
 public class GetLastKnownBlocksTest {
     

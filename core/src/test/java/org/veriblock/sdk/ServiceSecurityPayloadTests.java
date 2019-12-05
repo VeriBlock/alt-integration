@@ -78,7 +78,7 @@ public class ServiceSecurityPayloadTests {
     @Test
     public void normalAddPayloadTest() throws BlockStoreException, SQLException {
         long blockHeight = 1L;
-        String blockHash = "01";
+        String blockHash = "02";
         BlockIndex blockIndex = new BlockIndex(blockHeight, blockHash);
 
         List<AltPublication> altPublications = new ArrayList<>();
@@ -103,10 +103,26 @@ public class ServiceSecurityPayloadTests {
         }
 
         ///HACK: we skip block difficulty validation. Will be fixed in future.
-        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(true);
+        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(false);
         security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(true);
 
         // assume no error is thrown
         security.addPayloads(blockIndex, vtbPublications, altPublications);
+        
+        ///TODO: removePayloads throws an exception. Fix.
+        /*
+        security.removePayloads(blockIndex);
+        
+        // now we can see that only BTC validation throws an error
+        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(true);
+        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(false);
+        
+        try {
+            security.addPayloads(blockIndex, vtbPublications, altPublications);
+            Assert.fail();
+        } catch (VerificationException e) {
+            Assert.assertEquals("Block does not conform", e.getMessage());
+        }
+        */
     }
 }
