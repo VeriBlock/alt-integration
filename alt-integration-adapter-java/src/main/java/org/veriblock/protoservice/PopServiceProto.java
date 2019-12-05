@@ -59,12 +59,12 @@ public class PopServiceProto {
                 .build();
     }
 
-    static public VeriBlockMessages.Empty savePopTxToDatabase(VeriBlockMessages.SaveBlockPopTxRequest request) throws Exception {
+    static public VeriBlockMessages.EmptyReply saveBlockPopTxToDatabase(VeriBlockMessages.SaveBlockPopTxRequest request) throws Exception {
         AltChainBlock containingBlock = AltChainBlockProtoConverter.fromProto(request.getContainingBlock());
-        for(VeriBlockMessages.PopTxData popData : request.getpopDataList())
+        for(VeriBlockMessages.PopTxData popData : request.getPopDataList())
         {
             AltChainBlock endorsedBlock = AltChainBlockProtoConverter.fromProto(popData.getEndorsedBlock());
-            AltPublication altPublication = SerializeDeserializeService.parseAltPublication(popData.getAltPublication());
+            AltPublication altPublication = SerializeDeserializeService.parseAltPublication(popData.getAltPublication().toByteArray());
 
             List<VeriBlockPublication> veriBlockPublications = new ArrayList<VeriBlockPublication>();
             for(ByteString veriBlockPublicationBytes : popData.getVeriblockPublicationsList())
@@ -72,14 +72,14 @@ public class PopServiceProto {
                 veriBlockPublications.add(SerializeDeserializeService.parseVeriBlockPublication(veriBlockPublicationBytes.toByteArray()));
             }
 
-            PoPTransactionData popTx = new PoPTransactionData(popData.getPopTxHash(), veriBlockPublications, altPublication);
+            PoPTransactionData popTx = new PoPTransactionData(popData.getPopTxHash(), altPublication, veriBlockPublications);
             Context.getPopTxDBStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
         }
 
-        return VeriBlockMessages.Empty.newBuilder().build();
+        return VeriBlockMessages.EmptyReply.newBuilder().build();
     }
 
-    public static VeriBlockMessages.Empty updateContext(VeriBlockMessages.UpdateContextRequest request) throws Exception {
+    public static VeriBlockMessages.EmptyReply updateContext(VeriBlockMessages.UpdateContextRequest request) throws Exception {
         List<BitcoinBlock> bitcoinBlocks = new ArrayList<BitcoinBlock>(request.getBitcoinBlocksCount());
         List<VeriBlockBlock> veriBlockBlocks = new ArrayList<VeriBlockBlock>(request.getVeriBlockBlocksCount());
         for(ByteString encodedBlock : request.getBitcoinBlocksList()) {
@@ -93,17 +93,16 @@ public class PopServiceProto {
         }
 
         security.updateContext(bitcoinBlocks, veriBlockBlocks);
-        return VeriBlockMessages.Empty.newBuilder().build();
+        return VeriBlockMessages.EmptyReply.newBuilder().build();
     }
 
     public static VeriBlockMessages.CompareTwoBranchesReply compareTwoBranches(VeriBlockMessages.TwoBranchesRequest request) throws Exception {
-
         List<AltChainBlock> leftFork = AltChainBlockProtoConverter.fromProto(request.getLeftForkList());
         List<AltChainBlock> rightFork = AltChainBlockProtoConverter.fromProto(request.getRightForkList());
         int compareResult = ForkresolutionComparator.compareTwoBranches(leftFork, rightFork);
 
         return VeriBlockMessages.CompareTwoBranchesReply.newBuilder()
-                .setComparingsResult(compareResult)
+                .setCompareResult(compareResult)
                 .build();
     }
 }

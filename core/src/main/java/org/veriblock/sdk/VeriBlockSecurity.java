@@ -15,7 +15,6 @@ import org.veriblock.sdk.auditor.Changeset;
 import org.veriblock.sdk.blockchain.BitcoinBlockchain;
 import org.veriblock.sdk.blockchain.VeriBlockBlockchain;
 import org.veriblock.sdk.blockchain.VeriBlockPublicationUtilities;
-import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.models.*;
 import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.Utils;
