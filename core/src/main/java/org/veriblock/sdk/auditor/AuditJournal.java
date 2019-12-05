@@ -8,7 +8,7 @@
 
 package org.veriblock.sdk.auditor;
 
-import org.veriblock.sdk.auditor.store.AuditorChangesStore;
+import org.veriblock.sdk.auditor.store.ChangeStore;
 import org.veriblock.sdk.auditor.store.StoredChange;
 import org.veriblock.sdk.util.Preconditions;
 
@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 
 public class AuditJournal {
 
-    private final AuditorChangesStore store;
+    private final ChangeStore store;
 
-    public AuditJournal(AuditorChangesStore store) {
+    public AuditJournal(ChangeStore store) {
         Preconditions.notNull(store, "Store cannot be null");
 
         this.store = store;

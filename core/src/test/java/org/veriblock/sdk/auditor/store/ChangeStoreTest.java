@@ -32,11 +32,13 @@ import java.util.Random;
 public class ChangeStoreTest {
 
     private VeriBlockSecurity veriBlockSecurity;
+    private ChangeStore changeStore;
 
     @Before
     public void setUp() throws Exception {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
         veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
+        changeStore = Context.getChangeStore();
     }
 
     @After
@@ -46,8 +48,6 @@ public class ChangeStoreTest {
 
     @Test
     public void changeStoreStoreBitcoinBTest() throws SQLException, IOException {
-        AuditorChangesStore changeStore = Context.getChangeStore();
-
         Random random = new Random(100L);
         byte[] scratch = new byte[BlockIdentifier.LENGTH];
         random.nextBytes(scratch);
@@ -68,8 +68,6 @@ public class ChangeStoreTest {
 
     @Test
     public void changeStoreStoreVeriBTest() throws SQLException, IOException {
-        AuditorChangesStore changeStore = Context.getChangeStore();
-
         Random random = new Random(100L);
         byte[] scratch = new byte[BlockIdentifier.LENGTH];
         random.nextBytes(scratch);
@@ -90,8 +88,6 @@ public class ChangeStoreTest {
 
     @Test
     public void nonexistingChangeStoreTest() throws SQLException, IOException {
-        AuditorChangesStore changeStore = Context.getChangeStore();
-
         BlockIdentifier blockIdentifier = BlockIdentifier.wrap("123".getBytes());
         List<StoredChange> storedChanges = changeStore.get(blockIdentifier);
         Assert.assertTrue(storedChanges.isEmpty());
