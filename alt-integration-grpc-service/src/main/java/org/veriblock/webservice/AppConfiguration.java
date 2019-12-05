@@ -40,6 +40,11 @@ public class AppConfiguration {
         
         loadFromFile(mainPropertiesFileName);
     }
+    
+    public AppConfiguration(String mainPropertiesFileName) {
+        properties = new Properties(defaultProperties);
+        loadFromFile(mainPropertiesFileName);
+    }
 
     // to mock tests.
     public AppConfiguration(Properties properties) {
