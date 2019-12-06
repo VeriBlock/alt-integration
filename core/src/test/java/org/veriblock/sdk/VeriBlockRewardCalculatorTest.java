@@ -50,6 +50,7 @@ import org.veriblock.sdk.rewards.PopPayoutRound;
 import org.veriblock.sdk.rewards.PopRewardCalculator;
 import org.veriblock.sdk.rewards.PopRewardOutput;
 import org.veriblock.sdk.rewards.RewardDefaults;
+import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.util.Utils;
 
@@ -59,9 +60,9 @@ public class VeriBlockRewardCalculatorTest {
 
     @Before
     public void setUp() throws SQLException, IOException {
-        VeriBlockStore veriBlockStore = new VeriBlockStore(null);
-        BitcoinStore bitcoinStore = new BitcoinStore(null);
-        AuditorChangesStore auditStore = new AuditorChangesStore(null);
+        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
+        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
+        AuditorChangesStore auditStore = new AuditorChangesStore(ConnectionSelector.setConnectionInMemory());
         VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock popTxDBStore = new VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock();
 
         Context context = new Context(new MainNetParameters(), new BitcoinMainNetParameters(),
@@ -557,7 +558,7 @@ public class VeriBlockRewardCalculatorTest {
         private Map<String, List<AltPublication>> endoresedAltPublication;
 
         public PoPTransactionsDBStoreMock() throws SQLException {
-            super(null);
+            super(ConnectionSelector.setConnectionInMemory());
         }
 
         {

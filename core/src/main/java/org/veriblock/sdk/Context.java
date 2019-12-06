@@ -24,6 +24,7 @@ import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.models.BlockStoreException;
 import org.veriblock.sdk.models.Sha256Hash;
 import org.veriblock.sdk.models.VBlakeHash;
+import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.util.Preconditions;
 
 import java.sql.SQLException;
@@ -89,7 +90,9 @@ public class Context {
 
     public static Context init() throws BlockStoreException, SQLException {
        return new Context(new MainNetParameters(), new BitcoinMainNetParameters(),
-                          new VeriBlockStore(), new BitcoinStore(),
-                          new AuditorChangesStore(), new PoPTransactionsDBStore());
+                          new VeriBlockStore(ConnectionSelector.setConnectionDefault()),
+                          new BitcoinStore(ConnectionSelector.setConnectionDefault()),
+                          new AuditorChangesStore(ConnectionSelector.setConnectionDefault()),
+                          new PoPTransactionsDBStore(ConnectionSelector.setConnectionDefault()));
     }
 }

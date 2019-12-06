@@ -15,7 +15,6 @@ import org.veriblock.sdk.models.AltChainBlock;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.VeriBlockPublication;
 import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.sqlite.tables.AltPublicationRepository;
 import org.veriblock.sdk.sqlite.tables.ContainRepository;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
@@ -41,20 +40,10 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
     private VeriBlockPublicationRepository veriBlockPublicationRepo;
     private PoPTransactionsVeriblockPublicationRefRepository popTxVeriBlockPublicationRefRepo;
 
-    public PoPTransactionsDBStore(String databasePath) throws SQLException
+    public PoPTransactionsDBStore(Connection connection) throws SQLException
     {
-        this.connectionResource = ConnectionSelector.setConnection(databasePath);
+        this.connectionResource = connection;
 
-        popTxRepo = new PoPTransactionsRepository(connectionResource);
-        containRepo = new ContainRepository(connectionResource);
-        altPublicationRepo = new AltPublicationRepository(connectionResource);
-        veriBlockPublicationRepo = new VeriBlockPublicationRepository(connectionResource);
-        popTxVeriBlockPublicationRefRepo = new PoPTransactionsVeriblockPublicationRefRepository(connectionResource);
-    }
-
-    public PoPTransactionsDBStore() throws SQLException
-    {
-        this.connectionResource = ConnectionSelector.setConnectionDefault();
         popTxRepo = new PoPTransactionsRepository(connectionResource);
         containRepo = new ContainRepository(connectionResource);
         altPublicationRepo = new AltPublicationRepository(connectionResource);

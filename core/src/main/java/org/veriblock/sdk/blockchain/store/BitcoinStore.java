@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.sdk.models.BlockStoreException;
 import org.veriblock.sdk.models.Sha256Hash;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.sqlite.tables.BitcoinBlockRepository;
 import org.veriblock.sdk.sqlite.tables.KeyValueData;
 import org.veriblock.sdk.sqlite.tables.KeyValueRepository;
@@ -35,18 +34,12 @@ public class BitcoinStore implements BlockStore<StoredBitcoinBlock, Sha256Hash> 
     
     private final String chainHeadRepositoryName = "chainHead";
     
-    public BitcoinStore() throws SQLException {
-        databaseConnection = ConnectionSelector.setConnectionDefault();
+    public BitcoinStore(Connection databaseConnection) throws SQLException {
+        this.databaseConnection = databaseConnection;
         bitcoinRepository = new BitcoinBlockRepository(databaseConnection);
         keyValueRepository = new KeyValueRepository(databaseConnection);
     }
-    
-    public BitcoinStore(String databasePath) throws SQLException {
-        databaseConnection = ConnectionSelector.setConnection(databasePath);
-        bitcoinRepository = new BitcoinBlockRepository(databaseConnection);
-        keyValueRepository = new KeyValueRepository(databaseConnection);
-    }
-    
+
     public void shutdown() {
         try {
             if(databaseConnection != null) databaseConnection.close();
