@@ -19,6 +19,7 @@ import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
+import org.veriblock.sdk.sqlite.ConnectionSelector;
 
 ///TODO: this is not a test - move to helpers package
 public class VeriBlockIntegrationLibraryManager {
@@ -81,10 +82,10 @@ public class VeriBlockIntegrationLibraryManager {
     }
     
     private Context initContext(String path) throws SQLException {
-        VeriBlockStore veriBlockStore = new VeriBlockStore(path);
-        BitcoinStore bitcoinStore = new BitcoinStore(path);
-        AuditorChangesStore changeStore = new AuditorChangesStore(path);
-        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(path);
+        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnection(path));
+        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnection(path));
+        AuditorChangesStore changeStore = new AuditorChangesStore(ConnectionSelector.setConnection(path));
+        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(ConnectionSelector.setConnection(path));
 
         return new Context(getVeriblockNetworkParameters(), getBitcoinNetworkParameters(),
                            veriBlockStore, bitcoinStore, changeStore, popTxDBStore);

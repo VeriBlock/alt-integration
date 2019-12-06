@@ -14,7 +14,6 @@ import org.veriblock.sdk.auditor.BlockIdentifier;
 import org.veriblock.sdk.auditor.Change;
 import org.veriblock.sdk.auditor.Operation;
 import org.veriblock.sdk.auditor.ReadOnlyChange;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.sqlite.tables.AuditorChangeData;
 import org.veriblock.sdk.sqlite.tables.AuditorChangesRepository;
 import org.veriblock.sdk.util.Utils;
@@ -32,13 +31,8 @@ public class AuditorChangesStore implements ChangeStore {
     private final Connection databaseConnection;
     private final AuditorChangesRepository changesRepository;
 
-    public AuditorChangesStore() throws SQLException {
-        databaseConnection = ConnectionSelector.setConnectionDefault();
-        changesRepository = new AuditorChangesRepository(databaseConnection);
-    }
-
-    public AuditorChangesStore(String databasePath) throws SQLException {
-        databaseConnection = ConnectionSelector.setConnection(databasePath);
+    public AuditorChangesStore(Connection databaseConnection) throws SQLException {
+        this.databaseConnection = databaseConnection;
         changesRepository = new AuditorChangesRepository(databaseConnection);
     }
 

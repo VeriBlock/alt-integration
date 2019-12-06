@@ -27,6 +27,7 @@ import org.veriblock.sdk.models.VeriBlockPoPTransaction;
 import org.veriblock.sdk.models.VeriBlockPublication;
 import org.veriblock.sdk.models.VeriBlockTransaction;
 import org.veriblock.sdk.services.SerializeDeserializeService;
+import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.util.Utils;
 
@@ -99,7 +100,7 @@ public class PoPTransactionsDBStoreTest {
     @Before
     public void setUp() throws SQLException
     {
-        popTxDBStore = new PoPTransactionsDBStore(null);
+        popTxDBStore = new PoPTransactionsDBStore(ConnectionSelector.setConnectionInMemory());
     }
 
     @After
