@@ -108,11 +108,10 @@ public class ServiceSecurityPayloadTests {
 
         // assume no error is thrown
         security.addPayloads(blockIndex, vtbPublications, altPublications);
-        
-        ///TODO: removePayloads throws an exception. Fix.
-        /*
+
         security.removePayloads(blockIndex);
         
+        /* TODO: this check is broken by TODO(Bogdan) patch in BitcoinBlockchain
         // now we can see that only BTC validation throws an error
         security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(true);
         security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(false);

@@ -122,22 +122,25 @@ public class VeriBlockSecurity {
             journal.record(changeset);
 
         } catch (VerificationException e) {
-            Iterator<Change> changeIterator = changeset.reverseIterator();
-            while (changeIterator.hasNext()) {
-                Change change = changeIterator.next();
-                bitcoinBlockchain.rewind(Collections.singletonList(change));
-                veriblockBlockchain.rewind(Collections.singletonList(change));
-            }
+            rewind(changeset);
             throw e;
+        }
+    }
+
+    private void rewind(Changeset changeset) throws SQLException {
+        Iterator<Change> changeIterator = changeset.reverseIterator();
+        while (changeIterator.hasNext()) {
+            Change change = changeIterator.next();
+            bitcoinBlockchain.rewind(Collections.singletonList(change));
+            veriblockBlockchain.rewind(Collections.singletonList(change));
         }
     }
 
     public void removePayloads(BlockIndex blockIndex) throws SQLException {
         BlockIdentifier blockIdentifier = BlockIdentifier.wrap(Utils.decodeHex(blockIndex.getHash()));
 
-        List<Change> changes = journal.get(blockIdentifier);
-        veriblockBlockchain.rewind(changes);
-        bitcoinBlockchain.rewind(changes);
+        Changeset changeset = journal.get(blockIdentifier);
+        rewind(changeset);
     }
 
     public void addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws VerificationException, BlockStoreException, SQLException {
