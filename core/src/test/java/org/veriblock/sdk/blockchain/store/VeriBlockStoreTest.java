@@ -45,7 +45,7 @@ public class VeriBlockStoreTest {
     public void setUp() throws Exception {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
         veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
-        store = Context.getVeriblockStore();
+        store = veriBlockSecurity.getContext().getVeriblockStore();
     }
 
     @After
