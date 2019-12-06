@@ -29,7 +29,6 @@ import org.veriblock.sdk.forkresolution.ForkresolutionConfig;
 import org.veriblock.sdk.rewards.PopRewardCalculator;
 import org.veriblock.sdk.rewards.PopRewardCalculatorConfig;
 import org.veriblock.sdk.sqlite.ConnectionSelector;
-import org.veriblock.sdk.sqlite.FileManager;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -65,15 +64,14 @@ public final class Application {
         log.info(packageName + " " + AppConstants.APP_VERSION);
         terminated = false;
 
-        String databasePath = Paths.get(FileManager.getDataDirectory(), ConnectionSelector.defaultDatabaseName).toString();
         ConfigurationParser config = null;
         try {
             config = new ConfigurationParser(appConfiguration.getProperties());
             
-            VeriBlockStore veriBlockStore = new VeriBlockStore(databasePath);
-            BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
-            AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
-            PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
+            VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionDefault());
+            BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionDefault());
+            AuditorChangesStore auditStore = new AuditorChangesStore(ConnectionSelector.setConnectionDefault());
+            PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(ConnectionSelector.setConnectionDefault());
 
             Context context = new Context(config.getVeriblockNetworkParameters(),
                                           config.getBitcoinNetworkParameters(),

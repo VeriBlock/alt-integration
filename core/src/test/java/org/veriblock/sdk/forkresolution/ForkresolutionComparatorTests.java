@@ -37,6 +37,7 @@ import org.veriblock.sdk.models.VeriBlockBlock;
 import org.veriblock.sdk.models.VeriBlockMerklePath;
 import org.veriblock.sdk.models.VeriBlockPublication;
 import org.veriblock.sdk.models.VeriBlockTransaction;
+import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.util.Utils;
 
@@ -63,9 +64,9 @@ public class ForkresolutionComparatorTests {
 
     @Before
     public void setUp() throws IOException, SQLException {
-        VeriBlockStore veriBlockStore = new VeriBlockStore(null);
-        BitcoinStore bitcoinStore = new BitcoinStore(null);
-        AuditorChangesStore auditStore = new AuditorChangesStore(null);
+        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
+        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
+        AuditorChangesStore auditStore = new AuditorChangesStore(ConnectionSelector.setConnectionInMemory());
         PoPTransactionsDBStoreMock popTxDBStore = new PoPTransactionsDBStoreMock();
 
         Context context = new Context(new MainNetParameters(), new BitcoinMainNetParameters(),
@@ -654,7 +655,7 @@ public class ForkresolutionComparatorTests {
         private Map<String, List<AltPublication>> endoresedAltPublication;
 
         public PoPTransactionsDBStoreMock() throws SQLException {
-            super(null);
+            super(ConnectionSelector.setConnectionInMemory());
             this.containingAltPublication = new TreeMap<>();
             this.containingVeriBlockPublication = new TreeMap<>();
             this.endoresedAltPublication = new TreeMap<>();

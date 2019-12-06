@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.sdk.models.BlockStoreException;
 import org.veriblock.sdk.models.VBlakeHash;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.sqlite.tables.KeyValueData;
 import org.veriblock.sdk.sqlite.tables.KeyValueRepository;
 import org.veriblock.sdk.sqlite.tables.VeriBlockBlockRepository;
@@ -35,14 +34,8 @@ public class VeriBlockStore implements BlockStore<StoredVeriBlockBlock, VBlakeHa
 
     private final String chainHeadRepositoryName = "chainHeadVbk";
 
-    public VeriBlockStore() throws SQLException {
-        databaseConnection = ConnectionSelector.setConnectionDefault();
-        veriBlockRepository = new VeriBlockBlockRepository(databaseConnection);
-        keyValueRepository = new KeyValueRepository(databaseConnection);
-    }
-
-    public VeriBlockStore(String databasePath) throws SQLException {
-        databaseConnection = ConnectionSelector.setConnection(databasePath);
+    public VeriBlockStore(Connection databaseConnection) throws SQLException {
+        this.databaseConnection = databaseConnection;
         veriBlockRepository = new VeriBlockBlockRepository(databaseConnection);
         keyValueRepository = new KeyValueRepository(databaseConnection);
     }
