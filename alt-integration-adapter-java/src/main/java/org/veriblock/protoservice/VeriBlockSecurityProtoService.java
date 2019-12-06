@@ -232,7 +232,7 @@ public class VeriBlockSecurityProtoService {
             PoPTransactionData popTx = PoPTransactionDataProtoConverter.fromProto(request.getPopTx());
             AltChainBlock containingBlock = AltChainBlockProtoConverter.fromProto(request.getContainingBlock());
             AltChainBlock endorsedBlock = AltChainBlockProtoConverter.fromProto(request.getEndorsedBlock());
-            Context.getPopTxDBStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
+            Context.getPopTxStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
             result = ValidationResult.success();
         }
         catch (SQLException e) {

@@ -11,7 +11,7 @@ package org.veriblock.sdk.forkresolution;
 
 import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockSecurity;
-import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.models.AltChainBlock;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.ValidationResult;
@@ -28,7 +28,7 @@ public class ForkresolutionComparator {
 
     private static VeriBlockSecurity security;
 
-    private static PoPTransactionsDBStore popTxDBStore;
+    private static PoPTransactionStore popTxStore;
 
     public static ForkresolutionConfig getForkresolutionConfig() { return forkresolutionConfig; }
 
@@ -39,7 +39,7 @@ public class ForkresolutionComparator {
     public static void setSecurity(VeriBlockSecurity security)
     {
         ForkresolutionComparator.security = security;
-        ForkresolutionComparator.popTxDBStore = Context.getPopTxDBStore();
+        ForkresolutionComparator.popTxStore = Context.getPopTxStore();
     }
 
     // return 1 if leftBranchScore > rightBranchScore
@@ -90,8 +90,8 @@ public class ForkresolutionComparator {
     {
         for(AltChainBlock block : blocks)
         {
-            List<AltPublication> altPublications = popTxDBStore.getAltPublicationsFromBlock(block);
-            List<VeriBlockPublication> veriBlockPublications = popTxDBStore.getVeriBlockPublicationsFromBlock(block);
+            List<AltPublication> altPublications = popTxStore.getAltPublicationsFromBlock(block);
+            List<VeriBlockPublication> veriBlockPublications = popTxStore.getVeriBlockPublicationsFromBlock(block);
             security.addTemporaryPayloads(veriBlockPublications, altPublications);
         }
     }
@@ -137,7 +137,7 @@ public class ForkresolutionComparator {
             AltChainBlock workingBlock = blockSequence.get(i);
 
             if(workingBlock.getHeight() < keystoneBlock.getHeight() + security.getAltChainParametersConfig().keystoneInterval) {
-                List<AltPublication> publications = popTxDBStore.getAltPublicationsEndorse(workingBlock, blockSequence.subList(i, blockSequence.size()));
+                List<AltPublication> publications = popTxStore.getAltPublicationsEndorse(workingBlock, blockSequence.subList(i, blockSequence.size()));
 
                 for(AltPublication publication: publications) {
                     ValidationResult fsuccess = security.checkATVAgainstView(publication);
