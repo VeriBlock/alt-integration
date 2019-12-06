@@ -65,10 +65,10 @@ public class VeriBlockIntegrationLibraryManager {
     }
 
     public VeriBlockSecurity init() throws SQLException, IOException {
-        initContext(null);
-        Context.resetSecurity();
+        Context context = initContext(null);
+        context.resetSecurity();
 
-        security = new VeriBlockSecurity();
+        security = new VeriBlockSecurity(context);
         return security;
     }
 
@@ -80,14 +80,14 @@ public class VeriBlockIntegrationLibraryManager {
         security = null;
     }
     
-    private void initContext(String path) throws SQLException {
+    private Context initContext(String path) throws SQLException {
         VeriBlockStore veriBlockStore = new VeriBlockStore(path);
         BitcoinStore bitcoinStore = new BitcoinStore(path);
         AuditorChangesStore changeStore = new AuditorChangesStore(path);
         PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(path);
 
-        Context.init(getVeriblockNetworkParameters(), getBitcoinNetworkParameters(),
-                     veriBlockStore, bitcoinStore, changeStore, popTxDBStore);
+        return new Context(getVeriblockNetworkParameters(), getBitcoinNetworkParameters(),
+                           veriBlockStore, bitcoinStore, changeStore, popTxDBStore);
     }
 
     @Test
