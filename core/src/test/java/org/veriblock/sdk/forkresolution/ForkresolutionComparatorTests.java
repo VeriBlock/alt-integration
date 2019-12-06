@@ -22,6 +22,7 @@ import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.models.Address;
 import org.veriblock.sdk.models.AltChainBlock;
@@ -152,7 +153,7 @@ public class ForkresolutionComparatorTests {
 
     @Test
     public void getBestPublicationHeightSimpleTest() throws SQLException {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -181,7 +182,7 @@ public class ForkresolutionComparatorTests {
 
     @Test
     public void getBestPublicationHeightWithOneBlockInFutureTest() throws SQLException {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -211,7 +212,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void getBestPublicationHeightWithFirstBlockIsNotKeystoneTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 49, timestamp);
@@ -241,7 +242,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void getBestPublicationHeightWithAllBlockInTheFutureTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -272,7 +273,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void getReducedPublicationViewSimpleTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -356,7 +357,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void getReducedPublicationViewWithFailFinalityDelayTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -439,7 +440,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void simpleCompareTwoBranchesLeftForkPriorityTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
         int timestamp = 100;
 
         // left branch
@@ -501,7 +502,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void simpleCompareTwoBranchesRightForkPriorityTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
         int timestamp = 100;
 
         // left branch
@@ -562,7 +563,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void simpleCompareTwoBranchesForksEqualTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = Context.getPopTxStore();
         int timestamp = 100;
 
         // left branch
