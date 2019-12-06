@@ -4,8 +4,7 @@ import com.google.protobuf.ByteString;
 import integration.api.grpc.VeriBlockMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.veriblock.protoconverters.AltChainBlockProtoConverter;
-import org.veriblock.protoconverters.RewardOutputProtoConverter;
+import org.veriblock.protoconverters.*;
 import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.forkresolution.ForkresolutionComparator;
@@ -30,15 +29,13 @@ public class PopServiceProto {
         PopServiceProto.security = security;
     }
 
-    static public VeriBlockMessages.CheckReply checkATVInternally(VeriBlockMessages.BytesArrayRequest request) throws Exception
-    {
+    static public VeriBlockMessages.CheckReply checkATVInternally(VeriBlockMessages.BytesArrayRequest request) throws Exception {
         AltPublication publication = SerializeDeserializeService.parseAltPublication(request.getData().toByteArray());
         ValidationResult result = security.checkATVInternally(publication);
         return VeriBlockServiceCommon.validationResultToCheckReplyProto(result);
     }
 
-    static public VeriBlockMessages.CheckReply checkVTBInternally(VeriBlockMessages.BytesArrayRequest request) throws Exception
-    {
+    static public VeriBlockMessages.CheckReply checkVTBInternally(VeriBlockMessages.BytesArrayRequest request) throws Exception {
         VeriBlockPublication publication = SerializeDeserializeService.parseVeriBlockPublication(request.getData().toByteArray());
         ValidationResult result = security.checkVTBInternally(publication);
         return VeriBlockServiceCommon.validationResultToCheckReplyProto(result);
@@ -104,5 +101,31 @@ public class PopServiceProto {
         return VeriBlockMessages.CompareTwoBranchesReply.newBuilder()
                 .setCompareResult(compareResult)
                 .build();
+    }
+
+    public static VeriBlockMessages.GetLastKnownBlocksReply getLastKnownVBKBlocks(VeriBlockMessages.GetLastKnownBlocksRequest request) throws Exception {
+        List<VBlakeHash> blocks = security.getLastKnownVBKBlocks(request.getMaxBlockCount());
+        List<ByteString> protoBlocks = VBlakeHashProtoConverter.toProto(blocks);
+        return VeriBlockMessages.GetLastKnownBlocksReply.newBuilder()
+                .addAllBlocks(protoBlocks)
+                .build();
+    }
+
+    public static VeriBlockMessages.GetLastKnownBlocksReply getLastKnownBTCBlocks(VeriBlockMessages.GetLastKnownBlocksRequest request) throws Exception {
+        List<Sha256Hash> blocks = security.getLastKnownBTCBlocks(request.getMaxBlockCount());
+        List<ByteString> protoBlocks = Sha256HashProtoConverter.toProto(blocks);
+        return VeriBlockMessages.GetLastKnownBlocksReply.newBuilder()
+                .addAllBlocks(protoBlocks)
+                .build();
+    }
+
+    public static VeriBlockMessages.AltPublication parseAltPublication(VeriBlockMessages.BytesArrayRequest request) throws Exception {
+        AltPublication publication = SerializeDeserializeService.parseAltPublication(request.getData().toByteArray());
+        return AltPublicationProtoConverter.toProto(publication);
+    }
+
+    public static VeriBlockMessages.VeriBlockPublication parseVeriBlockPublication(VeriBlockMessages.BytesArrayRequest request) throws Exception {
+        VeriBlockPublication publication = SerializeDeserializeService.parseVeriBlockPublication(request.getData().toByteArray());
+        return VeriBlockPublicationProtoConverter.toProto(publication);
     }
 }
