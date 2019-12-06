@@ -103,7 +103,7 @@ public class ServiceSecurityPayloadTests {
         }
 
         ///HACK: we skip block difficulty validation. Will be fixed in future.
-        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(false);
+        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(true);
         security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(true);
 
         // assume no error is thrown
@@ -111,17 +111,27 @@ public class ServiceSecurityPayloadTests {
 
         security.removePayloads(blockIndex);
         
-        /* TODO: this check is broken by TODO(Bogdan) patch in BitcoinBlockchain
-        // now we can see that only BTC validation throws an error
-        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(true);
-        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(false);
-        
+        // check that the BTC difficulty validation throws an error
+        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(false);
+        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(true);
+
         try {
             security.addPayloads(blockIndex, vtbPublications, altPublications);
             Assert.fail();
         } catch (VerificationException e) {
-            Assert.assertEquals("Block does not conform", e.getMessage());
+            Assert.assertTrue(e.getMessage().equals("Block does not match difficulty of previous block")
+                           || e.getMessage().equals("Block does not match computed difficulty adjustment"));
         }
-        */
+
+        // check that the VBK difficulty validation throws an error
+        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(true);
+        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(false);
+
+        try {
+            security.addPayloads(blockIndex, vtbPublications, altPublications);
+            Assert.fail();
+        } catch (VerificationException e) {
+            Assert.assertEquals("Block does not conform to expected difficulty", e.getMessage());
+        }
     }
 }
