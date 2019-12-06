@@ -51,7 +51,7 @@ public class VeriBlockSecurityProtoService {
     public static GeneralReply resetSecurity() {
         ValidationResult result = null;
         try {
-            Context.resetSecurity();
+            security.getContext().resetSecurity();
             result = ValidationResult.success();
         } catch (SQLException e) {
             result = ValidationResult.fail(e.getMessage());
@@ -232,7 +232,7 @@ public class VeriBlockSecurityProtoService {
             PoPTransactionData popTx = PoPTransactionDataProtoConverter.fromProto(request.getPopTx());
             AltChainBlock containingBlock = AltChainBlockProtoConverter.fromProto(request.getContainingBlock());
             AltChainBlock endorsedBlock = AltChainBlockProtoConverter.fromProto(request.getEndorsedBlock());
-            Context.getPopTxDBStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
+            security.getContext().getPopTxStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
             result = ValidationResult.success();
         }
         catch (SQLException e) {

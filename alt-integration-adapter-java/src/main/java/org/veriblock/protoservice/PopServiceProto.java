@@ -70,7 +70,7 @@ public class PopServiceProto {
             }
 
             PoPTransactionData popTx = new PoPTransactionData(popData.getPopTxHash(), altPublication, veriBlockPublications);
-            Context.getPopTxDBStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
+            security.getContext().getPopTxStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
         }
 
         return VeriBlockMessages.EmptyReply.newBuilder().build();

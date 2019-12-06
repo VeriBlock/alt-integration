@@ -11,7 +11,7 @@ package org.veriblock.sdk.rewards;
 import org.veriblock.sdk.AltChainParametersConfig;
 import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockSecurity;
-import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.models.AltChainBlock;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.ValidationResult;
@@ -30,12 +30,12 @@ public class PopRewardCalculator {
 
     private static VeriBlockSecurity security;
 
-    private static PoPTransactionsDBStore popTxDBStore;
+    private static PoPTransactionStore popTxStore;
 
     public static void setSecurity(VeriBlockSecurity security)
     {
         PopRewardCalculator.security = security;
-        PopRewardCalculator.popTxDBStore = Context.getPopTxDBStore();
+        PopRewardCalculator.popTxStore = security.getContext().getPopTxStore();
     }
 
     public static PopRewardCalculatorConfig getCalculatorConfig() {
@@ -169,7 +169,7 @@ public class PopRewardCalculator {
     public static BigDecimal calculatePopScoreFromEndorsements(AltChainBlock endorsedBlock, List<AltChainBlock> endorsementBlocks) throws SQLException {
         BigDecimal totalScore = BigDecimal.ZERO;
 
-        List<AltPublication> endorsements = popTxDBStore.getAltPublicationsEndorse(endorsedBlock, endorsementBlocks);
+        List<AltPublication> endorsements = popTxStore.getAltPublicationsEndorse(endorsedBlock, endorsementBlocks);
 
         int bestPublication = getBestPublicationHeight(endorsements);
 
@@ -281,7 +281,7 @@ public class PopRewardCalculator {
         if(endorsementBlocks.size() != config.popRewardSettlementInterval)
             throw new IllegalArgumentException("The amount of endorsementBlocks must be equal to popRewardSettlementInterval");
 
-        List<AltPublication> endorsements = popTxDBStore.getAltPublicationsEndorse(endorsedBlock, endorsementBlocks);
+        List<AltPublication> endorsements = popTxStore.getAltPublicationsEndorse(endorsedBlock, endorsementBlocks);
 
         int veriBlockLowestHeight = getBestPublicationHeight(endorsements);
         BigDecimal scoreForThisBlock = calculatePopScoreFromEndorsements(endorsements, veriBlockLowestHeight);

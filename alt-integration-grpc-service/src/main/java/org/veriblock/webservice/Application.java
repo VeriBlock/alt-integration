@@ -74,10 +74,12 @@ public final class Application {
             BitcoinStore bitcoinStore = new BitcoinStore(databasePath);
             AuditorChangesStore auditStore = new AuditorChangesStore(databasePath);
             PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(databasePath);
-            Context.init(config.getVeriblockNetworkParameters(), config.getBitcoinNetworkParameters(),
-                         veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+
+            Context context = new Context(config.getVeriblockNetworkParameters(),
+                                          config.getBitcoinNetworkParameters(),
+                                          veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
             
-            security = new VeriBlockSecurity();
+            security = new VeriBlockSecurity(context);
 
             BitcoinBlockchainBootstrapConfig btcBootstrap = config.getBitcoinBlockchainBootstrapConfig();
             if (btcBootstrap != null) {
