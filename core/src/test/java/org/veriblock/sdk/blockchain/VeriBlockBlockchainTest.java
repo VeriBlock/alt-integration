@@ -53,13 +53,13 @@ public class VeriBlockBlockchainTest {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
         veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
 
-        store = Context.getVeriblockStore();
+        store = veriBlockSecurity.getContext().getVeriblockStore();
         store.clear();
         
-        BlockStore<StoredBitcoinBlock, Sha256Hash> btcStore = Context.getBitcoinStore();
+        BlockStore<StoredBitcoinBlock, Sha256Hash> btcStore = veriBlockSecurity.getContext().getBitcoinStore();
         btcStore.clear();
         
-        blockchain = new VeriBlockBlockchain(Context.getVeriBlockNetworkParameters(), store, btcStore);
+        blockchain = new VeriBlockBlockchain(veriBlockSecurity.getContext().getVeriBlockNetworkParameters(), store, btcStore);
     }
 
     @After

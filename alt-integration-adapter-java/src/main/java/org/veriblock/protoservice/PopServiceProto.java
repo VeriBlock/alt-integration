@@ -5,7 +5,6 @@ import integration.api.grpc.VeriBlockMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.veriblock.protoconverters.*;
-import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.forkresolution.ForkresolutionComparator;
 import org.veriblock.sdk.models.*;
@@ -70,7 +69,7 @@ public class PopServiceProto {
             }
 
             PoPTransactionData popTx = new PoPTransactionData(popData.getPopTxHash(), altPublication, veriBlockPublications);
-            Context.getPopTxDBStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
+            security.getContext().getPopTxStore().addPoPTransaction(popTx, containingBlock, endorsedBlock);
         }
 
         return VeriBlockMessages.EmptyReply.newBuilder().build();
@@ -155,4 +154,5 @@ public class PopServiceProto {
         security.removePayloads(blockIndex);
         return VeriBlockMessages.EmptyReply.newBuilder().build();
     }
+}
 }

@@ -13,6 +13,8 @@ import org.veriblock.sdk.auditor.store.StoredChange;
 import org.veriblock.sdk.util.Preconditions;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,9 +38,16 @@ public class AuditJournal {
         }
     }
 
-    public List<Change> get(BlockIdentifier blockIdentifier) throws SQLException {
+    public Changeset get(BlockIdentifier blockIdentifier) throws SQLException {
         List<StoredChange> storedChanges = store.get(blockIdentifier);
 
-        return storedChanges.stream().map(StoredChange::getChange).collect(Collectors.toList());
+        List<Change> changes = new ArrayList<Change>(Collections.nCopies(storedChanges.size(), (Change) null));
+        for (StoredChange change : storedChanges) {
+            changes.set(change.getSequenceNumber(), change.getChange());
+        }
+
+        Changeset changeset = new Changeset(blockIdentifier);
+        changeset.addChanges(changes);
+        return changeset;
     }
 }

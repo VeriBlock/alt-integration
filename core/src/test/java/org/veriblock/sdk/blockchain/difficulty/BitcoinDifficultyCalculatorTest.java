@@ -57,7 +57,7 @@ public class BitcoinDifficultyCalculatorTest {
         VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
         veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
 
-        store = Context.getBitcoinStore();
+        store = veriBlockSecurity.getContext().getBitcoinStore();
         store.clear();
     }
 

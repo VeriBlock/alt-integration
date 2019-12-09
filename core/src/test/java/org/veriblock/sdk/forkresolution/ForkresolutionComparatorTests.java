@@ -17,12 +17,14 @@ import org.mockito.Mockito;
 
 import org.veriblock.sdk.AltChainParametersConfig;
 import org.veriblock.sdk.Context;
-import org.veriblock.sdk.VeriBlockIntegrationLibraryManager;
 import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
+import org.veriblock.sdk.conf.BitcoinMainNetParameters;
+import org.veriblock.sdk.conf.MainNetParameters;
 import org.veriblock.sdk.models.Address;
 import org.veriblock.sdk.models.AltChainBlock;
 import org.veriblock.sdk.models.AltPublication;
@@ -57,23 +59,19 @@ import static org.veriblock.sdk.forkresolution.ForkresolutionComparator.compareT
 @Ignore
 public class ForkresolutionComparatorTests {
 
-    private VeriBlockSecurity veriBlockSecurity;
+    private VeriBlockSecurity veriBlockSecuritySpy;
 
     @Before
     public void setUp() throws IOException, SQLException {
-        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
-        veriBlockSecurity = veriBlockIntegrationLibraryManager.init();
-
         VeriBlockStore veriBlockStore = new VeriBlockStore(null);
         BitcoinStore bitcoinStore = new BitcoinStore(null);
         AuditorChangesStore auditStore = new AuditorChangesStore(null);
         PoPTransactionsDBStoreMock popTxDBStore = new PoPTransactionsDBStoreMock();
 
-        Context.init(veriBlockIntegrationLibraryManager.getVeriblockNetworkParameters(),
-                     veriBlockIntegrationLibraryManager.getBitcoinNetworkParameters(),
-                     veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Context context = new Context(new MainNetParameters(), new BitcoinMainNetParameters(),
+                                      veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
-        VeriBlockSecurity veriBlockSecuritySpy = Mockito.spy(new VeriBlockSecurity());
+        VeriBlockSecurity veriBlockSecuritySpy = Mockito.spy(new VeriBlockSecurity(context));
 
         Mockito.doReturn(ValidationResult.success()).when(veriBlockSecuritySpy).checkATVAgainstView(any());
         AltChainParametersConfig altChainParametersConfig = new AltChainParametersConfig();
@@ -88,7 +86,7 @@ public class ForkresolutionComparatorTests {
 
     @After
     public void tearDown() {
-        veriBlockSecurity.shutdown();
+        veriBlockSecuritySpy.shutdown();
     }
 
     @Test
@@ -152,7 +150,7 @@ public class ForkresolutionComparatorTests {
 
     @Test
     public void getBestPublicationHeightSimpleTest() throws SQLException {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = veriBlockSecuritySpy.getContext().getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -181,7 +179,7 @@ public class ForkresolutionComparatorTests {
 
     @Test
     public void getBestPublicationHeightWithOneBlockInFutureTest() throws SQLException {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = veriBlockSecuritySpy.getContext().getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -211,7 +209,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void getBestPublicationHeightWithFirstBlockIsNotKeystoneTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = veriBlockSecuritySpy.getContext().getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 49, timestamp);
@@ -241,7 +239,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void getBestPublicationHeightWithAllBlockInTheFutureTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = veriBlockSecuritySpy.getContext().getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -272,7 +270,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void getReducedPublicationViewSimpleTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = veriBlockSecuritySpy.getContext().getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -356,7 +354,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void getReducedPublicationViewWithFailFinalityDelayTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = veriBlockSecuritySpy.getContext().getPopTxStore();
         int timestamp = 100;
 
         AltChainBlock block1 = new AltChainBlock("blockHash1", 50, timestamp);
@@ -439,7 +437,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void simpleCompareTwoBranchesLeftForkPriorityTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = veriBlockSecuritySpy.getContext().getPopTxStore();
         int timestamp = 100;
 
         // left branch
@@ -501,7 +499,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void simpleCompareTwoBranchesRightForkPriorityTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = veriBlockSecuritySpy.getContext().getPopTxStore();
         int timestamp = 100;
 
         // left branch
@@ -562,7 +560,7 @@ public class ForkresolutionComparatorTests {
     @Test
     public void simpleCompareTwoBranchesForksEqualTest() throws SQLException
     {
-        PoPTransactionsDBStore popTxStore = Context.getPopTxDBStore();
+        PoPTransactionStore popTxStore = veriBlockSecuritySpy.getContext().getPopTxStore();
         int timestamp = 100;
 
         // left branch
