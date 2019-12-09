@@ -39,8 +39,12 @@ public class ConfigurationParser {
     }
     
     public int getApiPort() {
-        Integer port = Integer.valueOf(getPropertyOverrideOrDefault("app.api.port"));
-        return port;
+        try {
+            Integer port = Integer.valueOf(getPropertyOverrideOrDefault("app.api.port"));
+            return port;
+        } catch (NumberFormatException e) {
+            throw new AltConfigurationException(String.format("Failed to parse app.api.port: %s", e.getMessage()));
+        }
     }
 
     public String getApiHost() {
@@ -70,7 +74,7 @@ public class ConfigurationParser {
             return getCustomVeriblockNetworkParameters();
         }
 
-        throw new IllegalArgumentException("Unknown VeriBlock network name");
+        throw new AltConfigurationException("Unknown VeriBlock network name");
     }
 
     private VeriBlockNetworkParameters getCustomVeriblockNetworkParameters() {
@@ -111,7 +115,7 @@ public class ConfigurationParser {
             return getCustomBitcoinNetworkParameters();
         }
 
-        throw new IllegalArgumentException("Unknown Bitcoin network name");
+        throw new AltConfigurationException("Unknown Bitcoin network name");
     }
 
     private BitcoinNetworkParameters getCustomBitcoinNetworkParameters() {
@@ -189,7 +193,7 @@ public class ConfigurationParser {
         }
 
         if (keystoneFinalityDelay == null || amnestyPeriod == null) {
-            throw new IllegalArgumentException("Must specify either all or none of the Forkresolution config values");
+            throw new AltConfigurationException("Must specify either all or none of the Forkresolution config values");
         }
 
         ForkresolutionConfig config = new ForkresolutionConfig();
@@ -215,7 +219,7 @@ public class ConfigurationParser {
         if (startOfDecreasingLine == null || widthOfDecreasingLineNormal == null ||
             widthOfDecreasingLineKeystone == null || aboveIntendedPayoutMultiplierNormal == null ||
             aboveIntendedPayoutMultiplierKeystone == null) {
-            throw new IllegalArgumentException("Must specify either all or none of the PopRewardCurve config values");
+            throw new AltConfigurationException("Must specify either all or none of the PopRewardCurve config values");
         }
 
         PopRewardCurveConfig config = new PopRewardCurveConfig();
@@ -257,7 +261,7 @@ public class ConfigurationParser {
             flatScoreRound == null || flatScoreRoundUse == null ||
             curveConfig == null || relativeScoreLookupTable == null ||
             popDifficultyAveragingInterval == null || popRewardSettlementInterval == null) {
-            throw new IllegalArgumentException("Must specify either all or none of the PopRewardCalculator config values");
+            throw new AltConfigurationException("Must specify either all or none of the PopRewardCalculator config values");
         }
 
         PopRewardCalculatorConfig config = new PopRewardCalculatorConfig();
@@ -308,7 +312,7 @@ public class ConfigurationParser {
         }
 
         if (blocks == null || firstBlockHeight == null) {
-            throw new IllegalArgumentException("Must specify either all of none of the BitcoinBlockchainBootstrap config values");
+            throw new AltConfigurationException("Must specify either all of none of the BitcoinBlockchainBootstrap config values");
         }
 
         return new BitcoinBlockchainBootstrapConfig(ParseBlocks.parseBitcoinBlockList(blocks), Integer.parseInt(firstBlockHeight));
