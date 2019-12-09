@@ -77,8 +77,12 @@ public class AppConfiguration {
     }
 
     public int getApiPort() {
-        Integer port = Integer.valueOf(getPropertyOverrideOrDefault("app.api.port"));
-        return port;
+        try {
+            Integer port = Integer.valueOf(getPropertyOverrideOrDefault("app.api.port"));
+            return port;
+        } catch (NumberFormatException e) {
+            throw new AltConfigurationException(String.format("Failed to parse app.api.port: %s", e.getMessage()));
+        }
     }
 
     public String getApiHost() {
