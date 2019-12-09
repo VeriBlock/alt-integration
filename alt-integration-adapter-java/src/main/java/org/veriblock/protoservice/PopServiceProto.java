@@ -128,4 +128,31 @@ public class PopServiceProto {
         VeriBlockPublication publication = SerializeDeserializeService.parseVeriBlockPublication(request.getData().toByteArray());
         return VeriBlockPublicationProtoConverter.toProto(publication);
     }
+
+    public static VeriBlockMessages.PublicationData getPublicationDataFromAltPublication(VeriBlockMessages.BytesArrayRequest request) throws Exception {
+        AltPublication publication = SerializeDeserializeService.parseAltPublication(request.getData().toByteArray());
+        return PublicationDataProtoConverter.toProto(publication.getTransaction().getPublicationData());
+    }
+
+    public static VeriBlockMessages.EmptyReply addPayloads(VeriBlockMessages.AddPayloadsDataRequest request) throws Exception {
+        BlockIndex blockIndex = BlockIndexProtoConverter.fromProto(request.getBlockIndex());
+        List<AltPublication> altPublications = new ArrayList<>();
+        for(ByteString altPublicationBytes : request.getAltPublications())
+        {
+            altPublications.add(SerializeDeserializeService.parseAltPublication(altPublicationBytes.toByteArray()));
+        }
+        List<VeriBlockPublication> veriBlockPublications = new ArrayList<>();
+        for(ByteString veriBlockPublicationBytes : request.getVeriblockPublicationsList())
+        {
+            veriBlockPublications.add(SerializeDeserializeService.parseVeriBlockPublication(veriBlockPublicationBytes.toByteArray()));
+        }
+        security.addPayloads(blockIndex, veriBlockPublications, altPublications);
+        return VeriBlockMessages.EmptyReply.newBuilder().build();
+    }
+
+    public static VeriBlockMessages.EmptyReply removePayloads(VeriBlockMessages.RemovePayloadsRequest request) throws Exception {
+        BlockIndex blockIndex = BlockIndexProtoConverter.fromProto(request.getBlockIndex());
+        security.removePayloads(blockIndex);
+        return VeriBlockMessages.EmptyReply.newBuilder().build();
+    }
 }

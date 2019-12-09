@@ -122,4 +122,37 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onError(e);
         }
     }
+
+    @Override
+    public void getPublicationDataFromAltPublication(VeriBlockMessages.BytesArrayRequest request, StreamObserver<VeriBlockMessages.PublicationData> responseObserve) {
+        try {
+            VeriBlockMessages.PublicationData reply = PopServiceProto.getPublicationDataFromAltPublication(request);
+            responseObserve.onNext(reply);
+            responseObserve.onCompleted();
+        } catch (Exception e) {
+            responseObserve.onError(e);
+        }
+    }
+
+    @Override
+    public void addPayloads(VeriBlockMessages.AddPayloadsDataRequest request, StreamObserver<VeriBlockMessages.EmptyReply> responseObserve) {
+        try {
+            VeriBlockMessages.EmptyReply reply = PopServiceProto.addPayloads(request);
+            responseObserve.onNext(reply);
+            responseObserve.onCompleted();
+        } catch (Exception e) {
+            responseObserve.onError(e);
+        }
+    }
+
+    @Override
+    public void removePayloads(VeriBlockMessages.RemovePayloadsRequest request, StreamObserver<VeriBlockMessages.EmptyReply> responseObserve) {
+        try {
+            VeriBlockMessages.EmptyReply reply = PopServiceProto.removePayloads(request);
+            responseObserve.onNext(reply);
+            responseObserve.onCompleted();
+        } catch (Exception e) {
+            responseObserve.onError(e);
+        }
+    }
 }
