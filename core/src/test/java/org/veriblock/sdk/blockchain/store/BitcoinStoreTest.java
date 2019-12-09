@@ -94,6 +94,28 @@ public class BitcoinStoreTest {
     }
 
     @Test
+    public void PutDoesNotUpdateTest() throws SQLException, IOException {
+        StoredBitcoinBlock updatedStoredBlock1 = new StoredBitcoinBlock(block1, BigInteger.ONE, 0);
+        Assert.assertNotEquals(updatedStoredBlock1, storedBlock1);
+
+        store.put(storedBlock1);
+
+        try {
+            store.put(storedBlock1);
+            Assert.fail("Should throw BlockStoreException");
+        } catch (BlockStoreException e) {
+            Assert.assertEquals("A block with the same hash is already in the store", e.getMessage());
+        }
+
+        try {
+            store.put(updatedStoredBlock1);
+            Assert.fail("Should throw BlockStoreException");
+        } catch (BlockStoreException e) {
+            Assert.assertEquals("A block with the same hash is already in the store", e.getMessage());
+        }
+    }
+
+    @Test
     public void chainHeadStoreTest() throws SQLException, IOException {
         byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
         StoredBitcoinBlock storedBitcoinBlockExpected = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);

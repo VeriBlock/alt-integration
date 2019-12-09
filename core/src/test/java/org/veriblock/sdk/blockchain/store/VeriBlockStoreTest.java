@@ -87,7 +87,28 @@ public class VeriBlockStoreTest {
 
             Assert.assertEquals(storedVeriBlockBlockExpected, storedVeriBlockBlockActual);
     }
-    
+
+    public void PutDoesNotUpdateTest() throws SQLException, IOException {
+        StoredVeriBlockBlock updatedStoredBlock1 = new StoredVeriBlockBlock(block1, BigInteger.ONE);
+        Assert.assertNotEquals(updatedStoredBlock1, storedBlock1);
+
+        store.put(storedBlock1);
+
+        try {
+            store.put(storedBlock1);
+            Assert.fail("Should throw BlockStoreException");
+        } catch (BlockStoreException e) {
+            Assert.assertEquals("A block with the same hash is already in the store", e.getMessage());
+        }
+
+        try {
+            store.put(updatedStoredBlock1);
+            Assert.fail("Should throw BlockStoreException");
+        } catch (BlockStoreException e) {
+            Assert.assertEquals("A block with the same hash is already in the store", e.getMessage());
+        }
+    }
+
     @Test
     public void chainHeadStoreTest() throws SQLException, IOException {
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
