@@ -79,6 +79,9 @@ public final class Application {
             
             security = new VeriBlockSecurity(context);
 
+            security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(!config.isValidateBTCBlockDifficulty());
+            security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(!config.isValidateVBBlockDifficulty());
+
             BitcoinBlockchainBootstrapConfig btcBootstrap = config.getBitcoinBlockchainBootstrapConfig();
             if (btcBootstrap != null) {
                 security.getBitcoinBlockchain().bootstrap(btcBootstrap);
