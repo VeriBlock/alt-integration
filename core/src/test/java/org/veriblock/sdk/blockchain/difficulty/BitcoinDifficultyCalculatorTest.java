@@ -24,7 +24,7 @@ import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.blockchain.BitcoinBlockchain;
 import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
-import org.veriblock.sdk.conf.BitcoinNetworkParameters;
+import org.veriblock.sdk.conf.BitcoinRegTestParameters;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.models.Sha256Hash;
 import org.veriblock.sdk.services.SerializeDeserializeService;
@@ -33,24 +33,6 @@ import org.veriblock.sdk.util.Utils;
 public class BitcoinDifficultyCalculatorTest {
     private BlockStore<StoredBitcoinBlock, Sha256Hash> store;
     private VeriBlockSecurity veriBlockSecurity;
-
-    private static final BitcoinNetworkParameters bitcoinRegtestNetworkParameters = new BitcoinNetworkParameters() {
-                public BigInteger getPowLimit() {
-                    return new BigInteger("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
-                }
-                public int getPowTargetTimespan() {
-                    return 1209600;
-                }
-                public int getPowTargetSpacing() {
-                    return 600;
-                }
-                public boolean getAllowMinDifficultyBlocks() {
-                    return true;
-                }
-                public boolean getPowNoRetargeting() {
-                    return true;
-                }
-            };
 
     @Before
     public void init() throws SQLException, IOException {
@@ -86,7 +68,7 @@ public class BitcoinDifficultyCalculatorTest {
 
     @Test
     public void regtestTest() throws SQLException, IOException {
-        BitcoinBlockchain blockchain = new BitcoinBlockchain(bitcoinRegtestNetworkParameters, store);
+        BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinRegTestParameters(), store);
         addBlockDataToBlockchain(BitcoinRegtestBlockData.headers,
                                  BitcoinRegtestBlockData.firstBlockHeight,
                                  blockchain);
