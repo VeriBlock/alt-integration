@@ -313,11 +313,10 @@ public class BitcoinBlockchain {
 
         // Previous + 1 = height of block
         if (networkParameters.getPowNoRetargeting() || (previous.getHeight() + 1) % 2016 > 0) {
-            // TODO(Bogdan): why same? sample data show that they are different
-//            // Difficulty should be same as previous
-//            if (block.getBits() != previous.getBlock().getBits()) {
-//                throw new VerificationException("Block does not match difficulty of previous block");
-//            }
+            // Difficulty should be same as previous
+            if (block.getBits() != previous.getBlock().getBits()) {
+                throw new VerificationException("Block does not match difficulty of previous block");
+            }
         } else {
             // Difficulty needs to adjust
 
