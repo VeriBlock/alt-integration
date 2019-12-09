@@ -23,76 +23,48 @@ public class KeyValueRepository {
     public KeyValueRepository(Connection connection) throws SQLException {
         this.connectionSource = connection;
 
-        Statement stmt = null;
-        try {
-            stmt = connectionSource.createStatement();
+        try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS genericCache (\n"
                     + " key TEXT PRIMARY KEY,\n"
                     + " value TEXT\n"
                     + ");");
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
         }
 
-        try {
-            stmt = connectionSource.createStatement();
+        try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("PRAGMA journal_mode=WAL;");
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
     public void clear() throws SQLException {
-        Statement stmt = null;
-        try {
-            stmt = connectionSource.createStatement();
+        try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("DELETE FROM genericCache");
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
     public void save(String key, String value) throws SQLException {        
-        PreparedStatement stmt = null;
-        try {
-            stmt = connectionSource.prepareStatement("REPLACE INTO genericCache ('key', 'value') " +
-                "VALUES(?, ?)");
+        String statement = "REPLACE INTO genericCache ('key', 'value') VALUES(?, ?)";
+        try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
             stmt.setObject(++i, key);
             stmt.setObject(++i, value);
             stmt.execute();
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
         }
     }
 
     public String getValue(String key) throws SQLException {
-        List<KeyValueData> values = new ArrayList<KeyValueData>();
-        PreparedStatement stmt = null;
-        try {
-            stmt = connectionSource.prepareStatement("SELECT key, value FROM genericCache WHERE key = ?");
+        String statement = "SELECT key, value FROM genericCache WHERE key = ?";
+        try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
             stmt.setObject(++i, key);
             ResultSet resultSet = stmt.executeQuery();
-    
-            while (resultSet.next()) {
-                KeyValueData data = new KeyValueData();
-                data.key = resultSet.getString("key");
-                data.value = resultSet.getString("value");
-    
-                values.add(data);
-            }
-        } finally {
-            if(stmt != null) stmt.close();
-            stmt = null;
-        }
 
-        if(values.size() > 1) throw new SQLException("Not an unique id: " + key);
-        if(values.size() == 0) return null;
-        return values.get(0).value;
+            if (!resultSet.next()) return null;
+
+            String value = resultSet.getString("value");
+
+            if (!resultSet.next()) return value;
+
+            throw new SQLException("Not an unique id: " + key);
+        }
     }
 }
