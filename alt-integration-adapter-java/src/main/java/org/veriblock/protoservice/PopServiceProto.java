@@ -135,7 +135,7 @@ public class PopServiceProto {
     public static VeriBlockMessages.EmptyReply addPayloads(VeriBlockMessages.AddPayloadsDataRequest request) throws Exception {
         BlockIndex blockIndex = BlockIndexProtoConverter.fromProto(request.getBlockIndex());
         List<AltPublication> altPublications = new ArrayList<>();
-        for(ByteString altPublicationBytes : request.getAltPublications())
+        for(ByteString altPublicationBytes : request.getAltPublicationsList())
         {
             altPublications.add(SerializeDeserializeService.parseAltPublication(altPublicationBytes.toByteArray()));
         }
