@@ -10,7 +10,6 @@ package org.veriblock.sdk.blockchain.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.models.AltChainBlock;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.VeriBlockPublication;
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PoPTransactionsDBStore implements PoPTransactionStore {
-    private static final Logger log = LoggerFactory.getLogger(AuditorChangesStore.class);
+    private static final Logger log = LoggerFactory.getLogger(PoPTransactionsDBStore.class);
 
     private Connection connectionResource;
 
