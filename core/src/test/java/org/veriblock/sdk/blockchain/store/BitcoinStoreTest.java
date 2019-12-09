@@ -193,6 +193,27 @@ public class BitcoinStoreTest {
     }
 
     @Test
+    public void cantEraseChainHeadTest() throws SQLException, IOException {
+        StoredBitcoinBlock chainHeadBlock = storedBlock1;
+
+        store.put(chainHeadBlock);
+        store.setChainHead(chainHeadBlock);
+
+        Assert.assertEquals(chainHeadBlock, store.get(chainHeadBlock.getHash()));
+        Assert.assertEquals(chainHeadBlock, store.getChainHead());
+
+        try {
+            store.erase(chainHeadBlock.getHash());
+            Assert.fail("Should throw a BlockStoreException");
+        } catch (BlockStoreException e) {
+            Assert.assertEquals("Cannot erase the chain head block", e.getMessage());
+        }
+
+        // the block is still in the store
+        Assert.assertEquals(chainHeadBlock, store.get(chainHeadBlock.getHash()));
+    }
+
+    @Test
     public void eraseNonexistentTest() throws SQLException, IOException {
         byte[] raw = Base64.getDecoder().decode("AAAAIPfeKZWJiACrEJr5Z3m5eaYHFdqb8ru3RbMAAAAAAAAA+FSGAmv06tijekKSUzLsi1U/jjEJdP6h66I4987mFl4iE7dchBoBGi4A8po=");
         StoredBitcoinBlock expectedBlock = new StoredBitcoinBlock(SerializeDeserializeService.parseBitcoinBlock(raw), BigInteger.TEN, 0);

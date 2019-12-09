@@ -193,6 +193,27 @@ public class VeriBlockStoreTest {
     }
 
     @Test
+    public void cantEraseChainHeadTest() throws SQLException, IOException {
+        StoredVeriBlockBlock chainHeadBlock = storedBlock1;
+
+        store.put(chainHeadBlock);
+        store.setChainHead(chainHeadBlock);
+
+        Assert.assertEquals(chainHeadBlock, store.get(chainHeadBlock.getHash()));
+        Assert.assertEquals(chainHeadBlock, store.getChainHead());
+
+        try {
+            store.erase(chainHeadBlock.getHash());
+            Assert.fail("Should throw a BlockStoreException");
+        } catch (BlockStoreException e) {
+            Assert.assertEquals("Cannot erase the chain head block", e.getMessage());
+        }
+
+        // the block is still in the store
+        Assert.assertEquals(chainHeadBlock, store.get(chainHeadBlock.getHash()));
+    }
+
+    @Test
     public void eraseNonexistentTest() throws SQLException, IOException {
             byte[] raw = Base64.getDecoder().decode("AAATiAAClOfcPjviGpbszw+99fYqMzHcmVw2sJNWN4YGed3V2w8TUxKywnhnyag+8bmbmFyblJMHAjrWcrr9dw==");
             StoredVeriBlockBlock expectedBlock = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw), BigInteger.TEN);

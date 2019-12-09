@@ -87,6 +87,12 @@ public class BitcoinStore implements BlockStore<StoredBitcoinBlock, Sha256Hash> 
     }
 
     public StoredBitcoinBlock erase(Sha256Hash hash) throws BlockStoreException, SQLException {
+        String headEncoded = keyValueRepository.getValue(chainHeadRepositoryName);
+
+        if (headEncoded != null && Sha256Hash.wrap(Utils.decodeHex(headEncoded)).equals(hash)) {
+            throw new BlockStoreException("Cannot erase the chain head block");
+        }
+
         StoredBitcoinBlock erased = get(hash);
 
         if(erased != null && bitcoinRepository.isInUse(hash)) {
