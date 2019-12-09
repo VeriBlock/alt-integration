@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class PopServiceProto {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockForkresolutionProtoService.class);
     private static VeriBlockSecurity security = null;
@@ -154,5 +153,4 @@ public class PopServiceProto {
         security.removePayloads(blockIndex);
         return VeriBlockMessages.EmptyReply.newBuilder().build();
     }
-}
 }
