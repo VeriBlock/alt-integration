@@ -44,6 +44,13 @@ public class GetLastKnownBlocksTest {
     }
 
     @Test
+    public void getLastKnownVBKBlocksEmptyStoreTest() throws SQLException {
+        BlockStore<StoredVeriBlockBlock, VBlakeHash> store = security.getContext().getVeriblockStore();
+        List<VBlakeHash> blocks = security.getLastKnownVBKBlocks(16);
+        Assert.assertEquals(blocks.size(), 0);
+    }
+
+    @Test
     public void getLastKnownVBKBlocksTest() throws SQLException {
         byte[] raw1 = Utils.decodeHex("0001998300029690ACA425987B8B529BEC04654A16FCCE708F3F0DEED25E1D2513D05A3B17C49D8B3BCFEFC10CB2E9C4D473B2E25DB7F1BD040098960DE0E313");
         StoredVeriBlockBlock newBlock1 = new StoredVeriBlockBlock(SerializeDeserializeService.parseVeriBlockBlock(raw1), BigInteger.TEN);
@@ -68,6 +75,13 @@ public class GetLastKnownBlocksTest {
         blocks.sort(comparator);
         expectedBlocks.sort(comparator);
         Assert.assertEquals(blocks, expectedBlocks);
+    }
+
+    @Test
+    public void getLastKnownBTCBlocksEmptyStoreTest() throws SQLException {
+        BlockStore<StoredBitcoinBlock, Sha256Hash> store = security.getContext().getBitcoinStore();
+        List<Sha256Hash> blocks = security.getLastKnownBTCBlocks(16);
+        Assert.assertEquals(blocks.size(), 0);
     }
 
     @Test
