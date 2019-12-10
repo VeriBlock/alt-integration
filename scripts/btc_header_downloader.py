@@ -87,8 +87,7 @@ if args.java_class is None:
     for header in headers:
         print header
 else:
-    print """
-// This file has been automatically generated using scripts/btc_header_downloader.py
+    print """// This file has been automatically generated using scripts/btc_header_downloader.py
 
 // VeriBlock Blockchain Project
 // Copyright 2017-2018 VeriBlock, Inc
@@ -98,7 +97,7 @@ else:
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
-package org.veriblock.integrations.blockchain;
+package org.veriblock.sdk.blockchain.difficulty;
 
 import java.util.Arrays;
 import java.util.List;
