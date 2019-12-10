@@ -18,6 +18,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.veriblock.sdk.conf.BitcoinTestNetParameters;
+import org.veriblock.sdk.conf.TestNetParameters;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.models.BlockIndex;
@@ -36,8 +38,9 @@ public class ServiceSecurityPayloadTests {
 
     @Before
     public void setUp() throws SQLException, IOException {
-        VeriBlockIntegrationLibraryManager veriBlockIntegrationLibraryManager = new VeriBlockIntegrationLibraryManager();
-        security = veriBlockIntegrationLibraryManager.init();
+        VeriBlockIntegrationLibraryManager manager = new VeriBlockIntegrationLibraryManager(new TestNetParameters(),
+                                                                                            new BitcoinTestNetParameters());
+        security = manager.init();
 
         String bootstrapBtcStr = "00000207aef28eadca7d52e9f8135fa52f7465124a2de40493a3fa16202000000000000629957636b95022c137ff8f6cdc3839eff6ea30392b8c5ffd8cc3564c1d351dda40ce55dffff001da74a71ac,00008020a983a690769af18b19bcce62d33698fb291040030ea2c2018a5884fc000000005810263bd94e7d68290ec3ef66e2ffd976caffc3b4b4c162fd1b83d459f464905611e55dffff001d580efbe3,00000020b4c99fa50b5a748be39c7ba592007390f1256e0f84a0b151c3b90100000000000d3e18d51bfb9b84ea5f1e95cfc2d0ca2cc78e46e1455b325c56cb58f98f5db70916e55dffff001d4429a16e,0000002024b956bf399b23f91abab38cb0583d94ca00a16012378dca0dd60000000000007ee8cba8a9f2fd084ef4f42cdd993786f6a6e323b7d50f6008f825a998c3e0e61917e55decae031a100fbfec,00000020df6e38acb8045f94705bb8e2ea9ad874d1425485b851982bbf02000000000000941a435fd68b7ad9847354e8c6fffb5d581257bbb8e6f6da3b61a341e141902d601be55decae031aa1434322,00000020c79fe6932d663e52d2cc3f6a141ee0f17e89c0a36f8048342a010000000000009ad88ff94d891648fffbd2f39dafa2fc6634bcb6d6ea2e4471a7834dea00a242941fe55decae031aa4bb58d1,0000c0209e0a2092b0a22223290b4139ab9e47e7ccc54b7892069447b40200000000000011cda17c7e467854bb3850846f3000026093b828d25433c236778e6889ff2d1fe120e55decae031a245cc292,00000020e82ad39b8588672839ac0e2049b6e716ae394f75b9ef59ebde020000000000002b4fc0cb172028a4c8f451d85880d71b9c460853bb02e230b75301a9f52e9f8c4d21e55decae031a4322e181,00000020106698ff9f204b4cca9e01e7c69438444b54d3dca9b22d3fdd02000000000000b439b13e5542c00eb5ecae37969aeea37d9e97fa203906058484d073499ee3f90f26e55dffff001d014ca226,000000202853dd6dace5f462baeaad5a08e3c39c2c6852074685981f6cc79c88000000001127dca111d54d15c4e4757acd5dceca12420699bde7f4c13d99a0de067e21e02c29e55decae031ae47499d9,0000c0200a8e1f58ad19c07c6810741df62a26a27a46f50f13b821aa4801000000000000dbaab078a63d469d9fe1b7d2aa6dc67d0c732ad3281983158df2b53afb428c70f62ce55decae031a3cb1e4a2,00000020b6cd94522d692a31601ec060c4711618c5c746abcb7c7c58ae020000000000006c0a60b391f8b84db5c491969307cae2e3c00742723748eaa8ac8cefc4cadf07c530e55decae031a36bdea68,000000207f7c70750cd68d26600d3c8ce26f3fe1c2c06e305770fbf5b1020000000000000bb6b460d0e309bd02481c2b62a85077c7dd65819ba164cbccd398d7674f52958b35e55dffff001d5627eca4,000000200ed3b745c78920b70287019304d7806a5cba6aea41bbb079bdeab862000000002b40023fd5e50fe15e459279f2de427b8bda043df97151655e6dc394e39ed9981c36e55decae031a17101a07,00000020c91f04881e8604f2a902d2bba22819a8fed014949be417f1ad0300000000000005ec552ba3ea0ad564d3387d820ebc4a4960775e9fbcd92db5105ed3a83cc7c3c939e55decae031a76ffceab,00000020b15d70ede23ca82d38a9418914d836cf75251b8027b9a9d53c02000000000000d455849c387207d5b3ca9577796874dcdf22e5a31e6bdc8b15a6aaaf44e7de1f7a3ee55dffff001d31f589dc";
         List<BitcoinBlock> bootstrapBtc = ParseBlocks.parseBitcoinBlockList(bootstrapBtcStr);
@@ -102,9 +105,9 @@ public class ServiceSecurityPayloadTests {
             vtbPublications.add(pub);
         }
 
-        ///HACK: we skip block difficulty validation. Will be fixed in future.
+        ///HACK: we skip BTC block difficulty validation. Will be fixed in future.
         security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(true);
-        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(true);
+        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(false);
 
         // assume no error is thrown
         security.addPayloads(blockIndex, vtbPublications, altPublications);
@@ -121,17 +124,6 @@ public class ServiceSecurityPayloadTests {
         } catch (VerificationException e) {
             Assert.assertTrue(e.getMessage().equals("Block does not match difficulty of previous block")
                            || e.getMessage().equals("Block does not match computed difficulty adjustment"));
-        }
-
-        // check that the VBK difficulty validation throws an error
-        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(true);
-        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(false);
-
-        try {
-            security.addPayloads(blockIndex, vtbPublications, altPublications);
-            Assert.fail();
-        } catch (VerificationException e) {
-            Assert.assertEquals("Block does not conform to expected difficulty", e.getMessage());
         }
     }
 }
