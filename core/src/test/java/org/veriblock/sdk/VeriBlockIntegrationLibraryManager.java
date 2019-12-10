@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.SQLException;
 
-import org.junit.Test;
 import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
@@ -24,12 +23,21 @@ import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.sqlite.ConnectionSelector;
 
 ///TODO: this is not a test - move to helpers package
+//TODO: refactoring is overdue
 public class VeriBlockIntegrationLibraryManager {
     private static VeriBlockSecurity security = null;
-    private final VeriBlockNetworkParameters veriblockNetworkParameters = new MainNetParameters();
-    private final BitcoinNetworkParameters bitcoinNetworkParameters = new BitcoinMainNetParameters();
-    //Should have public constructor.
+    private final VeriBlockNetworkParameters veriblockNetworkParameters;
+    private final BitcoinNetworkParameters bitcoinNetworkParameters;
+
     public VeriBlockIntegrationLibraryManager() {
+        veriblockNetworkParameters = new MainNetParameters();
+        bitcoinNetworkParameters = new BitcoinMainNetParameters();
+    }
+
+    public VeriBlockIntegrationLibraryManager(VeriBlockNetworkParameters veriblockNetworkParameters,
+                                              BitcoinNetworkParameters bitcoinNetworkParameters) {
+        this.veriblockNetworkParameters = veriblockNetworkParameters;
+        this.bitcoinNetworkParameters = bitcoinNetworkParameters;
     }
 
     public VeriBlockNetworkParameters getVeriblockNetworkParameters() {
@@ -64,9 +72,5 @@ public class VeriBlockIntegrationLibraryManager {
 
         return new Context(getVeriblockNetworkParameters(), getBitcoinNetworkParameters(),
                            veriBlockStore, bitcoinStore, changeStore, popTxDBStore);
-    }
-
-    @Test
-    public void test() {
     }
 }
