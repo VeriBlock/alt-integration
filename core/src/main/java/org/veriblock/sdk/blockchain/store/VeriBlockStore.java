@@ -88,6 +88,12 @@ public class VeriBlockStore implements BlockStore<StoredVeriBlockBlock, VBlakeHa
     }
 
     public StoredVeriBlockBlock erase(VBlakeHash hash) throws BlockStoreException, SQLException {
+        String headEncoded = keyValueRepository.getValue(chainHeadRepositoryName);
+
+        if (headEncoded != null && VBlakeHash.wrap(Utils.decodeHex(headEncoded)).equals(hash)) {
+            throw new BlockStoreException("Cannot erase the chain head block");
+        }
+
         StoredVeriBlockBlock erased = get(hash);
 
         if(erased != null && veriBlockRepository.isInUse(hash.trimToPreviousBlockSize())) {
