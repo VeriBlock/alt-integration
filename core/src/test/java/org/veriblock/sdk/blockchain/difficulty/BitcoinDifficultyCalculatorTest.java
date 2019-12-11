@@ -16,7 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockIntegrationLibraryManager;
@@ -24,9 +26,12 @@ import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.blockchain.BitcoinBlockchain;
 import org.veriblock.sdk.blockchain.store.BlockStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
+import org.veriblock.sdk.conf.BitcoinMainNetParameters;
+import org.veriblock.sdk.conf.BitcoinTestNetParameters;
 import org.veriblock.sdk.conf.BitcoinRegTestParameters;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.models.Sha256Hash;
+import org.veriblock.sdk.models.VerificationException;
 import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
@@ -66,6 +71,11 @@ public class BitcoinDifficultyCalculatorTest {
         }
     }
 
+    private void assertDifficultyValidationFailure(VerificationException e) {
+        Assert.assertTrue(e.getMessage().equals("Block does not match difficulty of previous block")
+                       || e.getMessage().equals("Block does not match computed difficulty adjustment"));
+    }
+
     @Test
     public void regtestTest() throws SQLException, IOException {
         BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinRegTestParameters(), store);
@@ -73,7 +83,101 @@ public class BitcoinDifficultyCalculatorTest {
                                  BitcoinRegtestBlockData.firstBlockHeight,
                                  blockchain);
     }
-    
-    // FIXME: test that the regtest config fails on testnet and mainnet data
+
+    @Ignore("Testnet code is broken")
+    @Test
+    public void testnetTest() throws SQLException, IOException {
+        BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinTestNetParameters(), store);
+        addBlockDataToBlockchain(BitcoinTestnetBlockData.headers,
+                                 BitcoinTestnetBlockData.firstBlockHeight,
+                                 blockchain);
+    }
+
+    @Ignore("Mainnet code is broken")
+    @Test
+    public void mainnetTest() throws SQLException, IOException {
+        BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinMainNetParameters(), store);
+        addBlockDataToBlockchain(BitcoinMainnetBlockData.headers,
+                                 BitcoinMainnetBlockData.firstBlockHeight,
+                                 blockchain);
+    }
+
+    @Test
+    public void regtestFailsOnTestnetTest() throws SQLException, IOException {
+        BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinRegTestParameters(), store);
+        try {
+            addBlockDataToBlockchain(BitcoinTestnetBlockData.headers,
+                                     BitcoinTestnetBlockData.firstBlockHeight,
+                                     blockchain);
+            Assert.fail();
+        } catch (VerificationException e) {
+            assertDifficultyValidationFailure(e);
+        }
+    }
+
+    @Test
+    public void regtestFailsOnMainnetTest() throws SQLException, IOException {
+        BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinRegTestParameters(), store);
+        try {
+            addBlockDataToBlockchain(BitcoinMainnetBlockData.headers,
+                                     BitcoinMainnetBlockData.firstBlockHeight,
+                                     blockchain);
+            Assert.fail();
+        } catch (VerificationException e) {
+            assertDifficultyValidationFailure(e);
+        }
+    }
+
+    @Test
+    public void mainnetFailsOnTestnetTest() throws SQLException, IOException {
+        BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinMainNetParameters(), store);
+        try {
+            addBlockDataToBlockchain(BitcoinTestnetBlockData.headers,
+                                     BitcoinTestnetBlockData.firstBlockHeight,
+                                     blockchain);
+            Assert.fail();
+        } catch (VerificationException e) {
+            assertDifficultyValidationFailure(e);
+        }
+    }
+
+    @Test
+    public void mainnetFailsOnRegtestTest() throws SQLException, IOException {
+        BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinMainNetParameters(), store);
+        try {
+            addBlockDataToBlockchain(BitcoinRegtestBlockData.headers,
+                                     BitcoinRegtestBlockData.firstBlockHeight,
+                                     blockchain);
+            Assert.fail();
+        } catch (VerificationException e) {
+            assertDifficultyValidationFailure(e);
+        }
+    }
+
+    @Test
+    public void testnetFailsOnRegtestTest() throws SQLException, IOException {
+        BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinTestNetParameters(), store);
+        try {
+            addBlockDataToBlockchain(BitcoinRegtestBlockData.headers,
+                                     BitcoinRegtestBlockData.firstBlockHeight,
+                                     blockchain);
+            Assert.fail();
+        } catch (VerificationException e) {
+            assertDifficultyValidationFailure(e);
+        }
+    }
+
+    @Test
+    public void testnetFailsOnMainnetTest() throws SQLException, IOException {
+        BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinTestNetParameters(), store);
+        try {
+            addBlockDataToBlockchain(BitcoinMainnetBlockData.headers,
+                                     BitcoinMainnetBlockData.firstBlockHeight,
+                                     blockchain);
+            Assert.fail();
+        } catch (VerificationException e) {
+            assertDifficultyValidationFailure(e);
+        }
+    }
 
 }
