@@ -93,7 +93,6 @@ public class BitcoinDifficultyCalculatorTest {
                                  blockchain);
     }
 
-    @Ignore("Mainnet code is broken")
     @Test
     public void mainnetTest() throws SQLException, IOException {
         BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinMainNetParameters(), store);
@@ -168,16 +167,13 @@ public class BitcoinDifficultyCalculatorTest {
     }
 
     @Test
-    public void testnetFailsOnMainnetTest() throws SQLException, IOException {
+    public void testnetOnMainnetTest() throws SQLException, IOException {
+        // the testnet allows minimum difficulty blocks and has smaller
+        // minimum difficulty, thus should validate mainnet blocks as well
         BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinTestNetParameters(), store);
-        try {
-            addBlockDataToBlockchain(BitcoinMainnetBlockData.headers,
-                                     BitcoinMainnetBlockData.firstBlockHeight,
-                                     blockchain);
-            Assert.fail();
-        } catch (VerificationException e) {
-            assertDifficultyValidationFailure(e);
-        }
+        addBlockDataToBlockchain(BitcoinMainnetBlockData.headers,
+                                    BitcoinMainnetBlockData.firstBlockHeight,
+                                    blockchain);
     }
 
 }

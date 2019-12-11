@@ -329,7 +329,7 @@ public class BitcoinBlockchain {
                 StoredBitcoinBlock last = tempBlocks.get(tempBlocks.size() - 1);
                 cycleStart = store.getFromChain(last.getBlock().getPreviousBlock(), DIFFICULTY_ADJUST_BLOCK_COUNT - tempBlocks.size());
             } else {
-                cycleStart = store.getFromChain(previous.getHash(), DIFFICULTY_ADJUST_BLOCK_COUNT);
+                cycleStart = store.getFromChain(previous.getHash(), DIFFICULTY_ADJUST_BLOCK_COUNT - 1);
             }
 
             if (cycleStart == null) {
