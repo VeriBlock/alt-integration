@@ -11,7 +11,7 @@ package org.veriblock.sdk.conf;
 import java.math.BigInteger;
 
 public class BitcoinTestNetParameters implements BitcoinNetworkParameters {
-    private static final BigInteger POW_LIMIT = new BigInteger("0000007fffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
+    private static final BigInteger POW_LIMIT = new BigInteger("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
 
     @Override
     public BigInteger getPowLimit() {

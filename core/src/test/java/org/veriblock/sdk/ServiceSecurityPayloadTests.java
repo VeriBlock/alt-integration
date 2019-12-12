@@ -105,25 +105,12 @@ public class ServiceSecurityPayloadTests {
             vtbPublications.add(pub);
         }
 
-        ///HACK: we skip BTC block difficulty validation. Will be fixed in future.
-        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(true);
+        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(false);
         security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(false);
 
         // assume no error is thrown
         security.addPayloads(blockIndex, vtbPublications, altPublications);
 
         security.removePayloads(blockIndex);
-        
-        // check that the BTC difficulty validation throws an error
-        security.getBitcoinBlockchain().setSkipValidateBlocksDifficulty(false);
-        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(true);
-
-        try {
-            security.addPayloads(blockIndex, vtbPublications, altPublications);
-            Assert.fail();
-        } catch (VerificationException e) {
-            Assert.assertTrue(e.getMessage().equals("Block does not match difficulty of previous block")
-                           || e.getMessage().equals("Block does not match computed difficulty adjustment"));
-        }
     }
 }
