@@ -311,13 +311,46 @@ public class BitcoinBlockchain {
             return;
         }
 
+        int difficultyAdjustmentInterval = networkParameters.getPowTargetTimespan()
+                                         / networkParameters.getPowTargetSpacing();
+
         // Previous + 1 = height of block
-        if (networkParameters.getPowNoRetargeting() || (previous.getHeight() + 1) % 2016 > 0) {
+        if (networkParameters.getPowNoRetargeting() || (previous.getHeight() + 1) % difficultyAdjustmentInterval > 0) {
+
             // Difficulty should be same as previous
-            if (block.getBits() != previous.getBlock().getBits()) {
-                throw new VerificationException("Block does not match difficulty of previous block");
+            if (block.getBits() == previous.getBlock().getBits()) return;
+
+            // Unless minimum difficulty blocks are allowed(special difficulty rule for the testnet)
+            if (networkParameters.getAllowMinDifficultyBlocks()) {
+
+                long proofOfWorkLimit = BitcoinUtils.encodeCompactBits(networkParameters.getPowLimit());
+
+                // If the block's timestamp is more than 2*PowTargetSpacing minutes
+                // then allow mining of a minimum difficulty block
+                if (block.getTimestamp() > previous.getBlock().getTimestamp() + networkParameters.getPowTargetSpacing()*2) {
+                    if (block.getBits() == proofOfWorkLimit) return;
+                } else {
+
+                    // Find the last non-minimum difficulty block
+                    while (previous != null && previous.getBlock().getPreviousBlock() != null
+                        && previous.getHeight() % difficultyAdjustmentInterval != 0
+                        && previous.getBlock().getBits() == proofOfWorkLimit) {
+
+                        previous = getInternal(previous.getBlock().getPreviousBlock());
+                    }
+
+                    // Corner case: we're less than DIFFICULTY_ADJUST_BLOCK_COUNT
+                    // from the bootstrap and all blocks are minimum difficulty
+                    if (previous == null) return;
+
+                    // Difficulty matches the closest non-minimum difficulty block
+                    if (block.getBits() == previous.getBlock().getBits()) return;
+                }
             }
+
+            throw new VerificationException("Block does not match difficulty of previous block" );
         } else {
+
             // Difficulty needs to adjust
 
             List<StoredBitcoinBlock> tempBlocks = getTemporaryBlocks(previous.getHash(), DIFFICULTY_ADJUST_BLOCK_COUNT);

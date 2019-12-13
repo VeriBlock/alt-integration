@@ -84,7 +84,6 @@ public class BitcoinDifficultyCalculatorTest {
                                  blockchain);
     }
 
-    @Ignore("Testnet code is broken")
     @Test
     public void testnetTest() throws SQLException, IOException {
         BitcoinBlockchain blockchain = new BitcoinBlockchain(new BitcoinTestNetParameters(), store);
