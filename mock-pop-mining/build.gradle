@@ -1,0 +1,18 @@
+plugins {
+    id "java"
+    id "idea"
+    id "java-library"
+}
+
+dependencies {
+    compile project(':core')
+    
+    testCompile 'junit:junit:4.12'
+}
+
+test {
+    testLogging {
+        showStackTraces = true
+        showStandardStreams = true
+    }
+}
