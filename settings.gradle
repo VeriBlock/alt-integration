@@ -2,5 +2,6 @@ include 'core'
 include 'alt-integration-adapter-java'
 include 'alt-integration-grpc-client'
 include 'alt-integration-grpc-service'
+include 'mock-pop-mining'
 
 rootProject.name = 'alt-integration'
