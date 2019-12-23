@@ -8,11 +8,52 @@
 
 package org.veriblock.sdk.mock;
 
+import org.veriblock.sdk.models.MerklePath;
 import org.veriblock.sdk.models.Sha256Hash;
 
-public class BitcoinBlockData {
+import java.util.ArrayList;
+import java.util.List;
+
+public class BitcoinBlockData extends ArrayList<byte[]> {
+
     public Sha256Hash getMerkleRoot() {
-        // FIXME: implement
-        return Sha256Hash.ZERO_HASH;
+        return calculateSubtreeHash(0, 0);
+    }
+
+    // calculate the number of bits it takes to store size()
+    private int getMaxDepth() {
+        return (int)(Math.log(size()) / Math.log(2) + 1);
+    }
+
+    // at each depth, there are 2**depth subtrees
+    // leaves are at the depth equal to getMaxDepth()
+    private Sha256Hash calculateSubtreeHash(int index, int depth) {
+        if (depth >= getMaxDepth()) {
+            return Sha256Hash.twiceOf(index < size() ? get(index) : new byte[0]);
+        }
+
+        return Sha256Hash.twiceOf(calculateSubtreeHash(index * 2, depth + 1).getBytes(),
+                                  calculateSubtreeHash(index * 2 + 1, depth + 1).getBytes());
+    }
+
+    public MerklePath getMerklePath(int index) {
+        if (index >= size())
+            throw new IndexOutOfBoundsException("index must be less than size()");
+
+        int maxDepth = getMaxDepth();
+        int layerIndex = index;
+
+        Sha256Hash subject = calculateSubtreeHash(index, maxDepth);
+        List<Sha256Hash> layers = new ArrayList<>(maxDepth);
+
+        for (int depth = maxDepth; depth > 0; depth--) {
+            // invert the last bit of layerIndex to reach the opposite subtree
+            Sha256Hash layer = calculateSubtreeHash(layerIndex ^ 1, depth);
+            layers.add(layer);
+
+            layerIndex /= 2;
+        }
+
+        return new MerklePath(index, subject, layers);
     }
 }
