@@ -34,9 +34,9 @@ public class BitcoinBlockchainTest {
     // FIXME: need a proper genesis block
     private final byte[] rawGenesis = Utils.decodeHex("00000020e1205431708b69b0a0c48ef51d3bdd1049643cfa7e1d841a18d43dcf48d6be5ef3bb206027319c0939db20cf223be3fc7385d1aa871461ce89a441577978f40afd9adf5dffff7f2001000000");
     private final BitcoinBlock genesis = SerializeDeserializeService.parseBitcoinBlock(rawGenesis);
-        
+    private final int genesisHeight = 92;
     private final BitcoinBlockchainBootstrapConfig bootstrap = new BitcoinBlockchainBootstrapConfig(
-                                                                    Arrays.asList(genesis), 92);
+                                                                    Arrays.asList(genesis), genesisHeight);
 
     private VeriBlockSecurity security;
     private org.veriblock.sdk.blockchain.BitcoinBlockchain blockchain;
