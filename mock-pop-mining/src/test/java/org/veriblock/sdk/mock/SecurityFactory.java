@@ -54,10 +54,14 @@ public class SecurityFactory {
     }
 
     private Context createContext() throws SQLException {
-        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
-        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
-        AuditorChangesStore changeStore = new AuditorChangesStore(ConnectionSelector.setConnectionInMemory());
-        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(ConnectionSelector.setConnectionInMemory());
+        // we use a separate in-memory database for the security service
+        // to avoid conflicts with mock blockchain stores created using
+        // ConnectionSelector.setConnectionInMemory()
+        String dbPath = "file:memdb2?mode=memory&cache=shared";
+        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnection(dbPath));
+        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnection(dbPath));
+        AuditorChangesStore changeStore = new AuditorChangesStore(ConnectionSelector.setConnection(dbPath));
+        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(ConnectionSelector.setConnection(dbPath));
 
         return new Context(getVeriblockNetworkParameters(), getBitcoinNetworkParameters(),
                            veriBlockStore, bitcoinStore, changeStore, popTxDBStore);
