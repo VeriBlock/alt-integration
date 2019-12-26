@@ -44,7 +44,7 @@ public class BitcoinBlockDataTest {
     private BitcoinBlockData createBlockData(Random random, int count, int maxSize) {
         BitcoinBlockData blockData = new BitcoinBlockData();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < count; i++) {
             byte[] data = new byte[random.nextInt(maxSize)];
             random.nextBytes(data);
             blockData.add(data);
