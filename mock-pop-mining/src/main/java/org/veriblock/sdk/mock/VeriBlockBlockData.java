@@ -40,7 +40,7 @@ public class VeriBlockBlockData {
         blockContentMetapackage = data;
     }
 
-    public byte[] getBlockContentMetapackage(byte[] data) {
+    public byte[] getBlockContentMetapackage() {
         return blockContentMetapackage;
     }
 
