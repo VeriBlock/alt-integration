@@ -2,6 +2,9 @@ package org.veriblock.webservice;
 
 import integration.api.grpc.GrpcPopServiceGrpc.GrpcPopServiceImplBase;
 import integration.api.grpc.VeriBlockMessages;
+import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.StatusRuntimeException;
 import org.veriblock.protoservice.PopServiceProto;
 import io.grpc.stub.StreamObserver;
 import org.veriblock.sdk.VeriBlockSecurity;
@@ -20,7 +23,9 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
@@ -31,7 +36,9 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
@@ -42,7 +49,9 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
@@ -53,7 +62,9 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
@@ -64,7 +75,9 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
@@ -75,7 +88,9 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
@@ -86,7 +101,9 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
@@ -97,7 +114,9 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
@@ -108,7 +127,9 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
@@ -119,40 +140,48 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
     @Override
-    public void getPublicationDataFromAltPublication(VeriBlockMessages.BytesArrayRequest request, StreamObserver<VeriBlockMessages.PublicationData> responseObserve) {
+    public void getPublicationDataFromAltPublication(VeriBlockMessages.BytesArrayRequest request, StreamObserver<VeriBlockMessages.PublicationData> responseObserver) {
         try {
             VeriBlockMessages.PublicationData reply = PopServiceProto.getPublicationDataFromAltPublication(request);
-            responseObserve.onNext(reply);
-            responseObserve.onCompleted();
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserve.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
     @Override
-    public void addPayloads(VeriBlockMessages.AddPayloadsDataRequest request, StreamObserver<VeriBlockMessages.EmptyReply> responseObserve) {
+    public void addPayloads(VeriBlockMessages.AddPayloadsDataRequest request, StreamObserver<VeriBlockMessages.EmptyReply> responseObserver) {
         try {
             VeriBlockMessages.EmptyReply reply = PopServiceProto.addPayloads(request);
-            responseObserve.onNext(reply);
-            responseObserve.onCompleted();
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserve.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 
     @Override
-    public void removePayloads(VeriBlockMessages.RemovePayloadsRequest request, StreamObserver<VeriBlockMessages.EmptyReply> responseObserve) {
+    public void removePayloads(VeriBlockMessages.RemovePayloadsRequest request, StreamObserver<VeriBlockMessages.EmptyReply> responseObserver) {
         try {
             VeriBlockMessages.EmptyReply reply = PopServiceProto.removePayloads(request);
-            responseObserve.onNext(reply);
-            responseObserve.onCompleted();
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserve.onError(e);
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
         }
     }
 }
