@@ -25,8 +25,12 @@ jobs:
         run: ./gradlew test
       - name: Install
         run: ./gradlew install
-      - name: Authenticate in docker
-        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Collect Coverage
+        run: ./gradlew jacocoTestReport
+      - name: Submit codecov coverage
+        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
+      - name: Run Sonarqube scanner
+        run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }} || true
       - name: Docker Push
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
@@ -35,3 +39,4 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
           tag_names: true
+          snapshot: true
