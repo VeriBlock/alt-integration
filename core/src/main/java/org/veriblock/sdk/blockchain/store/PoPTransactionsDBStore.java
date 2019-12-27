@@ -89,7 +89,9 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
                 " = " + ContainRepository.tableName + "." + ContainRepository.txHashColumnName +
                 " WHERE " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.endorsedBlockHashColumnName + " = '" + endorsedBlock.getHash() + "'" +
                 " AND " + ContainRepository.tableName + "." + ContainRepository.blockHashColumnName + " IN (");
-        sql.append("?,".repeat(containBlocks.size()));
+        for (int i = 0; i < containBlocks.size(); i++) {
+            sql.append("?,");
+        }
         sql.delete(sql.length() - 1, sql.length());
         sql.append(")");
 
