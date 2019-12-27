@@ -20,12 +20,12 @@ public class GenericBlockRepository<Block, Id> {
     protected Connection connectionSource;
     protected String tableBlocks;
     protected BlockSQLSerializer<Block, Id> serializer;
-    
+
     public GenericBlockRepository(Connection connection, String tableName, BlockSQLSerializer<Block, Id> serializer) throws SQLException {
         this.connectionSource = connection;
         this.tableBlocks = tableName;
         this.serializer = serializer;
-        
+
         try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS "
                     + tableBlocks
@@ -38,7 +38,7 @@ public class GenericBlockRepository<Block, Id> {
             stmt.execute("PRAGMA journal_mode=WAL;");
         }
     }
-    
+
     public void clear() throws SQLException {
         try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("DELETE FROM " + tableBlocks);
@@ -50,7 +50,7 @@ public class GenericBlockRepository<Block, Id> {
         List<String> quotedColumns = new ArrayList<String>();
         for (String col : columns)
             quotedColumns.add("'" + col + "'");
-    
+
         return String.join(", ", quotedColumns);
     }
 
@@ -58,7 +58,7 @@ public class GenericBlockRepository<Block, Id> {
         int columnCount = serializer.getColumns().size();
 
         String values = columnCount == 0 ? "" : "?";
-        for(int i = 1; i < columnCount; i++)
+        for (int i = 1; i < columnCount; i++)
             values += ", ?";
 
         return values;
@@ -66,9 +66,9 @@ public class GenericBlockRepository<Block, Id> {
 
     public void save(Block block) throws SQLException {
         String statement = "REPLACE INTO "
-                         +  tableBlocks
-                         + " (" + getColumnsString() + ") "
-                         + "VALUES(" + getValuesString() + ")";
+                + tableBlocks
+                + " (" + getColumnsString() + ") "
+                + "VALUES(" + getValuesString() + ")";
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             serializer.toStmt(block, stmt);
             stmt.execute();
@@ -80,13 +80,14 @@ public class GenericBlockRepository<Block, Id> {
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
             stmt.setObject(++i, serializer.idToString(id));
-            ResultSet resultSet = stmt.executeQuery();
-    
-            List<Block> values = new ArrayList<Block>();
-            while (resultSet.next())
-                values.add(serializer.fromResult(resultSet));
 
-            if(values.size() > 1) throw new SQLException("Not an unique id: " + id);
+            List<Block> values = new ArrayList<Block>();
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next())
+                    values.add(serializer.fromResult(resultSet));
+            }
+
+            if (values.size() > 1) throw new SQLException("Not an unique id: " + id);
 
             return values.size() == 0 ? null : values.get(0);
         }
@@ -97,11 +98,12 @@ public class GenericBlockRepository<Block, Id> {
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
             stmt.setObject(++i, "%" + serializer.idToString(id));
-            ResultSet resultSet = stmt.executeQuery();
 
             List<Block> values = new ArrayList<Block>();
-            while (resultSet.next())
-                values.add(serializer.fromResult(resultSet));
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next())
+                    values.add(serializer.fromResult(resultSet));
+            }
 
             return values;
         }
@@ -113,22 +115,24 @@ public class GenericBlockRepository<Block, Id> {
             int i = 0;
             stmt.setObject(++i, serializer.idToString(id));
 
-            return stmt.executeQuery().next();
+            try (ResultSet result = stmt.executeQuery()) {
+                return result.next();
+            }
         }
     }
 
     public List<Block> getAll() throws SQLException {
         try (Statement stmt = connectionSource.createStatement()) {
-            ResultSet resultSet = stmt.executeQuery("SELECT * FROM " + tableBlocks);
-
             List<Block> values = new ArrayList<Block>();
-            while (resultSet.next())
-                values.add(serializer.fromResult(resultSet));
+            try (ResultSet resultSet = stmt.executeQuery("SELECT * FROM " + tableBlocks)) {
+                while (resultSet.next())
+                    values.add(serializer.fromResult(resultSet));
 
+            }
             return values;
         }
     }
-    
+
     public void delete(Id id) throws SQLException {
         String statement = "DELETE FROM " + tableBlocks + " WHERE id = ?";
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
