@@ -79,6 +79,10 @@ public class VeriBlockStore implements BlockStore<StoredVeriBlockBlock, VBlakeHa
     }
 
     public void put(StoredVeriBlockBlock storedBlock) throws BlockStoreException, SQLException {
+        if (veriBlockRepository.get(storedBlock.getHash()) != null) {
+            throw new BlockStoreException("A block with the same hash is already in the store");
+        }
+
         veriBlockRepository.save(storedBlock);
     }
 

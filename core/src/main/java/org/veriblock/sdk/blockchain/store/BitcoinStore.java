@@ -79,6 +79,10 @@ public class BitcoinStore implements BlockStore<StoredBitcoinBlock, Sha256Hash> 
     }
 
     public void put(StoredBitcoinBlock storedBlock) throws BlockStoreException, SQLException {
+        if (bitcoinRepository.get(storedBlock.getHash()) != null) {
+            throw new BlockStoreException("A block with the same hash is already in the store");
+        }
+
         bitcoinRepository.save(storedBlock);
     }
     
