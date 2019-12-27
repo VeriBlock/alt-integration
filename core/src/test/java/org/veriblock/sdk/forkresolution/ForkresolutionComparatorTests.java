@@ -11,17 +11,15 @@ package org.veriblock.sdk.forkresolution;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-
 import org.veriblock.sdk.AltChainParametersConfig;
 import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
-import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
+import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.BitcoinMainNetParameters;
 import org.veriblock.sdk.conf.MainNetParameters;
@@ -41,8 +39,6 @@ import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.util.Utils;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,25 +50,21 @@ import java.util.TreeMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.veriblock.sdk.forkresolution.ForkresolutionComparator.compareTwoBranches;
 
-///TODO: unignore this
-@Ignore
 public class ForkresolutionComparatorTests {
 
     private VeriBlockSecurity veriBlockSecuritySpy;
 
     @Before
-    public void setUp() throws IOException, SQLException {
+    public void setUp() throws SQLException {
         VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
         BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
         AuditorChangesStore auditStore = new AuditorChangesStore(ConnectionSelector.setConnectionInMemory());
         PoPTransactionsDBStoreMock popTxDBStore = new PoPTransactionsDBStoreMock();
 
-        Context context = new Context(new MainNetParameters(), new BitcoinMainNetParameters(),
-                                      veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Context context = new Context(new MainNetParameters(), new BitcoinMainNetParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
 
-        VeriBlockSecurity veriBlockSecuritySpy = Mockito.spy(new VeriBlockSecurity(context));
+        veriBlockSecuritySpy = Mockito.spy(new VeriBlockSecurity(context));
 
         Mockito.doReturn(ValidationResult.success()).when(veriBlockSecuritySpy).checkATVAgainstView(any());
         AltChainParametersConfig altChainParametersConfig = new AltChainParametersConfig();
@@ -162,9 +154,9 @@ public class ForkresolutionComparatorTests {
         AltPublication altPublication2 = generateATV(120, timestamp * 2);
         AltPublication altPublication3 = generateATV(140, timestamp * 2);
 
-        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<VeriBlockPublication>());
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<>());
 
         popTxStore.addPoPTransaction(popTx1, block1, block1);
         popTxStore.addPoPTransaction(popTx2, block2, block2);
@@ -191,9 +183,9 @@ public class ForkresolutionComparatorTests {
         AltPublication altPublication2 = generateATV(120, timestamp - 10);
         AltPublication altPublication3 = generateATV(140, timestamp * 2);
 
-        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<VeriBlockPublication>());
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<>());
 
         popTxStore.addPoPTransaction(popTx1, block1, block1);
         popTxStore.addPoPTransaction(popTx2, block2, block2);
@@ -221,9 +213,9 @@ public class ForkresolutionComparatorTests {
         AltPublication altPublication2 = generateATV(120, timestamp - 10);
         AltPublication altPublication3 = generateATV(140, timestamp * 2);
 
-        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<VeriBlockPublication>());
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<>());
 
         popTxStore.addPoPTransaction(popTx1, block1, block1);
         popTxStore.addPoPTransaction(popTx2, block2, block2);
@@ -251,9 +243,9 @@ public class ForkresolutionComparatorTests {
         AltPublication altPublication2 = generateATV(120, timestamp - 10);
         AltPublication altPublication3 = generateATV(140, timestamp - 10);
 
-        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<VeriBlockPublication>());
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<>());
 
         popTxStore.addPoPTransaction(popTx1, block1, block1);
         popTxStore.addPoPTransaction(popTx2, block2, block2);
@@ -302,19 +294,19 @@ public class ForkresolutionComparatorTests {
         AltPublication altPublication12 = generateATV(125, timestamp * 2);
         AltPublication altPublication13 = generateATV(176, timestamp * 2);
 
-        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx9 = new PoPTransactionData("popTxHash9", altPublication9, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx10 = new PoPTransactionData("popTxHash10", altPublication10, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx11 = new PoPTransactionData("popTxHash11", altPublication11, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx12 = new PoPTransactionData("popTxHash12", altPublication12, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx13 = new PoPTransactionData("popTxHash13", altPublication13, new ArrayList<VeriBlockPublication>());
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<>());
+        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<>());
+        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<>());
+        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<>());
+        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<>());
+        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<>());
+        PoPTransactionData popTx9 = new PoPTransactionData("popTxHash9", altPublication9, new ArrayList<>());
+        PoPTransactionData popTx10 = new PoPTransactionData("popTxHash10", altPublication10, new ArrayList<>());
+        PoPTransactionData popTx11 = new PoPTransactionData("popTxHash11", altPublication11, new ArrayList<>());
+        PoPTransactionData popTx12 = new PoPTransactionData("popTxHash12", altPublication12, new ArrayList<>());
+        PoPTransactionData popTx13 = new PoPTransactionData("popTxHash13", altPublication13, new ArrayList<>());
 
         popTxStore.addPoPTransaction(popTx1, block1, block1);
         popTxStore.addPoPTransaction(popTx2, block2, block2);
@@ -386,19 +378,19 @@ public class ForkresolutionComparatorTests {
         AltPublication altPublication12 = generateATV(176, timestamp * 2);
         AltPublication altPublication13 = generateATV(177, timestamp * 2);
 
-        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx9 = new PoPTransactionData("popTxHash9", altPublication9, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx10 = new PoPTransactionData("popTxHash10", altPublication10, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx11 = new PoPTransactionData("popTxHash11", altPublication11, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx12 = new PoPTransactionData("popTxHash12", altPublication12, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx13 = new PoPTransactionData("popTxHash13", altPublication13, new ArrayList<VeriBlockPublication>());
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<>());
+        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<>());
+        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<>());
+        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<>());
+        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<>());
+        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<>());
+        PoPTransactionData popTx9 = new PoPTransactionData("popTxHash9", altPublication9, new ArrayList<>());
+        PoPTransactionData popTx10 = new PoPTransactionData("popTxHash10", altPublication10, new ArrayList<>());
+        PoPTransactionData popTx11 = new PoPTransactionData("popTxHash11", altPublication11, new ArrayList<>());
+        PoPTransactionData popTx12 = new PoPTransactionData("popTxHash12", altPublication12, new ArrayList<>());
+        PoPTransactionData popTx13 = new PoPTransactionData("popTxHash13", altPublication13, new ArrayList<>());
 
         popTxStore.addPoPTransaction(popTx1, block1, block1);
         popTxStore.addPoPTransaction(popTx2, block2, block2);
@@ -463,14 +455,14 @@ public class ForkresolutionComparatorTests {
         AltPublication altPublication7 = generateATV(136, timestamp * 2);
         AltPublication altPublication8 = generateATV(155, timestamp * 2);
 
-        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<VeriBlockPublication>());
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<>());
+        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<>());
+        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<>());
+        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<>());
+        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<>());
+        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<>());
 
         popTxStore.addPoPTransaction(popTx1, block1, block1);
         popTxStore.addPoPTransaction(popTx2, block2, block2);
@@ -493,8 +485,7 @@ public class ForkresolutionComparatorTests {
         rigthFork.add(block7);
         rigthFork.add(block8);
 
-        ///TODO: should use static method calls eg ForkresolutionComparator.compareTwoBranches
-        Assert.assertEquals(1, compareTwoBranches(leftFork, rigthFork));
+        Assert.assertEquals(1, ForkresolutionComparator.compareTwoBranches(leftFork, rigthFork));
     }
 
     @Test
@@ -525,14 +516,14 @@ public class ForkresolutionComparatorTests {
         AltPublication altPublication7 = generateATV(110, timestamp * 2);
         AltPublication altPublication8 = generateATV(155, timestamp * 2);
 
-        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<VeriBlockPublication>());
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<>());
+        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<>());
+        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<>());
+        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<>());
+        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<>());
+        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<>());
 
         popTxStore.addPoPTransaction(popTx1, block1, block1);
         popTxStore.addPoPTransaction(popTx2, block2, block2);
@@ -555,7 +546,7 @@ public class ForkresolutionComparatorTests {
         rigthFork.add(block7);
         rigthFork.add(block8);
 
-        Assert.assertEquals(-1, compareTwoBranches(leftFork, rigthFork));
+        Assert.assertEquals(-1, ForkresolutionComparator.compareTwoBranches(leftFork, rigthFork));
     }
 
     @Test
@@ -586,14 +577,14 @@ public class ForkresolutionComparatorTests {
         AltPublication altPublication7 = generateATV(110, timestamp * 2);
         AltPublication altPublication8 = generateATV(155, timestamp * 2);
 
-        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<VeriBlockPublication>());
-        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<VeriBlockPublication>());
+        PoPTransactionData popTx1 = new PoPTransactionData("popTxHash1", altPublication1, new ArrayList<>());
+        PoPTransactionData popTx2 = new PoPTransactionData("popTxHash2", altPublication2, new ArrayList<>());
+        PoPTransactionData popTx3 = new PoPTransactionData("popTxHash3", altPublication3, new ArrayList<>());
+        PoPTransactionData popTx4 = new PoPTransactionData("popTxHash4", altPublication4, new ArrayList<>());
+        PoPTransactionData popTx5 = new PoPTransactionData("popTxHash5", altPublication5, new ArrayList<>());
+        PoPTransactionData popTx6 = new PoPTransactionData("popTxHash6", altPublication6, new ArrayList<>());
+        PoPTransactionData popTx7 = new PoPTransactionData("popTxHash7", altPublication7, new ArrayList<>());
+        PoPTransactionData popTx8 = new PoPTransactionData("popTxHash8", altPublication8, new ArrayList<>());
 
         popTxStore.addPoPTransaction(popTx1, block1, block1);
         popTxStore.addPoPTransaction(popTx2, block2, block2);
@@ -604,19 +595,19 @@ public class ForkresolutionComparatorTests {
         popTxStore.addPoPTransaction(popTx7, block7, block7);
         popTxStore.addPoPTransaction(popTx8, block8, block8);
 
-        List<AltChainBlock> leftFork = new ArrayList<AltChainBlock>();
+        List<AltChainBlock> leftFork = new ArrayList();
         leftFork.add(block1);
         leftFork.add(block2);
         leftFork.add(block3);
 
-        List<AltChainBlock> rigthFork = new ArrayList<AltChainBlock>();
+        List<AltChainBlock> rigthFork = new ArrayList<>();
         rigthFork.add(block4);
         rigthFork.add(block5);
         rigthFork.add(block6);
         rigthFork.add(block7);
         rigthFork.add(block8);
 
-        Assert.assertEquals(0, compareTwoBranches(leftFork, rigthFork));
+        Assert.assertEquals(0, ForkresolutionComparator.compareTwoBranches(leftFork, rigthFork));
     }
 
 
@@ -662,25 +653,25 @@ public class ForkresolutionComparatorTests {
         }
 
         @Override
-        public List<AltPublication> getAltPublicationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) throws SQLException {
-            Set<AltPublication> altPublications1 = new HashSet<AltPublication>();
+        public List<AltPublication> getAltPublicationsEndorse(AltChainBlock endorsedBlock, List<AltChainBlock> containBlocks) {
+            Set<AltPublication> altPublications1 = new HashSet<>();
             for (AltChainBlock block : containBlocks) {
                 altPublications1.addAll(containingAltPublication.get(block.getHash()));
             }
 
-            Set<AltPublication> altPublications2 = new HashSet<AltPublication>();
+            Set<AltPublication> altPublications2 = new HashSet<>();
             altPublications2.addAll((endoresedAltPublication.get(endorsedBlock.getHash())));
             altPublications2.retainAll(altPublications1);
-            return new ArrayList<AltPublication>(altPublications2);
+            return new ArrayList<>(altPublications2);
         }
 
         @Override
-        public void addPoPTransaction(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) throws SQLException {
+        public void addPoPTransaction(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) {
             List<AltPublication> altPublications = containingAltPublication.get(containingBlock.getHash());
             if (altPublications != null) {
                 altPublications.add(popTx.altPublication);
             } else {
-                altPublications = new ArrayList<AltPublication>();
+                altPublications = new ArrayList<>();
                 altPublications.add(popTx.altPublication);
                 containingAltPublication.put(containingBlock.getHash(), altPublications);
             }
@@ -689,31 +680,31 @@ public class ForkresolutionComparatorTests {
             if (veriBlockPublications != null) {
                 veriBlockPublications.addAll(popTx.veriBlockPublications);
             } else {
-                containingVeriBlockPublication.put(containingBlock.getHash(), new ArrayList<VeriBlockPublication>(popTx.veriBlockPublications));
+                containingVeriBlockPublication.put(containingBlock.getHash(), new ArrayList<>(popTx.veriBlockPublications));
             }
 
             altPublications = endoresedAltPublication.get(endorsedBlock.getHash());
             if (altPublications != null) {
                 altPublications.add(popTx.altPublication);
             } else {
-                altPublications = new ArrayList<AltPublication>();
+                altPublications = new ArrayList<>();
                 altPublications.add(popTx.altPublication);
                 endoresedAltPublication.put(endorsedBlock.getHash(), altPublications);
             }
         }
 
         @Override
-        public List<AltPublication> getAltPublicationsFromBlock(AltChainBlock block) throws SQLException {
+        public List<AltPublication> getAltPublicationsFromBlock(AltChainBlock block) {
             return containingAltPublication.get(block.getHash());
         }
 
         @Override
-        public List<VeriBlockPublication> getVeriBlockPublicationsFromBlock(AltChainBlock block) throws SQLException {
+        public List<VeriBlockPublication> getVeriBlockPublicationsFromBlock(AltChainBlock block) {
             return containingVeriBlockPublication.get(block.getHash());
         }
 
         @Override
-        public void clear() throws SQLException {
+        public void clear() {
             this.containingAltPublication = new TreeMap<String, List<AltPublication>>();
             this.containingVeriBlockPublication = new TreeMap<String, List<VeriBlockPublication>>();
             this.endoresedAltPublication = new TreeMap<String, List<AltPublication>>();
