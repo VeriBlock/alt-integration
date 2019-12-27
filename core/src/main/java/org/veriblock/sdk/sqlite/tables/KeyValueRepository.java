@@ -39,7 +39,7 @@ public class KeyValueRepository {
         }
     }
 
-    public void save(String key, String value) throws SQLException {        
+    public void save(String key, String value) throws SQLException {
         String statement = "REPLACE INTO genericCache ('key', 'value') VALUES(?, ?)";
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
@@ -54,15 +54,15 @@ public class KeyValueRepository {
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
             stmt.setObject(++i, key);
-            ResultSet resultSet = stmt.executeQuery();
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (!resultSet.next()) return null;
 
-            if (!resultSet.next()) return null;
+                String value = resultSet.getString("value");
 
-            String value = resultSet.getString("value");
+                if (!resultSet.next()) return value;
 
-            if (!resultSet.next()) return value;
-
-            throw new SQLException("Not an unique id: " + key);
+                throw new SQLException("Not an unique id: " + key);
+            }
         }
     }
 }
