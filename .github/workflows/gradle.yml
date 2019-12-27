@@ -25,11 +25,3 @@ jobs:
       run: ./gradlew build -x test
     - name: Test
       run: ./gradlew test
-    - name: Collect Coverage
-      run: ./gradlew jacocoTestReport
-    - name: Submit codecov coverage
-      run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
-    - name: Run Sonarqube scanner
-      # run only on push to develop/master
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master'
-      run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }} || true
