@@ -94,7 +94,7 @@ public class BitcoinStoreTest {
     }
 
     @Test
-    public void PutDoesNotUpdateTest() throws SQLException, IOException {
+    public void putDoesNotUpdateTest() throws SQLException, IOException {
         StoredBitcoinBlock updatedStoredBlock1 = new StoredBitcoinBlock(block1, BigInteger.ONE, 0);
         Assert.assertNotEquals(updatedStoredBlock1, storedBlock1);
 

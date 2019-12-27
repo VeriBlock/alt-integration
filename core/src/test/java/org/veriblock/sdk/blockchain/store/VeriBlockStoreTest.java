@@ -88,7 +88,8 @@ public class VeriBlockStoreTest {
             Assert.assertEquals(storedVeriBlockBlockExpected, storedVeriBlockBlockActual);
     }
 
-    public void PutDoesNotUpdateTest() throws SQLException, IOException {
+    @Test
+    public void putDoesNotUpdateTest() throws SQLException, IOException {
         StoredVeriBlockBlock updatedStoredBlock1 = new StoredVeriBlockBlock(block1, BigInteger.ONE);
         Assert.assertNotEquals(updatedStoredBlock1, storedBlock1);
 
