@@ -340,8 +340,8 @@ public class ForkresolutionComparatorTests {
         List<Integer> reducedPulciationView = getReducedPublicationViewTest(blockList);
 
         Assert.assertEquals(2 , reducedPulciationView.size());
-        Assert.assertEquals(new Integer(114), reducedPulciationView.get(0));
-        Assert.assertEquals(new Integer(125), reducedPulciationView.get(1));
+        Assert.assertEquals(Integer.valueOf(114), reducedPulciationView.get(0));
+        Assert.assertEquals(Integer.valueOf(125), reducedPulciationView.get(1));
     }
 
     @Test
