@@ -71,7 +71,11 @@ public class VeriBlockBlockchain {
         this.networkParameters = networkParameters;
         this.temporalStore = new HashMap<>();
     }
-    
+
+    public VeriBlockNetworkParameters getNetworkParameters() {
+        return networkParameters;
+    }
+
     public boolean isValidateBlocksDifficulty() {
         return !skipValidateBlocksDifficulty;
     }

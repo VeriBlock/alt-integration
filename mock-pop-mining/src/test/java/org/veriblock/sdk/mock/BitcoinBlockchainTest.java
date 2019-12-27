@@ -36,6 +36,8 @@ public class BitcoinBlockchainTest {
         blockchain = security.getBitcoinBlockchain();
 
         BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
+        bitcoinStore.clear();
+
         mockchain = new BitcoinBlockchain(BitcoinDefaults.networkParameters, bitcoinStore);
     }
 
