@@ -46,11 +46,11 @@ public class Utils {
             hex = "0" + hex;
         }
         int len = hex.length();
-        
+
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-                    + Character.digit(hex.charAt(i+1), 16));
+                    + Character.digit(hex.charAt(i + 1), 16));
         }
         return data;
     }
@@ -104,7 +104,7 @@ public class Utils {
     }
 
     public static int getCurrentTimestamp() {
-        return (int)Instant.now().getEpochSecond();
+        return (int) Instant.now().getEpochSecond();
     }
 
     public static boolean verifySignature(byte[] payload, byte[] signatureBytes, byte[] publicKeyBytes) {
@@ -141,7 +141,7 @@ public class Utils {
     }
 
     public static byte[] toByteArray(int value) {
-        return new byte[]{(byte)((value & -16777216) >> 24), (byte)((value & 16711680) >> 16), (byte)((value & '\uff00') >> 8), (byte)(value & 255)};
+        return new byte[]{(byte) ((value & -16777216) >> 24), (byte) ((value & 16711680) >> 16), (byte) ((value & '\uff00') >> 8), (byte) (value & 255)};
     }
 
     public static long toLong(byte[] bytes) {
@@ -152,10 +152,10 @@ public class Utils {
 
         return ByteBuffer.wrap(intBytes).getLong();
     }
-    
+
     public static byte[] fillBytes(byte value, int count) {
         byte[] data = new byte[count];
-        for(int i = 0; i < count; i++) data[i] = value;
+        for (int i = 0; i < count; i++) data[i] = value;
         return data;
     }
 
@@ -199,7 +199,10 @@ public class Utils {
     }
 
     public static void sleep(int ms) {
-        try { Thread.sleep(ms); } catch (Exception ignored) { }
+        try {
+            Thread.sleep(ms);
+        } catch (Exception ignored) {
+        }
     }
 
     /**
@@ -221,13 +224,14 @@ public class Utils {
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
+                    + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
     }
 
     /**
      * Note: fails in 2038.
+     *
      * @return Conversion from current time/UNIX epoch (ms) to seconds since Jan 1, 1970.
      */
     public static int getCurrentTimeSeconds() {
@@ -236,8 +240,9 @@ public class Utils {
 
     /**
      * Determines if some number of second have elapsed since a given time
+     *
      * @param origin The timestamp to measure
-     * @param delta The amount of time to measure has elapsed
+     * @param delta  The amount of time to measure has elapsed
      * @return Whether delta has elapsed since origin
      */
     public static boolean hasElapsed(int origin, int delta) {
@@ -246,6 +251,7 @@ public class Utils {
 
     /**
      * Determines whether a provided String is a bit String (a String comprised of all zeroes and ones).
+     *
      * @param toTest String to test
      * @return Whether toTest is a bit String
      */
@@ -324,7 +330,7 @@ public class Utils {
 
 
         for (char c : toTest.toCharArray()) {
-            switch(c) {
+            switch (c) {
                 case '0':
                 case '1':
                 case '2':
@@ -358,7 +364,7 @@ public class Utils {
 
     /**
      * Creates the smallest possible byte array that can hold the number of input.
-     *
+     * <p>
      * For example:
      * Calling this method with 0L will return a byte array: {0x00}
      * Calling this method with 1L will return a byte array: {0x01}
@@ -380,7 +386,7 @@ public class Utils {
 
         byte[] trimmedByteArray = new byte[x];
         for (int i = 0; i < x; i++) {
-            trimmedByteArray[x - i - 1] = (byte)(input);
+            trimmedByteArray[x - i - 1] = (byte) (input);
             input >>= 8;
         }
 
@@ -436,9 +442,13 @@ public class Utils {
         return Base59.decode(base59);
     }
 
-    public static byte[] base64ToBytes(String base64) { return java.util.Base64.getDecoder().decode(base64); }
+    public static byte[] base64ToBytes(String base64) {
+        return java.util.Base64.getDecoder().decode(base64);
+    }
 
-    public static String bytesToBase64(byte[] bytes) { return java.util.Base64.getEncoder().encodeToString(bytes); }
+    public static String bytesToBase64(byte[] bytes) {
+        return java.util.Base64.getEncoder().encodeToString(bytes);
+    }
 
 
     /**
@@ -526,21 +536,27 @@ public class Utils {
     public static boolean isPositive(double toTest) {
         return toTest > 0;
     }
+
     public static boolean isPositive(float toTest) {
         return toTest > 0;
     }
+
     public static boolean isPositive(long toTest) {
         return toTest > 0;
     }
+
     public static boolean isPositive(int toTest) {
         return toTest > 0;
     }
+
     public static boolean isPositive(short toTest) {
         return toTest > 0;
     }
+
     public static boolean isPositive(char toTest) {
         return toTest > 0;
     }
+
     public static boolean isPositive(byte toTest) {
         return toTest > 0;
     }
@@ -944,10 +960,10 @@ public class Utils {
             throw new IllegalArgumentException("byteArrayToInt cannot be called with an input which isn't of length 4!");
         }
 
-        return (((int)input[0] & 0xFF) << 24) |
-                (((int)input[1] & 0xFF) << 16) |
-                (((int)input[2] & 0xFF) <<  8) |
-                (((int)input[3] & 0xFF));
+        return (((int) input[0] & 0xFF) << 24) |
+                (((int) input[1] & 0xFF) << 16) |
+                (((int) input[2] & 0xFF) << 8) |
+                (((int) input[3] & 0xFF));
     }
 
 
@@ -1009,14 +1025,15 @@ public class Utils {
         }
 
         try {
-            if (!new File(fileName).exists())
-            {
-                PrintWriter out = new PrintWriter(new File(fileName));
-                out.println("");
-                out.close();
+            if (!new File(fileName).exists()) {
+                try (PrintWriter out = new PrintWriter(new File(fileName))) {
+                    out.println("");
+                }
             }
             Files.write(Paths.get(fileName), (message + "\n").getBytes(), StandardOpenOption.APPEND);
-        } catch (Exception e) { return false; }
+        } catch (Exception e) {
+            return false;
+        }
         return true;
     }
 
@@ -1029,7 +1046,7 @@ public class Utils {
      * longer than the requested length, it will be returned as-is!
      *
      * @param toPad Hexadecimal string to pad
-     * @param size Length to zero-pad to
+     * @param size  Length to zero-pad to
      * @return A zero-padded version of toPad
      */
     public static String zeroPad(String toPad, int size) {
@@ -1099,6 +1116,7 @@ public class Utils {
     }
 
     private static final String DECIMAL_NUMBER_CHARACTERS = "-0123456789.";
+
     public static boolean isDecimalNumber(String number) {
         if (number == null) {
             throw new IllegalArgumentException("isDecimalNumber cannot be called with a null String!");
