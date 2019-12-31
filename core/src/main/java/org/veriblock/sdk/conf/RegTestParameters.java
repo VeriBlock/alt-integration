@@ -11,11 +11,9 @@ package org.veriblock.sdk.conf;
 import java.math.BigInteger;
 
 public class RegTestParameters implements VeriBlockNetworkParameters {
-    private static final BigInteger MINIMUM_POW_DIFFICULTY = new BigInteger("1");
-
     @Override
     public BigInteger getMinimumDifficulty() {
-        return MINIMUM_POW_DIFFICULTY;
+        return BigInteger.ONE;
     }
 
     @Override
