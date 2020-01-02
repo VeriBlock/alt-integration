@@ -16,7 +16,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ContainRepository {
-
     private Connection connectionSource;
 
     public static final String tableName = "contain";
@@ -28,9 +27,7 @@ public class ContainRepository {
     public ContainRepository(Connection connection) throws SQLException {
         this.connectionSource = connection;
 
-        Statement stmt = null;
-        try{
-            stmt = connectionSource.createStatement();
+        try(Statement stmt = connectionSource.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName
                     + "(\n "
                     + txHashColumnName + " TEXT NOT NULL,\n "
@@ -42,18 +39,9 @@ public class ContainRepository {
                     + " REFERENCES " + PoPTransactionsRepository.tableName + " (" + PoPTransactionsRepository.txHashColumnName + ")\n "
                     + ");");
         }
-        finally{
-            if(stmt != null) stmt.close();
-            stmt = null;
-        }
 
-        try {
-            stmt = connectionSource.createStatement();
+        try(Statement stmt = connectionSource.createStatement()) {
             stmt.execute("PRAGMA journal_mode=WAL;");
-        } finally {
-            if(stmt != null) {
-                stmt.close();
-            }
         }
     }
 
@@ -71,20 +59,15 @@ public class ContainRepository {
     }
 
     public void save(String txHash, AltChainBlock containingBlock) throws SQLException {
-        PreparedStatement stmt = null;
-        try {
-            stmt = connectionSource.prepareStatement("REPLACE INTO contain (tx_hash, block_hash, block_height, block_timestamp) " +
-                    "VALUES(?, ?, ?, ?)");
+        String sql = "REPLACE INTO contain (tx_hash, block_hash, block_height, block_timestamp) " +
+                "VALUES(?, ?, ?, ?)";
+        try(PreparedStatement stmt = connectionSource.prepareStatement(sql)) {
             int i = 0;
             stmt.setObject(++i, txHash);
             stmt.setObject(++i, containingBlock.getHash());
             stmt.setLong(++i, containingBlock.getHeight());
             stmt.setLong(++i, containingBlock.getTimestamp());
             stmt.execute();
-        } finally {
-            if(stmt != null){
-                stmt.close();
-            }
         }
     }
 }
