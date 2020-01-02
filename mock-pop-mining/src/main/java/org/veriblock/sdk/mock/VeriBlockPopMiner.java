@@ -159,7 +159,7 @@ public class VeriBlockPopMiner {
 
         // create a VTB
 
-        List<VeriBlockBlock> context = createVeriBlockContext(lastKnownVBKBlock);;
+        List<VeriBlockBlock> context = createVeriBlockContext(lastKnownVBKBlock);
 
         return new VeriBlockPublication(popTx,
                                         blockData.getPoPMerklePath(0),
