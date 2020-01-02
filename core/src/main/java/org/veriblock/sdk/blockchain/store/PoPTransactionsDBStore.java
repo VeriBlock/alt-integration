@@ -69,7 +69,7 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
         String altPublicationHash = altPublicationRepo.save(popTx.altPublication);
 
         popTxRepo.save(popTx.txHash, endorsedBlock.getHash(), altPublicationHash);
-        containRepo.save(popTx.txHash, containingBlock.getHash());
+        containRepo.save(popTx.txHash, containingBlock);
 
         for (VeriBlockPublication publication : popTx.veriBlockPublications) {
             String veriBlockPublicationHash = veriBlockPublicationRepo.save(publication);
@@ -122,6 +122,28 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
                 " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.txHashColumnName +
                 " = " + ContainRepository.tableName + "." + ContainRepository.txHashColumnName +
                 " WHERE " + ContainRepository.tableName + "." + ContainRepository.blockHashColumnName + " = '" + block.getHash() + "'")) {
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    resultData.add(SerializeDeserializeService.parseAltPublication(resultSet.getBytes(AltPublicationRepository.altPublicationDataColumnName)));
+                }
+            }
+        }
+
+        return resultData;
+    }
+
+    public List<AltPublication> getAltPublicationsFromBlockHeight(long height) throws SQLException {
+        List<AltPublication> resultData = new ArrayList<AltPublication>();
+
+        try (PreparedStatement stmt = connectionResource.prepareStatement(" SELECT DISTINCT " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationDataColumnName +
+                " FROM " + PoPTransactionsRepository.tableName + " LEFT JOIN " + AltPublicationRepository.tableName +
+                " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.altPublicationHashColumnName +
+                " = " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationHash +
+                " LEFT JOIN " + ContainRepository.tableName +
+                " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.txHashColumnName +
+                " = " + ContainRepository.tableName + "." + ContainRepository.txHashColumnName +
+                " WHERE " + ContainRepository.tableName + "." + ContainRepository.blockHeightColumnName + " >= '" + height + "'")) {
 
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
