@@ -55,8 +55,8 @@ public class ContainRepository {
     }
 
     public void save(String txHash, AltChainBlock containingBlock) throws SQLException {
-        String sql = "REPLACE INTO contain (tx_hash, block_hash, block_height, block_timestamp) " +
-                "VALUES(?, ?, ?, ?)";
+        String sql = String.format("REPLACE INTO %s (%s, %s, %s, %s) VALUES(?, ?, ?, ?)", tableName,
+                txHashColumnName, blockHashColumnName, blockHeightColumnName, blockTimestampColumnName);
         try(PreparedStatement stmt = connectionSource.prepareStatement(sql)) {
             int i = 0;
             stmt.setObject(++i, txHash);
