@@ -9,7 +9,6 @@
 
 package org.veriblock.sdk.forkresolution;
 
-import org.veriblock.sdk.Context;
 import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.models.AltChainBlock;
@@ -36,8 +35,7 @@ public class ForkresolutionComparator {
 
     public static VeriBlockSecurity getSecurity() { return security; }
 
-    public static void setSecurity(VeriBlockSecurity security)
-    {
+    public static void setSecurity(VeriBlockSecurity security) {
         ForkresolutionComparator.security = security;
         ForkresolutionComparator.popTxStore = security.getContext().getPopTxStore();
     }
@@ -45,8 +43,7 @@ public class ForkresolutionComparator {
     // return 1 if leftBranchScore > rightBranchScore
     // return -1 if leftBranchScore < rightBranchScore
     // return 0 if leftBranchScore == rightBranchScore
-    public static int compareTwoBranches(List<AltChainBlock> leftBranch, List<AltChainBlock> rightBranch) throws SQLException
-    {
+    public static int compareTwoBranches(List<AltChainBlock> leftBranch, List<AltChainBlock> rightBranch) throws SQLException {
         Collections.sort(leftBranch);  // make the ascending order for the blocks in the collection, it needs for the fork resolution
         Collections.sort(rightBranch);
 
