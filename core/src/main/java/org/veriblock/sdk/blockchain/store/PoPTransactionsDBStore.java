@@ -26,7 +26,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PoPTransactionsDBStore implements PoPTransactionStore {
     private static final Logger log = LoggerFactory.getLogger(PoPTransactionsDBStore.class);
@@ -65,11 +67,27 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
         }
     }
 
+    public AltChainBlock findFirstCommonKeystone(List<AltChainBlock> keyStones){
+        List<AltChainBlock> sorted = keyStones.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+
+        for (AltChainBlock keyStone : sorted) {
+            try {
+                boolean isExist = containRepo.isExist(keyStone);
+                if(isExist){
+                    return keyStone;
+                }
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        return null;
+    }
+
     public void addPoPTransaction(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) throws SQLException {
         String altPublicationHash = altPublicationRepo.save(popTx.altPublication);
 
         popTxRepo.save(popTx.txHash, endorsedBlock.getHash(), altPublicationHash);
-        containRepo.save(popTx.txHash, containingBlock.getHash());
+        containRepo.save(popTx.txHash, containingBlock);
 
         for (VeriBlockPublication publication : popTx.veriBlockPublications) {
             String veriBlockPublicationHash = veriBlockPublicationRepo.save(publication);
@@ -123,6 +141,29 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
                 " = " + ContainRepository.tableName + "." + ContainRepository.txHashColumnName +
                 " WHERE " + ContainRepository.tableName + "." + ContainRepository.blockHashColumnName + " = '" + block.getHash() + "'")) {
 
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    resultData.add(SerializeDeserializeService.parseAltPublication(resultSet.getBytes(AltPublicationRepository.altPublicationDataColumnName)));
+                }
+            }
+        }
+
+        return resultData;
+    }
+
+    public List<AltPublication> getAltPublicationsFromBlockHeight(long height) throws SQLException {
+        List<AltPublication> resultData = new ArrayList<AltPublication>();
+        String sql = " SELECT DISTINCT " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationDataColumnName +
+                " FROM " + PoPTransactionsRepository.tableName + " LEFT JOIN " + AltPublicationRepository.tableName +
+                " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.altPublicationHashColumnName +
+                " = " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationHash +
+                " LEFT JOIN " + ContainRepository.tableName +
+                " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.txHashColumnName +
+                " = " + ContainRepository.tableName + "." + ContainRepository.txHashColumnName +
+                " WHERE " + ContainRepository.tableName + "." + ContainRepository.blockHeightColumnName + " >= " + height + "";
+
+
+        try (PreparedStatement stmt = connectionResource.prepareStatement(sql)) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
                     resultData.add(SerializeDeserializeService.parseAltPublication(resultSet.getBytes(AltPublicationRepository.altPublicationDataColumnName)));
