@@ -12,8 +12,11 @@ import org.veriblock.sdk.models.AltChainBlock;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ContainRepository {
     private Connection connectionSource;
@@ -46,15 +49,8 @@ public class ContainRepository {
     }
 
     public void clear() throws SQLException {
-        Statement stmt = null;
-        try{
-            stmt = connectionSource.createStatement();
+        try(Statement stmt = connectionSource.createStatement()){
             stmt.execute( "DELETE FROM " + tableName);
-        }
-        finally {
-            if(stmt != null) {
-                stmt.close();
-            }
         }
     }
 
@@ -66,8 +62,50 @@ public class ContainRepository {
             stmt.setObject(++i, txHash);
             stmt.setObject(++i, containingBlock.getHash());
             stmt.setLong(++i, containingBlock.getHeight());
-            stmt.setLong(++i, containingBlock.getTimestamp());
+            stmt.setInt(++i, containingBlock.getTimestamp());
             stmt.execute();
         }
+    }
+
+    public boolean isExist(AltChainBlock altChainBlock) throws SQLException {
+        return get(altChainBlock.getHash()) != null;
+    }
+
+    public AltChainBlock get(String hash) throws SQLException {
+        AltChainBlock altChainBlock = null;
+
+        String sql = "SELECT * FROM " + tableName + " WHERE " + blockHashColumnName + "  = ?";
+        try (PreparedStatement stmt = connectionSource.prepareStatement(sql)) {
+            int i = 0;
+            stmt.setObject(++i, hash);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (!resultSet.isClosed()) {
+                    altChainBlock = mapper(resultSet);
+                }
+            }
+        }
+        return altChainBlock;
+    }
+
+    public List<AltChainBlock> getAllFromHeight(Long height) throws SQLException {
+        List<AltChainBlock> altChainBlock = new ArrayList<>();
+
+        String sql = "SELECT * FROM " + tableName + " WHERE " + blockHeightColumnName + " >= ?";
+        try (PreparedStatement stmt = connectionSource.prepareStatement(sql)) {
+            int i = 0;
+            stmt.setLong(++i, height);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    altChainBlock.add(mapper(resultSet));
+                }
+            }
+        }
+        return altChainBlock;
+    }
+
+    private AltChainBlock mapper(ResultSet resultSet) throws SQLException {
+        return new AltChainBlock(resultSet.getString(blockHashColumnName), resultSet.getLong(blockHeightColumnName), resultSet.getInt(blockTimestampColumnName));
     }
 }
