@@ -20,10 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.veriblock.sdk.VeriBlockSecurity;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
-import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.models.VeriBlockBlock;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
 
 public class VeriBlockBlockchainTest {
 
@@ -33,16 +30,13 @@ public class VeriBlockBlockchainTest {
 
     @Before
     public void setUp() throws IOException, SQLException {
-        SecurityFactory factory = new SecurityFactory();
-        security = factory.createInstance();
+        SecurityFactory securityFactory = new SecurityFactory();
+        security = securityFactory.createInstance();
 
         blockchain = security.getVeriBlockBlockchain();
 
-        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
-        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
-        veriBlockStore.clear();
-        bitcoinStore.clear();
-        mockchain = new VeriBlockBlockchain(VeriBlockDefaults.networkParameters, veriBlockStore, bitcoinStore);
+        MockFactory mockFactory = new MockFactory();
+        mockchain = mockFactory.getVeriBlockBlockchain();
     }
 
     @After
