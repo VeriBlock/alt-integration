@@ -17,10 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.veriblock.sdk.VeriBlockSecurity;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.models.BitcoinBlock;
-import org.veriblock.sdk.models.Sha256Hash;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
 
 public class BitcoinBlockchainTest {
 
@@ -35,10 +32,8 @@ public class BitcoinBlockchainTest {
 
         blockchain = security.getBitcoinBlockchain();
 
-        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
-        bitcoinStore.clear();
-
-        mockchain = new BitcoinBlockchain(BitcoinDefaults.networkParameters, bitcoinStore);
+        MockFactory mockFactory = new MockFactory();
+        mockchain = mockFactory.getBitcoinBlockchain();
     }
 
     @After

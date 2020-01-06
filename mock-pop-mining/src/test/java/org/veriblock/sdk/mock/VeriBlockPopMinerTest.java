@@ -26,11 +26,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.veriblock.sdk.VeriBlockSecurity;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
-import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.models.BlockIndex;
 import org.veriblock.sdk.models.VeriBlockPublication;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.util.KeyGenerator;
 
 public class VeriBlockPopMinerTest {
@@ -43,14 +40,8 @@ public class VeriBlockPopMinerTest {
         SecurityFactory factory = new SecurityFactory();
         security = factory.createInstance();
 
-        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
-        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
-        veriBlockStore.clear();
-        bitcoinStore.clear();
-        VeriBlockBlockchain mockVeriBlock = new VeriBlockBlockchain(VeriBlockDefaults.networkParameters, veriBlockStore, bitcoinStore);
-        BitcoinBlockchain mockBitcoin = new BitcoinBlockchain(BitcoinDefaults.networkParameters, bitcoinStore);
-        
-        vpm = new VeriBlockPopMiner(mockVeriBlock, mockBitcoin);
+        MockFactory mockFactory = new MockFactory();
+        vpm = mockFactory.getVeriBlockPopMiner();
     }
 
     @After
