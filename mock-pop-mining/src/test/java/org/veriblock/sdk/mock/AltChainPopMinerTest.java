@@ -24,12 +24,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.veriblock.sdk.VeriBlockSecurity;
-import org.veriblock.sdk.blockchain.store.BitcoinStore;
-import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.BlockIndex;
 import org.veriblock.sdk.models.PublicationData;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.util.KeyGenerator;
 
 public class AltChainPopMinerTest {
@@ -42,13 +39,8 @@ public class AltChainPopMinerTest {
         SecurityFactory factory = new SecurityFactory();
         security = factory.createInstance();
 
-        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
-        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
-        veriBlockStore.clear();
-        bitcoinStore.clear();
-        VeriBlockBlockchain mockVeriBlock = new VeriBlockBlockchain(VeriBlockDefaults.networkParameters, veriBlockStore, bitcoinStore);
-
-        apm = new AltChainPopMiner(mockVeriBlock);
+        MockFactory mockFactory = new MockFactory();
+        apm = mockFactory.getAltChainPopMiner();
     }
 
     @After
