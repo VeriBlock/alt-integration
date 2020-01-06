@@ -36,7 +36,7 @@ public class VeriBlockPopMiner {
     private final BitcoinBlockchain bitcoinBlockchain;
     private final VeriBlockBlockchain veriblockBlockchain;
 
-    VeriBlockPopMiner(VeriBlockBlockchain veriblockBlockchain, BitcoinBlockchain bitcoinBlockchain) {
+    public VeriBlockPopMiner(VeriBlockBlockchain veriblockBlockchain, BitcoinBlockchain bitcoinBlockchain) {
         this.bitcoinBlockchain = bitcoinBlockchain;
         this.veriblockBlockchain = veriblockBlockchain;
     }
