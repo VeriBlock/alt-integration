@@ -35,7 +35,7 @@ import org.veriblock.sdk.util.Utils;
 public class AltChainPopMiner {
     private final VeriBlockBlockchain veriblockBlockchain;
 
-    AltChainPopMiner(VeriBlockBlockchain veriblockBlockchain) {
+    public AltChainPopMiner(VeriBlockBlockchain veriblockBlockchain) {
         this.veriblockBlockchain = veriblockBlockchain;
     }
 
