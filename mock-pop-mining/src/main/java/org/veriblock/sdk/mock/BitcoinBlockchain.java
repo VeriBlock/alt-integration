@@ -37,7 +37,7 @@ public class BitcoinBlockchain extends org.veriblock.sdk.blockchain.BitcoinBlock
                 BitcoinBlock newBlock = new BitcoinBlock(
                     chainHead.getVersion(),
                     chainHead.getHash(),
-                    blockData.getMerkleRoot(),
+                    blockData.getMerkleRoot().getReversed(),
                     Utils.getCurrentTimestamp(),
                     // FIXME: remove the hardcoded regtest difficulty adjustment
                     // use the difficulty calculator to set the correct difficulty

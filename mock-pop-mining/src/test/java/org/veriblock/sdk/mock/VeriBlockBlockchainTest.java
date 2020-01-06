@@ -40,6 +40,8 @@ public class VeriBlockBlockchainTest {
 
         VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
         BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
+        veriBlockStore.clear();
+        bitcoinStore.clear();
         mockchain = new VeriBlockBlockchain(VeriBlockDefaults.networkParameters, veriBlockStore, bitcoinStore);
     }
 
