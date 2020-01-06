@@ -26,6 +26,8 @@ public class MockFactory {
     private final AltChainPopMiner apm;
     private final VeriBlockPopMiner vpm;
 
+    private final PoPMiningCoordinator coordinator;
+
     public MockFactory(VeriBlockNetworkParameters veriblockNetworkParameters, BitcoinNetworkParameters bitcoinNetworkParameters) throws SQLException {
         veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
         bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
@@ -37,6 +39,8 @@ public class MockFactory {
 
         apm = new AltChainPopMiner(veriBlockBlockchain);
         vpm = new VeriBlockPopMiner(veriBlockBlockchain, bitcoinBlockchain);
+
+        coordinator = new PoPMiningCoordinator(apm, vpm);
     }
 
     public MockFactory() throws SQLException {
@@ -57,6 +61,10 @@ public class MockFactory {
 
     public VeriBlockPopMiner getVeriBlockPopMiner() {
         return vpm;
+    }
+
+    public PoPMiningCoordinator getCoordinator() {
+        return coordinator;
     }
 
 }
