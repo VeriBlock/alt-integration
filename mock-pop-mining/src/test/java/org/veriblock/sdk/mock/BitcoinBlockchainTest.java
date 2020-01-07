@@ -51,7 +51,7 @@ public class BitcoinBlockchainTest {
         mockchain.bootstrap(BitcoinDefaults.bootstrap);
         blockchain.bootstrap(BitcoinDefaults.bootstrap);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             BitcoinBlock block = mockchain.mine(new BitcoinBlockData());
             blockchain.add(block);
         }
