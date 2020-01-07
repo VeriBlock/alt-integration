@@ -84,15 +84,19 @@ public class VeriBlockBlockchain extends org.veriblock.sdk.blockchain.VeriBlockB
         VBlakeHash previousKeystone = getPreviousKeystoneForNewBlock();
         VBlakeHash secondPreviousKeystone = getSecondPreviousKeystoneForNewBlock();
 
+        int timestamp = 0;
+
         for (int nonce = 0; nonce < Integer.MAX_VALUE; nonce++) {
             try {
+                timestamp = Math.max(timestamp, Utils.getCurrentTimestamp());
+
                 VeriBlockBlock newBlock = new VeriBlockBlock(blockHeight,
                                                             chainHead.getVersion(),
                                                             chainHead.getHash().trimToPreviousBlockSize(),
                                                             previousKeystone,
                                                             secondPreviousKeystone,
                                                             blockData.getMerkleRoot(),
-                                                            Utils.getCurrentTimestamp(),
+                                                            timestamp,
                                                             // FIXME: use the difficulty calculator to set the correct difficulty
                                                             chainHead.getDifficulty(),
                                                             nonce);
@@ -105,6 +109,17 @@ public class VeriBlockBlockchain extends org.veriblock.sdk.blockchain.VeriBlockB
                 return newBlock;
 
             } catch (VerificationException e) {
+                // FIXME: refactoring checkTimestamp() would make this less ugly
+                // if too many blocks are mined per second, we have to adjust the timestamp slightly
+                if (e.getMessage().equals("Block is too far in the past")) {
+                    timestamp++;
+
+                // FIXME: refactoring checkProofOfWork() would make this less ugly
+                // suppress this specific exception as it's just a signal
+                // that the block hash does not match the block difficulty
+                } else if (!e.getMessage().startsWith("Block hash is higher than target")) {
+                    throw e;
+                }
             }
         }
         throw new RuntimeException("Failed to mine the block due to too high difficulty");

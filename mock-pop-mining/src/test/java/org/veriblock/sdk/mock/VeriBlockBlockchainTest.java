@@ -54,11 +54,11 @@ public class VeriBlockBlockchainTest {
     public void miningTest() throws SQLException {
         // FIXME: turn on difficulty checking after refactoring the calculator
         blockchain.setSkipValidateBlocksDifficulty(true);
-        
+
         mockchain.bootstrap(VeriBlockDefaults.bootstrap);
         blockchain.bootstrap(VeriBlockDefaults.bootstrap);
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
             VeriBlockBlock block = mockchain.mine(new VeriBlockBlockData());
             blockchain.add(block);
         }
