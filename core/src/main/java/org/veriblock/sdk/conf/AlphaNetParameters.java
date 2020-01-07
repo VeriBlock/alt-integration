@@ -22,4 +22,9 @@ public class AlphaNetParameters implements VeriBlockNetworkParameters {
     public Byte getTransactionMagicByte() {
         return (byte)0xAA;
     }
+
+    @Override
+    public boolean getPowNoRetargeting() {
+        return false;
+    }
 }

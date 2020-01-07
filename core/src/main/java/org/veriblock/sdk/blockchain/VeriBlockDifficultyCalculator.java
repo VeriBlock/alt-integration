@@ -29,7 +29,7 @@ public strictfp class VeriBlockDifficultyCalculator {
 
     public static BigInteger calculate(VeriBlockNetworkParameters networkParameters,
                                        VeriBlockBlock lastBlock, List<VeriBlockBlock> context) {
-        if (lastBlock.getHeight() < N) {
+        if (lastBlock.getHeight() < N || networkParameters.getPowNoRetargeting()) {
             return BitcoinUtils.decodeCompactBits(lastBlock.getDifficulty());
         }
 

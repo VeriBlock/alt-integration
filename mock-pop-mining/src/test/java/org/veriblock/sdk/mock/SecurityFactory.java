@@ -28,8 +28,7 @@ public class SecurityFactory {
     private final BitcoinNetworkParameters bitcoinNetworkParameters;
 
     public SecurityFactory() {
-        veriblockNetworkParameters = new MainNetParameters();
-        bitcoinNetworkParameters = new BitcoinMainNetParameters();
+        this(VeriBlockDefaults.networkParameters, BitcoinDefaults.networkParameters);
     }
 
     public SecurityFactory(VeriBlockNetworkParameters veriblockNetworkParameters,

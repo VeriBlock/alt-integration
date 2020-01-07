@@ -13,4 +13,5 @@ import java.math.BigInteger;
 public interface VeriBlockNetworkParameters {
     BigInteger getMinimumDifficulty();
     Byte getTransactionMagicByte();
+    boolean getPowNoRetargeting();
 }
