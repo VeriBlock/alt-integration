@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.veriblock.sdk.VeriBlockSecurity;
+import org.veriblock.sdk.blockchain.VeriBlockDifficultyCalculator;
 import org.veriblock.sdk.models.VeriBlockBlock;
 
 public class VeriBlockBlockchainTest {
@@ -46,13 +47,10 @@ public class VeriBlockBlockchainTest {
 
     @Test
     public void miningTest() throws SQLException {
-        // FIXME: turn on difficulty checking after refactoring the calculator
-        blockchain.setSkipValidateBlocksDifficulty(true);
-
         mockchain.bootstrap(VeriBlockDefaults.bootstrap);
         blockchain.bootstrap(VeriBlockDefaults.bootstrap);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < VeriBlockDifficultyCalculator.RETARGET_PERIOD + 10; i++) {
             VeriBlockBlock block = mockchain.mine(new VeriBlockBlockData());
             blockchain.add(block);
         }

@@ -51,9 +51,6 @@ public class VeriBlockPopMinerTest {
 
     @Test
     public void miningTest() throws SQLException, SignatureException, InvalidKeyException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        // FIXME: turn on difficulty checking after refactoring the calculator
-        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(true);
-
         vpm.getBitcoinBlockchain().bootstrap(BitcoinDefaults.bootstrap);
         vpm.getVeriBlockBlockchain().bootstrap(VeriBlockDefaults.bootstrap);
 

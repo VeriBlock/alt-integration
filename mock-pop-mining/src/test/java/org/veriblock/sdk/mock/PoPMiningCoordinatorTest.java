@@ -50,9 +50,6 @@ public class PoPMiningCoordinatorTest {
 
     @Test
     public void miningTest() throws SQLException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
-        // FIXME: turn on difficulty validation after refactoring the calculator
-        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(true);
-
         coordinator.getVeriBlockPopMiner().getVeriBlockBlockchain().bootstrap(VeriBlockDefaults.bootstrap);
         coordinator.getVeriBlockPopMiner().getBitcoinBlockchain().bootstrap(BitcoinDefaults.bootstrap);
 

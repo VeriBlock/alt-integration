@@ -20,4 +20,9 @@ public class RegTestParameters implements VeriBlockNetworkParameters {
     public Byte getTransactionMagicByte() {
         return (byte)0xBB;
     }
+
+    @Override
+    public boolean getPowNoRetargeting() {
+        return true;
+    }
 }
