@@ -50,14 +50,9 @@ public class AltChainPopMinerTest {
 
     @Test
     public void miningTest() throws SQLException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
-        // FIXME: turn on difficulty validation after refactoring the calculator
-        security.getVeriBlockBlockchain().setSkipValidateBlocksDifficulty(true);
-
-
         apm.getVeriBlockBlockchain().bootstrap(VeriBlockDefaults.bootstrap);
 
         security.getVeriBlockBlockchain().bootstrap(VeriBlockDefaults.bootstrap);
-        security.getBitcoinBlockchain().bootstrap(BitcoinDefaults.bootstrap);
 
         KeyPair key = KeyGenerator.generate();
 

@@ -23,6 +23,7 @@ import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.conf.BitcoinRegTestParameters;
 import org.veriblock.sdk.conf.BitcoinTestNetParameters;
 import org.veriblock.sdk.conf.MainNetParameters;
+import org.veriblock.sdk.conf.RegTestParameters;
 import org.veriblock.sdk.conf.TestNetParameters;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.forkresolution.ForkresolutionConfig;
@@ -70,6 +71,8 @@ public class ConfigurationParser {
             return new TestNetParameters();
         } else if (preset.equalsIgnoreCase("alpha")) {
             return new AlphaNetParameters();
+        } else if (preset.equalsIgnoreCase("regtest")) {
+            return new RegTestParameters();
         } else if (preset.equalsIgnoreCase("custom")) {
             return getCustomVeriblockNetworkParameters();
         }
@@ -80,6 +83,7 @@ public class ConfigurationParser {
     private VeriBlockNetworkParameters getCustomVeriblockNetworkParameters() {
         String minDifficulty = properties.getProperty("veriblock.blockchain.minimumDifficulty");
         String txMagicByte = properties.getProperty("veriblock.blockchain.transactionMagicByte");
+        String powNoRetargeting = properties.getProperty("veriblock.blockchain.powNoRetargeting");
 
         byte[] magicBytes = txMagicByte == null ? new byte[0] : Utils.decodeHex(txMagicByte);
 
@@ -93,12 +97,19 @@ public class ConfigurationParser {
             throw new AltConfigurationException("veriblock.blockchain.minimumDifficulty is required");
         }
 
+        if (powNoRetargeting == null){
+            throw new AltConfigurationException("veriblock.blockchain.powNoRetargeting is required");
+        }
+
         return new VeriBlockNetworkParameters() {
                     public BigInteger getMinimumDifficulty() {
                         return new BigInteger(minDifficulty);
                     }
                     public Byte getTransactionMagicByte() {
                         return magicByte;
+                    }
+                    public boolean getPowNoRetargeting() {
+                        return Boolean.parseBoolean(powNoRetargeting);
                     }
                 };
     }

@@ -22,4 +22,9 @@ public class MainNetParameters implements VeriBlockNetworkParameters {
     public Byte getTransactionMagicByte() {
         return null;
     }
+
+    @Override
+    public boolean getPowNoRetargeting() {
+        return false;
+    }
 }
