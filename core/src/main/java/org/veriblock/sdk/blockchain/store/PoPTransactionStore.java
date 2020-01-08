@@ -8,26 +8,12 @@
 
 package org.veriblock.sdk.blockchain.store;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.models.AltChainBlock;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.VeriBlockPublication;
-import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.sqlite.ConnectionSelector;
-import org.veriblock.sdk.sqlite.tables.AltPublicationRepository;
-import org.veriblock.sdk.sqlite.tables.ContainRepository;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
-import org.veriblock.sdk.sqlite.tables.PoPTransactionsRepository;
-import org.veriblock.sdk.sqlite.tables.PoPTransactionsVeriblockPublicationRefRepository;
-import org.veriblock.sdk.sqlite.tables.VeriBlockPublicationRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface PoPTransactionStore {
@@ -76,4 +62,20 @@ public interface PoPTransactionStore {
      * @throws SQLException
      */
     List<VeriBlockPublication> getVeriBlockPublicationsFromBlock(AltChainBlock block) throws SQLException;
+
+    /**
+     * Retrieve AltPublications(ATVs) from the given block height
+     * @param height the block height to retrieve ATVs from
+     * @return the list of AltPublications
+     * @throws SQLException
+     */
+    List<AltPublication> getAltPublicationsFromBlockHeight(long height) throws SQLException;
+
+    /**
+     * Retrieve common keyStone, or null.
+     * @param keyStones keyStone list
+     * @return first common keyStone.
+     * @throws SQLException
+     */
+    AltChainBlock findFirstCommonKeystone(List<AltChainBlock> keyStones);
 }
