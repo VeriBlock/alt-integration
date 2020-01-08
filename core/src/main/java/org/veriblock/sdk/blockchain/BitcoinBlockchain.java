@@ -39,7 +39,6 @@ public class BitcoinBlockchain {
     private static final Logger log = LoggerFactory.getLogger(BitcoinBlockchain.class);
 
     private static final int MINIMUM_TIMESTAMP_BLOCK_COUNT = 11;
-    private static final int DIFFICULTY_ADJUST_BLOCK_COUNT = 2016;
 
     private final BlockStore<StoredBitcoinBlock, Sha256Hash> store;
     private final BitcoinNetworkParameters networkParameters;
@@ -339,7 +338,7 @@ public class BitcoinBlockchain {
                         previous = getInternal(previous.getBlock().getPreviousBlock());
                     }
 
-                    // Corner case: we're less than DIFFICULTY_ADJUST_BLOCK_COUNT
+                    // Corner case: we're less than difficultyAdjustmentInterval
                     // from the bootstrap and all blocks are minimum difficulty
                     if (previous == null) return;
 
@@ -353,16 +352,16 @@ public class BitcoinBlockchain {
 
             // Difficulty needs to adjust
 
-            List<StoredBitcoinBlock> tempBlocks = getTemporaryBlocks(previous.getHash(), DIFFICULTY_ADJUST_BLOCK_COUNT);
+            List<StoredBitcoinBlock> tempBlocks = getTemporaryBlocks(previous.getHash(), difficultyAdjustmentInterval);
 
             StoredBitcoinBlock cycleStart;
-            if (tempBlocks.size() == DIFFICULTY_ADJUST_BLOCK_COUNT) {
+            if (tempBlocks.size() == difficultyAdjustmentInterval) {
                 cycleStart = tempBlocks.get(tempBlocks.size() - 1);
             } else if (tempBlocks.size() > 0) {
                 StoredBitcoinBlock last = tempBlocks.get(tempBlocks.size() - 1);
-                cycleStart = store.getFromChain(last.getBlock().getPreviousBlock(), DIFFICULTY_ADJUST_BLOCK_COUNT - tempBlocks.size());
+                cycleStart = store.getFromChain(last.getBlock().getPreviousBlock(), difficultyAdjustmentInterval - tempBlocks.size());
             } else {
-                cycleStart = store.getFromChain(previous.getHash(), DIFFICULTY_ADJUST_BLOCK_COUNT - 1);
+                cycleStart = store.getFromChain(previous.getHash(), difficultyAdjustmentInterval - 1);
             }
 
             if (cycleStart == null) {
@@ -371,7 +370,7 @@ public class BitcoinBlockchain {
                 return;
             }
 
-            BigInteger newTarget = BitcoinUtils.calculateNewTarget(
+            BigInteger newTarget = calculateNewTarget(
                     BitcoinUtils.decodeCompactBits(previous.getBlock().getBits()),
                     cycleStart.getBlock().getTimestamp(),
                     previous.getBlock().getTimestamp());
@@ -388,6 +387,21 @@ public class BitcoinBlockchain {
                 throw new VerificationException("Block does not match computed difficulty adjustment");
             }
         }
+    }
+
+    private BigInteger calculateNewTarget(BigInteger current, int startTimestamp, int endTimestamp) {
+        int elapsed = endTimestamp - startTimestamp;
+
+        elapsed = Math.max(elapsed, networkParameters.getPowTargetTimespan() / 4);
+        elapsed = Math.min(elapsed, networkParameters.getPowTargetTimespan() * 4);
+
+        BigInteger newTarget = current.multiply(BigInteger.valueOf(elapsed))
+                                      .divide(BigInteger.valueOf(networkParameters.getPowTargetTimespan()));
+
+        // Should never occur; hitting the max target would mean Bitcoin has the hashrate of a few CPUs
+        newTarget = newTarget.min(networkParameters.getPowLimit());
+
+        return newTarget;
     }
 
     // Returns true if the store was empty and the bootstrap

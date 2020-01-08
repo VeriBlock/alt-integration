@@ -37,9 +37,6 @@ import java.util.Arrays;
  *
  */
 public class BitcoinUtils {
-    private static final int TARGET_BITCOIN_TIMESPAN = 60 * 60 * 24 * 14;
-    private static final BigInteger MAX_TARGET = decodeCompactBits(0x1d00ffffL);
-
     /**
      * Returns the difficulty target as a 256 bit value that can be compared to a SHA-256 hash. Inside a block the
      * target is represented using a compact form.
@@ -100,28 +97,6 @@ public class BitcoinUtils {
         return result;
     }
 
-    public static BigInteger calculateNewTarget(BigInteger current, int startTimestamp, int endTimestamp) {
-        int elapsed = endTimestamp - startTimestamp;
-        if (elapsed < TARGET_BITCOIN_TIMESPAN / 4) {
-            elapsed = TARGET_BITCOIN_TIMESPAN / 4;
-        }
-
-        if (elapsed > TARGET_BITCOIN_TIMESPAN * 4) {
-            elapsed = TARGET_BITCOIN_TIMESPAN * 4;
-        }
-
-        BigInteger newTarget = current;
-        newTarget = newTarget.multiply(BigInteger.valueOf(elapsed));
-        newTarget = newTarget.divide(BigInteger.valueOf(TARGET_BITCOIN_TIMESPAN));
-
-        // Should never occur; hitting max target would mean Bitcoin has the hashrate of a few CPUs
-        if (newTarget.compareTo(MAX_TARGET) > 0) {
-            newTarget = MAX_TARGET;
-        }
-
-        return newTarget;
-    }
-    
     // use this method to get the PoW for the block higher than any possible block hash
     // this bits value is equal to very low difficulty for the block mining
     public static int bitcoinVeryHighPowEncodeToBits() {
