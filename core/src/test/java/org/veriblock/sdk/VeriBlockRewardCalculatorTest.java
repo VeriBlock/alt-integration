@@ -8,28 +8,14 @@
 
 package org.veriblock.sdk;
 
-import static org.veriblock.sdk.rewards.PopRewardCalculator.calculatePopScoreFromEndorsements;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
-import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
+import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.BitcoinMainNetParameters;
 import org.veriblock.sdk.conf.MainNetParameters;
@@ -53,6 +39,20 @@ import org.veriblock.sdk.rewards.RewardDefaults;
 import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.sqlite.tables.PoPTransactionData;
 import org.veriblock.sdk.util.Utils;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import static org.veriblock.sdk.rewards.PopRewardCalculator.calculatePopScoreFromEndorsements;
 
 public class VeriBlockRewardCalculatorTest {
 
@@ -632,6 +632,16 @@ public class VeriBlockRewardCalculatorTest {
 
         @Test
         public void name() {}
+
+        @Override
+        public AltChainBlock findFirstCommonKeystone(List<AltChainBlock> keyStones) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<AltPublication> getAltPublicationsFromBlockHeight(long height) throws SQLException {
+            throw new UnsupportedOperationException();
+        }
     }
 
 

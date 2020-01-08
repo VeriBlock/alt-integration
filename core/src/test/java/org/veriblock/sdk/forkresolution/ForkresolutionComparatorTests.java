@@ -712,6 +712,16 @@ public class ForkresolutionComparatorTests {
 
         @Test
         public void test(){}
+
+        @Override
+        public AltChainBlock findFirstCommonKeystone(List<AltChainBlock> keyStones) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<AltPublication> getAltPublicationsFromBlockHeight(long height) {
+            throw new UnsupportedOperationException();
+        }
     }
 
     public List<Integer> getReducedPublicationViewTest(List<AltChainBlock> blocks) throws SQLException {
