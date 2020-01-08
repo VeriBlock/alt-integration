@@ -370,38 +370,36 @@ public class BitcoinBlockchain {
                 return;
             }
 
-            BigInteger newTarget = calculateNewTarget(
-                    BitcoinUtils.decodeCompactBits(previous.getBlock().getBits()),
+            long newTarget = calculateNewTarget(
+                    previous.getBlock().getBits(),
                     cycleStart.getBlock().getTimestamp(),
                     previous.getBlock().getTimestamp());
 
-            int accuracyBytes = (block.getBits() >>> 24) - 3;
-            long receivedTargetCompact = block.getBits();
-
-            // The calculated difficulty is to a higher precision than received, so reduce here.
-            BigInteger mask = BigInteger.valueOf(0xFFFFFFL).shiftLeft(accuracyBytes * 8);
-            newTarget = newTarget.and(mask);
-            long newTargetCompact = BitcoinUtils.encodeCompactBits(newTarget);
-
-            if (newTargetCompact != receivedTargetCompact) {
+            if (block.getBits() != newTarget) {
                 throw new VerificationException("Block does not match computed difficulty adjustment");
             }
         }
     }
 
-    private BigInteger calculateNewTarget(BigInteger current, int startTimestamp, int endTimestamp) {
+    private long calculateNewTarget(long current, int startTimestamp, int endTimestamp) {
         int elapsed = endTimestamp - startTimestamp;
 
         elapsed = Math.max(elapsed, networkParameters.getPowTargetTimespan() / 4);
         elapsed = Math.min(elapsed, networkParameters.getPowTargetTimespan() * 4);
 
-        BigInteger newTarget = current.multiply(BigInteger.valueOf(elapsed))
-                                      .divide(BigInteger.valueOf(networkParameters.getPowTargetTimespan()));
+        BigInteger newTarget = BitcoinUtils.decodeCompactBits(current)
+                                           .multiply(BigInteger.valueOf(elapsed))
+                                           .divide(BigInteger.valueOf(networkParameters.getPowTargetTimespan()));
 
         // Should never occur; hitting the max target would mean Bitcoin has the hashrate of a few CPUs
         newTarget = newTarget.min(networkParameters.getPowLimit());
 
-        return newTarget;
+        // Reduce the precision of the calculated difficulty to match that of the compact bits representation
+        int byteLength = (newTarget.bitLength() + 8 - 1) / 8;
+        BigInteger mask = BigInteger.valueOf(0xFFFFFFL).shiftLeft((byteLength - 3) * 8);
+        newTarget = newTarget.and(mask);
+
+        return BitcoinUtils.encodeCompactBits(newTarget);
     }
 
     // Returns true if the store was empty and the bootstrap
