@@ -66,10 +66,10 @@ public interface PoPTransactionStore {
     /**
      * Retrieve AltPublications(ATVs) from the given block height
      * @param height the block height to retrieve ATVs from
-     * @return the list of AltPublications
+     * @return the list of AltChainBlock
      * @throws SQLException
      */
-    List<AltPublication> getAltPublicationsFromBlockHeight(long height) throws SQLException;
+    List<AltChainBlock> getKeyStonesFromBlockHeight(long height) throws SQLException;
 
     /**
      * Retrieve common keyStone, or null.

@@ -151,27 +151,8 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
         return resultData;
     }
 
-    public List<AltPublication> getAltPublicationsFromBlockHeight(long height) throws SQLException {
-        List<AltPublication> resultData = new ArrayList<AltPublication>();
-        String sql = " SELECT DISTINCT " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationDataColumnName +
-                " FROM " + PoPTransactionsRepository.tableName + " LEFT JOIN " + AltPublicationRepository.tableName +
-                " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.altPublicationHashColumnName +
-                " = " + AltPublicationRepository.tableName + "." + AltPublicationRepository.altPublicationHash +
-                " LEFT JOIN " + ContainRepository.tableName +
-                " ON " + PoPTransactionsRepository.tableName + "." + PoPTransactionsRepository.txHashColumnName +
-                " = " + ContainRepository.tableName + "." + ContainRepository.txHashColumnName +
-                " WHERE " + ContainRepository.tableName + "." + ContainRepository.blockHeightColumnName + " >= " + height + "";
-
-
-        try (PreparedStatement stmt = connectionResource.prepareStatement(sql)) {
-            try (ResultSet resultSet = stmt.executeQuery()) {
-                while (resultSet.next()) {
-                    resultData.add(SerializeDeserializeService.parseAltPublication(resultSet.getBytes(AltPublicationRepository.altPublicationDataColumnName)));
-                }
-            }
-        }
-
-        return resultData;
+    public List<AltChainBlock> getKeyStonesFromBlockHeight(long height) throws SQLException {
+        return containRepo.getAllFromHeight(height);
     }
 
     public List<VeriBlockPublication> getVeriBlockPublicationsFromBlock(AltChainBlock block) throws SQLException {
