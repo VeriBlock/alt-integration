@@ -639,7 +639,7 @@ public class VeriBlockRewardCalculatorTest {
         }
 
         @Override
-        public List<AltPublication> getAltPublicationsFromBlockHeight(long height) throws SQLException {
+        public List<AltChainBlock> getKeyStonesFromBlockHeight(long height) {
             throw new UnsupportedOperationException();
         }
     }
