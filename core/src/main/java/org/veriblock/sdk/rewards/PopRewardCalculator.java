@@ -144,6 +144,10 @@ public class PopRewardCalculator {
     }
 
     public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException {
+        if(blocksInterval.size() > config.popRewardSettlementInterval + config.popDifficultyAveragingInterval && blocksInterval.size() < config.popRewardSettlementInterval) {
+            throw new IllegalArgumentException("The amount of blocks must be equal to popRewardSettlementInterval + popDifficultyAveragingInterval");
+        }
+
         BigDecimal difficulty = BigDecimal.ZERO;
 
         Collections.sort(blocksInterval);  // make the ascending order for the blocks in the collection, it needs for the correct calculation of the pop score
