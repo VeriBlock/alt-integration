@@ -144,16 +144,19 @@ public class PopRewardCalculator {
     }
 
     public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException {
-        if(blocksInterval.size() != config.popRewardSettlementInterval + config.popDifficultyAveragingInterval) {
-            throw new IllegalArgumentException("The amount of blocks must be equal to popRewardSettlementInterval + popDifficultyAveragingInterval");
+        if(blocksInterval.size() > config.popRewardSettlementInterval + config.popDifficultyAveragingInterval) {
+            throw new IllegalArgumentException("Amount of blocks must be less or equal than popRewardSettlementInterval + popDifficultyAveragingInterval");
+        }
+
+        if(blocksInterval.size() < config.popRewardSettlementInterval) {
+            throw new IllegalArgumentException("Amount of blocks must be higher or equal than popRewardSettlementInterval");
         }
 
         BigDecimal difficulty = BigDecimal.ZERO;
 
         Collections.sort(blocksInterval);  // make the ascending order for the blocks in the collection, it needs for the correct calculation of the pop score
 
-        for(int i = 0; i < config.popDifficultyAveragingInterval; ++i)
-        {
+        for(int i = 0; i < blocksInterval.size() - config.popRewardSettlementInterval; ++i)  {
             BigDecimal score = calculatePopScoreFromEndorsements(blocksInterval.get(i), blocksInterval.subList(i + 1 , i  + 1 + config.popRewardSettlementInterval));
             difficulty = difficulty.add(score);
         }
