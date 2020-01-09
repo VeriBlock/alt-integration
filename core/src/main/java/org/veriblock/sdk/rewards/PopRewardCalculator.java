@@ -145,7 +145,7 @@ public class PopRewardCalculator {
 
     public static BigDecimal calculatePopDifficultyForBlock(List<AltChainBlock> blocksInterval) throws SQLException {
         if(blocksInterval.size() > config.popRewardSettlementInterval + config.popDifficultyAveragingInterval && blocksInterval.size() < config.popRewardSettlementInterval) {
-            throw new IllegalArgumentException("The amount of blocks must be equal to popRewardSettlementInterval + popDifficultyAveragingInterval");
+            throw new IllegalArgumentException("the amount of difficulty blocks must be in the interval from  popRewardSettlementInterval to popRewardSettlementInterval + popDifficultyAveragingInterval");
         }
 
         BigDecimal difficulty = BigDecimal.ZERO;
