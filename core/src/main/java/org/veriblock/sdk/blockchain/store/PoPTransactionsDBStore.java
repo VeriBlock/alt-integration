@@ -83,6 +83,20 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
         return null;
     }
 
+    public AltChainBlock findFirstCommonKeystoneByHash(List<String> keyStoneHashes){
+        for (String keyStoneHash : keyStoneHashes) {
+            try {
+                AltChainBlock altChainBlock = containRepo.get(keyStoneHash);
+                if(altChainBlock != null){
+                    return altChainBlock;
+                }
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        return null;
+    }
+
     public void addPoPTransaction(PoPTransactionData popTx, AltChainBlock containingBlock, AltChainBlock endorsedBlock) throws SQLException {
         String altPublicationHash = altPublicationRepo.save(popTx.altPublication);
 
