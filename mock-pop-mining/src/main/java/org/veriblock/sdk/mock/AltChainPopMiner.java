@@ -44,7 +44,7 @@ public class AltChainPopMiner {
     }
 
     // retrieve the blocks between lastKnownBlock and getChainHead()
-    List<VeriBlockBlock> createVeriBlockContext(VeriBlockBlock lastKnownBlock) throws SQLException {
+    private List<VeriBlockBlock> createVeriBlockContext(VeriBlockBlock lastKnownBlock) throws SQLException {
         List<VeriBlockBlock> context = new ArrayList<>();
 
         VeriBlockBlock prevBlock = veriblockBlockchain.get(veriblockBlockchain.getChainHead().getPreviousBlock());
@@ -84,7 +84,7 @@ public class AltChainPopMiner {
         return new Address(data + checksum);
     }
 
-    AltPublication mine(PublicationData publicationData, VeriBlockBlock lastKnownVBKBlock, KeyPair key) throws SQLException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
+    public AltPublication mine(PublicationData publicationData, VeriBlockBlock lastKnownVBKBlock, KeyPair key) throws SQLException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
 
         Address address = deriveAddress(key.getPublic());
 
