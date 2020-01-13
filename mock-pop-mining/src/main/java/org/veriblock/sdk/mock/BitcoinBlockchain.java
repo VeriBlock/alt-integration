@@ -24,7 +24,7 @@ import java.util.HashMap;
 public class BitcoinBlockchain extends org.veriblock.sdk.blockchain.BitcoinBlockchain {
     private final Map<Sha256Hash, BitcoinBlockData> blockDataStore = new HashMap<>();
 
-    BitcoinBlockchain(BitcoinNetworkParameters networkParameters,
+    public BitcoinBlockchain(BitcoinNetworkParameters networkParameters,
                       BlockStore<StoredBitcoinBlock, Sha256Hash> store) {
         super(networkParameters, store);
     }

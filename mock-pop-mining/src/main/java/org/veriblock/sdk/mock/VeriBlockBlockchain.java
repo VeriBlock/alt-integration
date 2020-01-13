@@ -30,7 +30,7 @@ public class VeriBlockBlockchain extends org.veriblock.sdk.blockchain.VeriBlockB
     private final Map<VBlakeHash, VeriBlockBlockData> blockDataStore = new HashMap<>();
     private final BlockStore<StoredVeriBlockBlock, VBlakeHash> store;
 
-    VeriBlockBlockchain(VeriBlockNetworkParameters networkParameters,
+    public VeriBlockBlockchain(VeriBlockNetworkParameters networkParameters,
                         BlockStore<StoredVeriBlockBlock, VBlakeHash> store,
                         BlockStore<StoredBitcoinBlock, Sha256Hash> bitcoinStore) {
         super(networkParameters, store, bitcoinStore);

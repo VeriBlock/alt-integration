@@ -77,10 +77,10 @@ public class VeriBlockBlockData {
         }
     }
 
-    RegularSubtree txs = new RegularSubtree();
-    PoPSubtree popTxs = new PoPSubtree();
+    private RegularSubtree txs = new RegularSubtree();
+    private PoPSubtree popTxs = new PoPSubtree();
 
-    byte[] blockContentMetapackage = new byte[0];
+    private byte[] blockContentMetapackage = new byte[0];
 
     public Sha256Hash getMerkleRoot() {
         return Sha256Hash.of(
