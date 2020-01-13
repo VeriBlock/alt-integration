@@ -61,13 +61,13 @@ public class VeriBlockPopMiner {
         return payoutInfo;
     }
 
-    BitcoinTransaction createBitcoinTx(VeriBlockBlock publishedBlock, Address address) {
+    private BitcoinTransaction createBitcoinTx(VeriBlockBlock publishedBlock, Address address) {
         byte[] publicationData = createPublicationData(publishedBlock, address);
         return new BitcoinTransaction(publicationData);
     }
 
     // retrieve the blocks between lastKnownBlock and getChainHead()
-    List<BitcoinBlock> createBitcoinContext(BitcoinBlock lastKnownBlock) throws SQLException {
+    private List<BitcoinBlock> createBitcoinContext(BitcoinBlock lastKnownBlock) throws SQLException {
         List<BitcoinBlock> context = new ArrayList<>();
 
         BitcoinBlock prevBlock = bitcoinBlockchain.get(bitcoinBlockchain.getChainHead().getPreviousBlock());
@@ -81,7 +81,7 @@ public class VeriBlockPopMiner {
     }
 
     // retrieve the blocks between lastKnownBlock and getChainHead()
-    List<VeriBlockBlock> createVeriBlockContext(VeriBlockBlock lastKnownBlock) throws SQLException {
+    private List<VeriBlockBlock> createVeriBlockContext(VeriBlockBlock lastKnownBlock) throws SQLException {
         List<VeriBlockBlock> context = new ArrayList<>();
 
         VeriBlockBlock prevBlock = veriblockBlockchain.get(veriblockBlockchain.getChainHead().getPreviousBlock());
@@ -94,7 +94,7 @@ public class VeriBlockPopMiner {
         return context;
     }
 
-    Address deriveAddress(PublicKey key) {
+    private Address deriveAddress(PublicKey key) {
         String data = "V" + Base58.encode(Sha256Hash.of(key.getEncoded()).getBytes()).substring(0, 24);
         
         Sha256Hash hash = Sha256Hash.of(data.getBytes(StandardCharsets.UTF_8));
@@ -104,7 +104,7 @@ public class VeriBlockPopMiner {
     
     }
     
-    VeriBlockPoPTransaction signTransaction(VeriBlockPoPTransaction tx, PrivateKey privateKey) throws SignatureException, InvalidKeyException, NoSuchAlgorithmException {        
+    private VeriBlockPoPTransaction signTransaction(VeriBlockPoPTransaction tx, PrivateKey privateKey) throws SignatureException, InvalidKeyException, NoSuchAlgorithmException {        
         byte[] signature = Utils.signMessageWithPrivateKey(SerializeDeserializeService.getId(tx).getBytes(),
                                                            privateKey);
 
