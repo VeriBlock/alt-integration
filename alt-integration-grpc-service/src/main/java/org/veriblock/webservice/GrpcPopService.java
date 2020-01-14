@@ -184,4 +184,17 @@ public class GrpcPopService extends GrpcPopServiceImplBase {
             responseObserver.onError(new StatusException(status));
         }
     }
+
+    @Override
+    public void setConfig(VeriBlockMessages.SetConfigRequest request, StreamObserver<VeriBlockMessages.EmptyReply> responseObserver) {
+        try{
+            VeriBlockMessages.EmptyReply reply = PopServiceProto.setConfig(request);
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            Status status = Status.fromCode(Status.Code.INTERNAL);
+            status = status.withDescription(e.getMessage());
+            responseObserver.onError(new StatusException(status));
+        }
+    }
 }
