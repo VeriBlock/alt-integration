@@ -154,7 +154,7 @@ public class PopServiceProto {
         return VeriBlockMessages.EmptyReply.newBuilder().build();
     }
 
-    public static VeriBlockMessages.EmptyReply setConfig(VeriBlockMessages.RemovePayloadsRequest request) throws Exception {
+    public static VeriBlockMessages.EmptyReply setConfig(VeriBlockMessages.SetConfigRequest request) throws Exception {
         if (request.hasAltChainConfig()) {
             security.setAltChainParametersConfig(
                     AltChainParametersConfigProtoConverter.fromProto(request.getAltChainConfig()));
