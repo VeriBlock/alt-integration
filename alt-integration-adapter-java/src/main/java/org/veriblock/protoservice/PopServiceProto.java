@@ -153,4 +153,30 @@ public class PopServiceProto {
         security.removePayloads(blockIndex);
         return VeriBlockMessages.EmptyReply.newBuilder().build();
     }
+
+    public static VeriBlockMessages.EmptyReply setConfig(VeriBlockMessages.RemovePayloadsRequest request) throws Exception {
+        if (request.hasAltChainConfig()) {
+            security.setAltChainParametersConfig(
+                    AltChainParametersConfigProtoConverter.fromProto(request.getAltChainConfig()));
+        }
+        if (request.hasForkresolutionConfig()) {
+            ForkresolutionComparator.setForkresolutionConfig(
+                    ForkresolutionConfigProtoConverter.fromProto(request.getForkresolutionConfig()));
+        }
+        if (request.hasCalculatorConfig()) {
+            PopRewardCalculator.setCalculatorConfig(
+                    CalculatorConfigProtoConverter.fromProto(request.getCalculatorConfig()));
+        }
+        if (request.hasBitcoinBootstrapConfig()) {
+            security.getBitcoinBlockchain().bootstrap(
+                    BitcoinBlockchainBootstrapConfigProtoConverter.fromProto(
+                            request.getBitcoinBootstrapConfig()));
+        }
+        if (request.hasVeriblockBootstrapConfig()) {
+            security.getVeriBlockBlockchain().bootstrap(
+                    VeriBlockBlockchainBootstrapConfigProtoConverter.fromProto(
+                            request.getVeriblockBootstrapConfig()));
+        }
+        return VeriBlockMessages.EmptyReply.newBuilder().build();
+    }
 }
