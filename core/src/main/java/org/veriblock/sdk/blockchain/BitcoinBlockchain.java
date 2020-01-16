@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 public class BitcoinBlockchain {
     private static final Logger log = LoggerFactory.getLogger(BitcoinBlockchain.class);
@@ -278,19 +279,19 @@ public class BitcoinBlockchain {
         return previous;
     }
 
-    private void checkTimestamp(BitcoinBlock block) throws VerificationException, BlockStoreException, SQLException {
+    // return the earliest valid timestamp for a block that follows the blockHash block
+    public OptionalInt getNextEarliestTimestamp(Sha256Hash blockHash) throws BlockStoreException, SQLException {
         // Checks the temporary blocks first
-        List<StoredBitcoinBlock> context = getTemporaryBlocks(block.getPreviousBlock(), MINIMUM_TIMESTAMP_BLOCK_COUNT);
+        List<StoredBitcoinBlock> context = getTemporaryBlocks(blockHash, MINIMUM_TIMESTAMP_BLOCK_COUNT);
         if (context.size() > 0) {
             StoredBitcoinBlock last = context.get(context.size() - 1);
             context.addAll(store.get(last.getBlock().getPreviousBlock(), MINIMUM_TIMESTAMP_BLOCK_COUNT - context.size()));
         } else {
-            context.addAll(store.get(block.getPreviousBlock(), MINIMUM_TIMESTAMP_BLOCK_COUNT));
+            context.addAll(store.get(blockHash, MINIMUM_TIMESTAMP_BLOCK_COUNT));
         }
 
         if (context.size() < MINIMUM_TIMESTAMP_BLOCK_COUNT) {
-            log.warn("Not enough context blocks to check timestamp");
-            return;
+            return OptionalInt.empty();
         }
 
         Optional<Integer> median = context.stream().sorted(Comparator.comparingInt(StoredBitcoinBlock::getHeight).reversed())
@@ -300,8 +301,18 @@ public class BitcoinBlockchain {
                 .skip(MINIMUM_TIMESTAMP_BLOCK_COUNT / 2)
                 .findFirst();
 
-        if (!median.isPresent() || block.getTimestamp() <= median.get()) {
-            throw new VerificationException("Block is too far in the past");
+        return median.isPresent() ? OptionalInt.of(median.get() + 1) : OptionalInt.empty();
+    }
+
+    private void checkTimestamp(BitcoinBlock block) throws VerificationException, BlockStoreException, SQLException {
+        OptionalInt timestamp = getNextEarliestTimestamp(block.getPreviousBlock());
+
+        if (timestamp.isPresent()) {
+            if (block.getTimestamp() < timestamp.getAsInt()) {
+                throw new VerificationException("Block is too far in the past");
+            }
+        } else {
+            log.warn("Not enough context blocks to check timestamp");
         }
     }
 

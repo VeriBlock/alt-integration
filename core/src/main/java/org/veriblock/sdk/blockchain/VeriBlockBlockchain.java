@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 public class VeriBlockBlockchain {
@@ -569,10 +570,15 @@ public class VeriBlockBlockchain {
         return previous;
     }
 
-    private void checkTimestamp(VeriBlockBlock block, List<StoredVeriBlockBlock> context) throws VerificationException {
+    // return the earliest valid timestamp for a block that follows the blockHash block
+    public OptionalInt getNextEarliestTimestamp(VBlakeHash blockHash) throws SQLException {
+        List<StoredVeriBlockBlock> context = getChainInternal(blockHash, DIFFICULTY_ADJUST_BLOCK_COUNT);
+        return getNextEarliestTimestamp(context);
+    }
+
+    public OptionalInt getNextEarliestTimestamp(List<StoredVeriBlockBlock> context) {
         if (context.size() < MINIMUM_TIMESTAMP_BLOCK_COUNT) {
-            log.warn("Not enough context blocks to check timestamp");
-            return;
+            return OptionalInt.empty();
         }
 
         Optional<Integer> median = context.stream()
@@ -583,8 +589,18 @@ public class VeriBlockBlockchain {
                 .skip((MINIMUM_TIMESTAMP_BLOCK_COUNT / 2) - 1)
                 .findFirst();
 
-        if (!median.isPresent() || block.getTimestamp() <= median.get()) {
-            throw new VerificationException("Block is too far in the past");
+        return median.isPresent() ? OptionalInt.of(median.get() + 1) : OptionalInt.empty();
+    }
+
+    private void checkTimestamp(VeriBlockBlock block, List<StoredVeriBlockBlock> context) throws VerificationException {
+        OptionalInt timestamp = getNextEarliestTimestamp(context);
+
+        if (timestamp.isPresent()) {
+            if (block.getTimestamp() < timestamp.getAsInt()) {
+                throw new VerificationException("Block is too far in the past");
+            }
+        } else {
+            log.warn("Not enough context blocks to check timestamp");
         }
     }
 

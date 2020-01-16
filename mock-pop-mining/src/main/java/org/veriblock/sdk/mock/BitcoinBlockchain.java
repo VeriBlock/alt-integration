@@ -50,11 +50,10 @@ public class BitcoinBlockchain extends org.veriblock.sdk.blockchain.BitcoinBlock
     public BitcoinBlock mine(BitcoinBlockData blockData) throws SQLException {
         BitcoinBlock chainHead = getChainHead();
 
-        int timestamp = 0;
+        int timestamp = Math.max(getNextEarliestTimestamp(chainHead.getHash()).orElse(0), Utils.getCurrentTimestamp());
 
         for (int nonce = 0; nonce < Integer.MAX_VALUE; nonce++) {
             try {
-                timestamp = Math.max(timestamp, Utils.getCurrentTimestamp());
 
                 BitcoinBlock newBlock = new BitcoinBlock(
                     chainHead.getVersion(),
@@ -73,15 +72,10 @@ public class BitcoinBlockchain extends org.veriblock.sdk.blockchain.BitcoinBlock
 
                 return newBlock; 
             } catch (VerificationException e) {
-                // FIXME: refactoring checkTimestamp() would make this less ugly
-                // if too many blocks are mined per second, we have to adjust the timestamp slightly
-                if (e.getMessage().equals("Block is too far in the past")) {
-                    timestamp++;
-
                 // FIXME: refactoring checkProofOfWork() would make this less ugly
                 // suppress this specific exception as it's just a signal
                 // that the block hash does not match the block difficulty
-                } else if (!e.getMessage().startsWith("Block hash is higher than target")) {
+                if (!e.getMessage().startsWith("Block hash is higher than target")) {
                     throw e;
                 }
             }
