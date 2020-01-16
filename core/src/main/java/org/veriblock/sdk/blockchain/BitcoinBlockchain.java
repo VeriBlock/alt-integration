@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 public class BitcoinBlockchain {
     private static final Logger log = LoggerFactory.getLogger(BitcoinBlockchain.class);
@@ -214,6 +215,11 @@ public class BitcoinBlockchain {
         return chainHead == null ? null : chainHead.getBlock();
     }
 
+    // in case there's a need to know the chain head block height
+    public StoredBitcoinBlock getStoredChainHead() throws SQLException {
+        return store.getChainHead();
+    }
+
     private StoredBitcoinBlock getInternal(Sha256Hash hash) throws BlockStoreException, SQLException {
         if (temporalStore.containsKey(hash)) {
             return temporalStore.get(hash);
@@ -316,29 +322,27 @@ public class BitcoinBlockchain {
         }
     }
 
-    private void checkDifficulty(BitcoinBlock block, StoredBitcoinBlock previous) throws VerificationException, BlockStoreException, SQLException {
-        if(!isValidateBlocksDifficulty()){
-            return;
-        }
-
+    public OptionalLong getNextDifficulty(int blockTimestamp, StoredBitcoinBlock previous) throws BlockStoreException, SQLException {
         int difficultyAdjustmentInterval = networkParameters.getPowTargetTimespan()
                                          / networkParameters.getPowTargetSpacing();
 
         // Previous + 1 = height of block
         if (networkParameters.getPowNoRetargeting() || (previous.getHeight() + 1) % difficultyAdjustmentInterval > 0) {
 
-            // Difficulty should be same as previous
-            if (block.getBits() == previous.getBlock().getBits()) return;
+            // Unless minimum difficulty blocks are allowed(special difficulty rule for the testnet),
+            // the difficulty should be same as previous
+            if (!networkParameters.getAllowMinDifficultyBlocks()) {
+                return OptionalLong.of(previous.getBlock().getBits());
 
-            // Unless minimum difficulty blocks are allowed(special difficulty rule for the testnet)
-            if (networkParameters.getAllowMinDifficultyBlocks()) {
+            } else {
 
                 long proofOfWorkLimit = BitcoinUtils.encodeCompactBits(networkParameters.getPowLimit());
 
                 // If the block's timestamp is more than 2*PowTargetSpacing minutes
                 // then allow mining of a minimum difficulty block
-                if (block.getTimestamp() > previous.getBlock().getTimestamp() + networkParameters.getPowTargetSpacing()*2) {
-                    if (block.getBits() == proofOfWorkLimit) return;
+                if (blockTimestamp > previous.getBlock().getTimestamp() + networkParameters.getPowTargetSpacing()*2) {
+                    return OptionalLong.of(proofOfWorkLimit);
+
                 } else {
 
                     // Find the last non-minimum difficulty block
@@ -351,14 +355,12 @@ public class BitcoinBlockchain {
 
                     // Corner case: we're less than difficultyAdjustmentInterval
                     // from the bootstrap and all blocks are minimum difficulty
-                    if (previous == null) return;
+                    if (previous == null) return OptionalLong.empty();
 
                     // Difficulty matches the closest non-minimum difficulty block
-                    if (block.getBits() == previous.getBlock().getBits()) return;
+                    return OptionalLong.of(previous.getBlock().getBits()) ;
                 }
             }
-
-            throw new VerificationException("Block does not match difficulty of previous block" );
         } else {
 
             // Difficulty needs to adjust
@@ -378,7 +380,7 @@ public class BitcoinBlockchain {
             if (cycleStart == null) {
                 // Because there will just be some Bitcoin block from whence accounting begins, it's likely
                 // that the first adjustment period will not have sufficient blocks to compute correctly
-                return;
+                return OptionalLong.empty();
             }
 
             long newTarget = calculateNewTarget(
@@ -386,10 +388,22 @@ public class BitcoinBlockchain {
                     cycleStart.getBlock().getTimestamp(),
                     previous.getBlock().getTimestamp());
 
-            if (block.getBits() != newTarget) {
-                throw new VerificationException("Block does not match computed difficulty adjustment");
-            }
+            return OptionalLong.of(newTarget);
         }
+
+    }
+
+    private void checkDifficulty(BitcoinBlock block, StoredBitcoinBlock previous) throws VerificationException, BlockStoreException, SQLException {
+        if(!isValidateBlocksDifficulty()){
+            return;
+        }
+
+        OptionalLong difficulty = getNextDifficulty(block.getTimestamp(), previous);
+
+        if (difficulty.isPresent() && block.getBits() != difficulty.getAsLong()) {
+            throw new VerificationException("Block does not match computed difficulty adjustment");
+        }
+
     }
 
     private long calculateNewTarget(long current, int startTimestamp, int endTimestamp) {

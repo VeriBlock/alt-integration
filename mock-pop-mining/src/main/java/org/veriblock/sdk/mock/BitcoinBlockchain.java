@@ -48,21 +48,20 @@ public class BitcoinBlockchain extends org.veriblock.sdk.blockchain.BitcoinBlock
     }
 
     public BitcoinBlock mine(BitcoinBlockData blockData) throws SQLException {
-        BitcoinBlock chainHead = getChainHead();
+        StoredBitcoinBlock chainHead = getStoredChainHead();
 
         int timestamp = Math.max(getNextEarliestTimestamp(chainHead.getHash()).orElse(0), Utils.getCurrentTimestamp());
+        int difficulty = (int) getNextDifficulty(timestamp, chainHead).getAsLong();
 
         for (int nonce = 0; nonce < Integer.MAX_VALUE; nonce++) {
             try {
 
                 BitcoinBlock newBlock = new BitcoinBlock(
-                    chainHead.getVersion(),
+                    chainHead.getBlock().getVersion(),
                     chainHead.getHash(),
                     blockData.getMerkleRoot().getReversed(),
                     timestamp,
-                    // FIXME: remove the hardcoded regtest difficulty adjustment
-                    // use the difficulty calculator to set the correct difficulty
-                    chainHead.getBits(),
+                    difficulty,
                     nonce);
                                                             
                 ValidationService.checkProofOfWork(newBlock);
