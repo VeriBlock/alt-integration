@@ -326,8 +326,11 @@ public class BitcoinBlockchain {
         int difficultyAdjustmentInterval = networkParameters.getPowTargetTimespan()
                                          / networkParameters.getPowTargetSpacing();
 
+        // Special rule for the regtest: all blocks are minimum difficulty
+        if (networkParameters.getPowNoRetargeting()) return OptionalLong.of(previous.getBlock().getBits());
+
         // Previous + 1 = height of block
-        if (networkParameters.getPowNoRetargeting() || (previous.getHeight() + 1) % difficultyAdjustmentInterval > 0) {
+        if ((previous.getHeight() + 1) % difficultyAdjustmentInterval > 0) {
 
             // Unless minimum difficulty blocks are allowed(special difficulty rule for the testnet),
             // the difficulty should be same as previous
@@ -358,7 +361,7 @@ public class BitcoinBlockchain {
                     if (previous == null) return OptionalLong.empty();
 
                     // Difficulty matches the closest non-minimum difficulty block
-                    return OptionalLong.of(previous.getBlock().getBits()) ;
+                    return OptionalLong.of(previous.getBlock().getBits());
                 }
             }
         } else {
