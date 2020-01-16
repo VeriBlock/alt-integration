@@ -32,7 +32,7 @@ jobs:
       - name: Run Sonarqube scanner
         run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }} || true
       - name: Docker Push
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: warchant/Publish-Docker-Github-Action@3
         with:
           name: veriblock/alt-service
           workdir: alt-integration-grpc-service
