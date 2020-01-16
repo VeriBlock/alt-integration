@@ -91,6 +91,16 @@ public class Address {
         }
     }
 
+    static public Address fromPublicKey(byte[] publicKey) {
+        byte[] keyHash = Sha256Hash.of(publicKey).getBytes();
+        String data = "V" + Base58.encode(keyHash).substring(0, 24);
+
+        Sha256Hash hash = Sha256Hash.of(data.getBytes(StandardCharsets.UTF_8));
+        String checksum = Base58.encode(hash.getBytes()).substring(0, 4 + 1);
+
+        return new Address(data + checksum);
+    }
+
     public byte[] getBytes() {
         return this.isMultisig() ? Base59.decode(this.address) : Base58.decode(this.address);
     }

@@ -8,12 +8,10 @@
 
 package org.veriblock.sdk.mock;
 
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,11 +21,9 @@ import org.veriblock.sdk.models.Address;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.Coin;
 import org.veriblock.sdk.models.PublicationData;
-import org.veriblock.sdk.models.Sha256Hash;
 import org.veriblock.sdk.models.VeriBlockBlock;
 import org.veriblock.sdk.models.VeriBlockTransaction;
 import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.util.Base58;
 import org.veriblock.sdk.util.Utils;
 
 // Also known as APM
@@ -58,19 +54,9 @@ public class AltChainPopMiner {
                 tx.getNetworkByte());
     }
 
-    private Address deriveAddress(PublicKey key) {
-        byte [] keyHash = Sha256Hash.of(key.getEncoded()).getBytes();
-        String data = "V" + Base58.encode(keyHash).substring(0, 24);
-
-        Sha256Hash hash = Sha256Hash.of(data.getBytes(StandardCharsets.UTF_8));
-        String checksum = Base58.encode(hash.getBytes()).substring(0, 4 + 1);
-
-        return new Address(data + checksum);
-    }
-
     public AltPublication mine(PublicationData publicationData, VeriBlockBlock lastKnownVBKBlock, KeyPair key) throws SQLException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
 
-        Address address = deriveAddress(key.getPublic());
+        Address address = Address.fromPublicKey(key.getPublic().getEncoded());
 
         VeriBlockTransaction endorsementTx = signTransaction(
                 new VeriBlockTransaction(

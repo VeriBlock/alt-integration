@@ -9,12 +9,10 @@
 package org.veriblock.sdk.mock;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.List;
@@ -22,12 +20,10 @@ import java.util.List;
 import org.veriblock.sdk.models.Address;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.models.BitcoinTransaction;
-import org.veriblock.sdk.models.Sha256Hash;
 import org.veriblock.sdk.models.VeriBlockBlock;
 import org.veriblock.sdk.models.VeriBlockPoPTransaction;
 import org.veriblock.sdk.models.VeriBlockPublication;
 import org.veriblock.sdk.services.SerializeDeserializeService;
-import org.veriblock.sdk.util.Base58;
 import org.veriblock.sdk.util.Utils;
 
 public class VeriBlockPopMiner {
@@ -64,16 +60,6 @@ public class VeriBlockPopMiner {
         return new BitcoinTransaction(publicationData);
     }
 
-    private Address deriveAddress(PublicKey key) {
-        String data = "V" + Base58.encode(Sha256Hash.of(key.getEncoded()).getBytes()).substring(0, 24);
-        
-        Sha256Hash hash = Sha256Hash.of(data.getBytes(StandardCharsets.UTF_8));
-        String checksum = Base58.encode(hash.getBytes()).substring(0, 4 + 1);
-
-        return new Address(data + checksum);
-    
-    }
-    
     private VeriBlockPoPTransaction signTransaction(VeriBlockPoPTransaction tx, PrivateKey privateKey) throws SignatureException, InvalidKeyException, NoSuchAlgorithmException {        
         byte[] signature = Utils.signMessageWithPrivateKey(SerializeDeserializeService.getId(tx).getBytes(),
                                                            privateKey);
@@ -92,7 +78,7 @@ public class VeriBlockPopMiner {
 
     public VeriBlockPublication mine(VeriBlockBlock blockToEndorse, VeriBlockBlock lastKnownVBKBlock, BitcoinBlock lastKnownBTCBlock, KeyPair key) throws SQLException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
 
-        Address address = deriveAddress(key.getPublic());
+        Address address = Address.fromPublicKey(key.getPublic().getEncoded());
 
         // publish an endorsement transaction to Bitcoin
 
