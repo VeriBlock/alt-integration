@@ -18,8 +18,11 @@ import org.veriblock.sdk.services.ValidationService;
 import org.veriblock.sdk.util.Utils;
 
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BitcoinBlockchain extends org.veriblock.sdk.blockchain.BitcoinBlockchain {
     private final Map<Sha256Hash, BitcoinBlockData> blockDataStore = new HashMap<>();
@@ -27,6 +30,21 @@ public class BitcoinBlockchain extends org.veriblock.sdk.blockchain.BitcoinBlock
     public BitcoinBlockchain(BitcoinNetworkParameters networkParameters,
                       BlockStore<StoredBitcoinBlock, Sha256Hash> store) {
         super(networkParameters, store);
+    }
+
+
+    // retrieve the blocks between lastKnownBlock and getChainHead()
+    public List<BitcoinBlock> getContext(BitcoinBlock lastKnownBlock) throws SQLException {
+        List<BitcoinBlock> context = new ArrayList<>();
+
+        BitcoinBlock prevBlock = get(getChainHead().getPreviousBlock());
+        while (prevBlock != null && !prevBlock.equals(lastKnownBlock)) {
+            context.add(prevBlock);
+            prevBlock = get(prevBlock.getPreviousBlock());
+        }
+
+        Collections.reverse(context);
+        return context;
     }
 
     public BitcoinBlock mine(BitcoinBlockData blockData) throws SQLException {
