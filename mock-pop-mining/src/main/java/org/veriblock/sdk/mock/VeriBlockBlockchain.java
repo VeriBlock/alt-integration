@@ -104,32 +104,22 @@ public class VeriBlockBlockchain extends org.veriblock.sdk.blockchain.VeriBlockB
         int timestamp = Math.max(getNextEarliestTimestamp(chainHead.getHash()).orElse(0), Utils.getCurrentTimestamp());
 
         for (int nonce = 0; nonce < Integer.MAX_VALUE; nonce++) {
-            try {
-                VeriBlockBlock newBlock = new VeriBlockBlock(blockHeight,
-                                                            chainHead.getVersion(),
-                                                            chainHead.getHash().trimToPreviousBlockSize(),
-                                                            previousKeystone,
-                                                            secondPreviousKeystone,
-                                                            blockData.getMerkleRoot(),
-                                                            timestamp,
-                                                            // FIXME: use the difficulty calculator to set the correct difficulty
-                                                            chainHead.getDifficulty(),
-                                                            nonce);
+            VeriBlockBlock newBlock = new VeriBlockBlock(blockHeight,
+                                                        chainHead.getVersion(),
+                                                        chainHead.getHash().trimToPreviousBlockSize(),
+                                                        previousKeystone,
+                                                        secondPreviousKeystone,
+                                                        blockData.getMerkleRoot(),
+                                                        timestamp,
+                                                        // FIXME: use the difficulty calculator to set the correct difficulty
+                                                        chainHead.getDifficulty(),
+                                                        nonce);
 
-                ValidationService.checkProofOfWork(newBlock);
-
+            if (ValidationService.isProofOfWorkValid(newBlock)) {
                 add(newBlock);
                 blockDataStore.put(newBlock.getHash(), blockData);
 
                 return newBlock;
-
-            } catch (VerificationException e) {
-                // FIXME: refactoring checkProofOfWork() would make this less ugly
-                // suppress this specific exception as it's just a signal
-                // that the block hash does not match the block difficulty
-                if (!e.getMessage().startsWith("Block hash is higher than target")) {
-                    throw e;
-                }
             }
         }
         throw new RuntimeException("Failed to mine the block due to too high difficulty");

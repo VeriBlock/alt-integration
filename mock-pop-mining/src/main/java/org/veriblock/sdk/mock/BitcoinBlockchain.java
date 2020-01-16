@@ -54,29 +54,19 @@ public class BitcoinBlockchain extends org.veriblock.sdk.blockchain.BitcoinBlock
         int difficulty = (int) getNextDifficulty(timestamp, chainHead).getAsLong();
 
         for (int nonce = 0; nonce < Integer.MAX_VALUE; nonce++) {
-            try {
+            BitcoinBlock newBlock = new BitcoinBlock(
+                chainHead.getBlock().getVersion(),
+                chainHead.getHash(),
+                blockData.getMerkleRoot().getReversed(),
+                timestamp,
+                difficulty,
+                nonce);
 
-                BitcoinBlock newBlock = new BitcoinBlock(
-                    chainHead.getBlock().getVersion(),
-                    chainHead.getHash(),
-                    blockData.getMerkleRoot().getReversed(),
-                    timestamp,
-                    difficulty,
-                    nonce);
-                                                            
-                ValidationService.checkProofOfWork(newBlock);
-
+            if (ValidationService.isProofOfWorkValid(newBlock)) {
                 add(newBlock);
                 blockDataStore.put(newBlock.getHash(), blockData);
 
-                return newBlock; 
-            } catch (VerificationException e) {
-                // FIXME: refactoring checkProofOfWork() would make this less ugly
-                // suppress this specific exception as it's just a signal
-                // that the block hash does not match the block difficulty
-                if (!e.getMessage().startsWith("Block hash is higher than target")) {
-                    throw e;
-                }
+                return newBlock;
             }
         }
         throw new RuntimeException("Failed to mine the block due to too high difficulty");

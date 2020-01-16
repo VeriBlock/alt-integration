@@ -145,16 +145,23 @@ public class ValidationService {
         checkMaximumDrift(veriBlockBlock);
     }
 
-    public  static void checkProofOfWork(VeriBlockBlock veriBlockBlock) {
-        BigInteger embeddedDifficulty = BitcoinUtils.decodeCompactBits(veriBlockBlock.getDifficulty());
-        BigInteger embeddedTarget = Constants.MAXIMUM_DIFFICULTY.divide(embeddedDifficulty);
-        BigInteger hash = veriBlockBlock.getHash().toBigInteger();
+    public static BigInteger getEmbeddedTarget(VeriBlockBlock block) {
+        BigInteger embeddedDifficulty = BitcoinUtils.decodeCompactBits(block.getDifficulty());
+        return Constants.MAXIMUM_DIFFICULTY.divide(embeddedDifficulty);
+    }
 
-        if (hash.compareTo(embeddedTarget) > 0) {
+    public static boolean isProofOfWorkValid(VeriBlockBlock block) {
+        BigInteger hash = block.getHash().toBigInteger();
+
+        return hash.compareTo(getEmbeddedTarget(block)) <= 0;
+    }
+
+    public static void checkProofOfWork(VeriBlockBlock block) {
+        if (!isProofOfWorkValid(block)) {
             throw new VerificationException(
                     String.format(Locale.US, "Block hash is higher than target: %s vs %s",
-                            veriBlockBlock.getHash().toString(),
-                            embeddedTarget.toString(16)));
+                            block.getHash().toString(),
+                            getEmbeddedTarget(block).toString(16)));
         }
     }
 
@@ -172,14 +179,20 @@ public class ValidationService {
         checkMaximumDrift(bitcoinBlock);
     }
 
-    public static void checkProofOfWork(BitcoinBlock bitcoinBlock) throws VerificationException {
-        BigInteger embeddedTarget = BitcoinUtils.decodeCompactBits(bitcoinBlock.getBits());
-        BigInteger hash = bitcoinBlock.getHash().toBigInteger();
+    public static boolean isProofOfWorkValid(BitcoinBlock block) throws VerificationException {
+        BigInteger embeddedTarget = BitcoinUtils.decodeCompactBits(block.getBits());
+        BigInteger hash = block.getHash().toBigInteger();
 
-        if (hash.compareTo(embeddedTarget) > 0) {
+        return hash.compareTo(embeddedTarget) <= 0;
+    }
+
+    public static void checkProofOfWork(BitcoinBlock block) throws VerificationException {
+        if (!isProofOfWorkValid(block)) {
+            BigInteger embeddedTarget = BitcoinUtils.decodeCompactBits(block.getBits());
+
             throw new VerificationException(
                     String.format(Locale.US, "Block hash is higher than target: %s vs %s",
-                            bitcoinBlock.getHash().toString(),
+                            block.getHash().toString(),
                             embeddedTarget.toString(16)));
         }
     }
