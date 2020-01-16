@@ -21,6 +21,8 @@ import org.veriblock.sdk.util.BitcoinUtils;
 import org.veriblock.sdk.util.Utils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,21 @@ public class VeriBlockBlockchain extends org.veriblock.sdk.blockchain.VeriBlockB
         return context.size() == keystoneBlocksAgo
              ? context.get(keystoneBlocksAgo - 1).getBlock().getHash().trimToPreviousKeystoneSize()
              : VBlakeHash.EMPTY_HASH.trimToPreviousKeystoneSize();
+    }
+
+    // retrieve the blocks between lastKnownBlock and getChainHead()
+    public List<VeriBlockBlock> getContext(VeriBlockBlock lastKnownBlock) throws SQLException {
+        List<VeriBlockBlock> context = new ArrayList<>();
+
+        VeriBlockBlock prevBlock = get(getChainHead().getPreviousBlock());
+
+        while (prevBlock != null && !prevBlock.equals(lastKnownBlock)) {
+            context.add(prevBlock);
+            prevBlock = get(prevBlock.getPreviousBlock());
+        }
+
+        Collections.reverse(context);
+        return context;
     }
 
     public VeriBlockBlock mine(VeriBlockBlockData blockData) throws SQLException {

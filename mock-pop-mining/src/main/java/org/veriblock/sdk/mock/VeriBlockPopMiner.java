@@ -17,8 +17,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.veriblock.sdk.models.Address;
@@ -66,34 +64,6 @@ public class VeriBlockPopMiner {
         return new BitcoinTransaction(publicationData);
     }
 
-    // retrieve the blocks between lastKnownBlock and getChainHead()
-    private List<BitcoinBlock> createBitcoinContext(BitcoinBlock lastKnownBlock) throws SQLException {
-        List<BitcoinBlock> context = new ArrayList<>();
-
-        BitcoinBlock prevBlock = bitcoinBlockchain.get(bitcoinBlockchain.getChainHead().getPreviousBlock());
-        while (prevBlock != null && !prevBlock.equals(lastKnownBlock)) {
-            context.add(prevBlock);
-            prevBlock = bitcoinBlockchain.get(prevBlock.getPreviousBlock());
-        }
-
-        Collections.reverse(context);
-        return context;
-    }
-
-    // retrieve the blocks between lastKnownBlock and getChainHead()
-    private List<VeriBlockBlock> createVeriBlockContext(VeriBlockBlock lastKnownBlock) throws SQLException {
-        List<VeriBlockBlock> context = new ArrayList<>();
-
-        VeriBlockBlock prevBlock = veriblockBlockchain.get(veriblockBlockchain.getChainHead().getPreviousBlock());
-        while (prevBlock != null && !prevBlock.equals(lastKnownBlock)) {
-            context.add(prevBlock);
-            prevBlock = veriblockBlockchain.get(prevBlock.getPreviousBlock());
-        }
-
-        Collections.reverse(context);
-        return context;
-    }
-
     private Address deriveAddress(PublicKey key) {
         String data = "V" + Base58.encode(Sha256Hash.of(key.getEncoded()).getBytes()).substring(0, 24);
         
@@ -135,7 +105,7 @@ public class VeriBlockPopMiner {
        
         // create a VeriBlock PoP transaction
 
-        List<BitcoinBlock> blockOfProofContext = createBitcoinContext(lastKnownBTCBlock);
+        List<BitcoinBlock> blockOfProofContext = bitcoinBlockchain.getContext(lastKnownBTCBlock);
 
         VeriBlockPoPTransaction popTx = signTransaction(
                                                 new VeriBlockPoPTransaction(
@@ -159,7 +129,7 @@ public class VeriBlockPopMiner {
 
         // create a VTB
 
-        List<VeriBlockBlock> context = createVeriBlockContext(lastKnownVBKBlock);
+        List<VeriBlockBlock> context = veriblockBlockchain.getContext(lastKnownVBKBlock);
 
         return new VeriBlockPublication(popTx,
                                         blockData.getPoPMerklePath(0),
