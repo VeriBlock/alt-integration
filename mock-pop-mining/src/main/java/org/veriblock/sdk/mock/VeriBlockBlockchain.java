@@ -102,18 +102,19 @@ public class VeriBlockBlockchain extends org.veriblock.sdk.blockchain.VeriBlockB
         VBlakeHash secondPreviousKeystone = getSecondPreviousKeystoneForNewBlock();
 
         int timestamp = Math.max(getNextEarliestTimestamp(chainHead.getHash()).orElse(0), Utils.getCurrentTimestamp());
+        int difficulty = getNextDifficulty(chainHead).getAsInt();
 
         for (int nonce = 0; nonce < Integer.MAX_VALUE; nonce++) {
-            VeriBlockBlock newBlock = new VeriBlockBlock(blockHeight,
-                                                        chainHead.getVersion(),
-                                                        chainHead.getHash().trimToPreviousBlockSize(),
-                                                        previousKeystone,
-                                                        secondPreviousKeystone,
-                                                        blockData.getMerkleRoot(),
-                                                        timestamp,
-                                                        // FIXME: use the difficulty calculator to set the correct difficulty
-                                                        chainHead.getDifficulty(),
-                                                        nonce);
+            VeriBlockBlock newBlock = new VeriBlockBlock(
+                blockHeight,
+                chainHead.getVersion(),
+                chainHead.getHash().trimToPreviousBlockSize(),
+                previousKeystone,
+                secondPreviousKeystone,
+                blockData.getMerkleRoot(),
+                timestamp,
+                difficulty,
+                nonce);
 
             if (ValidationService.isProofOfWorkValid(newBlock)) {
                 add(newBlock);
