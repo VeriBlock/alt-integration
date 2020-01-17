@@ -604,21 +604,39 @@ public class VeriBlockBlockchain {
         }
     }
 
+    public OptionalInt getNextDifficulty(VeriBlockBlock previous, List<VeriBlockBlock> context) {
+        if (previous.getHeight() >= VeriBlockDifficultyCalculator.RETARGET_PERIOD &&
+            context.size() < VeriBlockDifficultyCalculator.RETARGET_PERIOD) {
+            return OptionalInt.empty();
+        }
+
+        BigInteger difficulty = VeriBlockDifficultyCalculator.calculate(networkParameters, previous, context);
+
+        return OptionalInt.of((int)BitcoinUtils.encodeCompactBits(difficulty));
+    }
+
+    public OptionalInt getNextDifficulty(VeriBlockBlock previous) throws SQLException {
+        List<StoredVeriBlockBlock> storedContext = getChainInternal(previous.getHash(), VeriBlockDifficultyCalculator.RETARGET_PERIOD);
+        List<VeriBlockBlock> context = storedContext.stream().map(StoredVeriBlockBlock::getBlock).collect(Collectors.toList());
+
+        return getNextDifficulty(previous, context);
+    }
+
     private void checkDifficulty(VeriBlockBlock block, StoredVeriBlockBlock previous, List<StoredVeriBlockBlock> context) throws VerificationException {
         if(!isValidateBlocksDifficulty()){
             return;
         }
 
-        if (context.size() < DIFFICULTY_ADJUST_BLOCK_COUNT) {
-            log.warn("Not enough context blocks to check difficulty");
-            return;
-        }
-
         List<VeriBlockBlock> contextBlocks = context.stream().map(StoredVeriBlockBlock::getBlock).collect(Collectors.toList());
-        BigInteger calculated = VeriBlockDifficultyCalculator.calculate(networkParameters, previous.getBlock(), contextBlocks);
 
-        if (block.getDifficulty() != (int)BitcoinUtils.encodeCompactBits(calculated)) {
-            throw new VerificationException("Block does not conform to expected difficulty");
+        OptionalInt difficulty = getNextDifficulty(previous.getBlock(), contextBlocks);
+
+        if (difficulty.isPresent()) {
+            if (block.getDifficulty() != difficulty.getAsInt()) {
+                throw new VerificationException("Block does not conform to expected difficulty");
+            }
+        } else {
+            log.warn("Not enough context blocks to check difficulty");
         }
     }
 
