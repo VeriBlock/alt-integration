@@ -56,11 +56,11 @@ public class SecurityFactory {
         // we use a separate in-memory database for the security service
         // to avoid conflicts with mock blockchain stores created using
         // ConnectionSelector.setConnectionInMemory()
-        String dbPath = "file:memdb2?mode=memory&cache=shared";
-        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnection(dbPath));
-        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnection(dbPath));
-        AuditorChangesStore changeStore = new AuditorChangesStore(ConnectionSelector.setConnection(dbPath));
-        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(ConnectionSelector.setConnection(dbPath));
+        String dbName = "alt-security";
+        VeriBlockStore veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory(dbName));
+        BitcoinStore bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory(dbName));
+        AuditorChangesStore changeStore = new AuditorChangesStore(ConnectionSelector.setConnectionInMemory(dbName));
+        PoPTransactionsDBStore popTxDBStore = new PoPTransactionsDBStore(ConnectionSelector.setConnectionInMemory(dbName));
 
         return new Context(getVeriblockNetworkParameters(), getBitcoinNetworkParameters(),
                            veriBlockStore, bitcoinStore, changeStore, popTxDBStore);
