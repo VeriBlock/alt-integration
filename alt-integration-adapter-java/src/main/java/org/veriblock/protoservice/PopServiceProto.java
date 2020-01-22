@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PopServiceProto {
-    private static final Logger log = LoggerFactory.getLogger(VeriBlockForkresolutionProtoService.class);
+    private static final Logger log = LoggerFactory.getLogger(PopServiceProto.class);
     private static VeriBlockSecurity security = null;
 
     private PopServiceProto() {}
