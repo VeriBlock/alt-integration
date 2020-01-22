@@ -24,28 +24,43 @@ public class ConnectionSelector {
     public static final String defaultDatabaseName = "database.sqlite";
     public static final String testDatabaseName = "database-test.sqlite";
 
+    static {
+        try {
+            DriverManager.registerDriver(new JDBC());
+        } catch (SQLException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
     private ConnectionSelector() { }
 
     public static Connection setConnection(String databasePath) throws SQLException
     {
-        String url;
-
         if (databasePath == null) {
-            logger.info("Using SqlLite in-memory store");
-            url = "jdbc:sqlite:file:memdb1?mode=memory&cache=shared";
-        } else {
-            logger.info("SqlLite path: '{}'", databasePath);
-            url = String.format("jdbc:sqlite:%s", databasePath);
+            return setConnectionInMemory();
         }
 
-        DriverManager.registerDriver(new JDBC());
-        Connection connection = DriverManager.getConnection(url);
-        return connection;
+        logger.info("SqlLite path: '{}'", databasePath);
+
+        String url = String.format("jdbc:sqlite:%s", databasePath);
+        return DriverManager.getConnection(url);
+    }
+
+    public static Connection setConnectionInMemory(String databaseName) throws SQLException
+    {
+        databaseName = databaseName == null || databaseName.isEmpty()
+                     ? "default"
+                     : databaseName;
+
+        logger.info("Using SqlLite in-memory store '{}'", databaseName);
+
+        String url = String.format("jdbc:sqlite:file:%s?mode=memory&cache=shared", databaseName);
+        return DriverManager.getConnection(url);
     }
 
     public static Connection setConnectionInMemory() throws SQLException
     {
-        return setConnection(null);
+        return setConnectionInMemory(null);
     }
 
     public static Connection setConnectionDefault() throws SQLException
