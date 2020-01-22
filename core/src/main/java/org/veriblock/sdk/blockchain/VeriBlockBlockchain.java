@@ -600,7 +600,7 @@ public class VeriBlockBlockchain {
                 throw new VerificationException("Block is too far in the past");
             }
         } else {
-            log.debug("Not enough context blocks to check timestamp");
+            log.debug("Not enough context blocks to check the timestamp of block '{}'", block.getHash().toString());
         }
     }
 
@@ -636,7 +636,7 @@ public class VeriBlockBlockchain {
                 throw new VerificationException("Block does not conform to expected difficulty");
             }
         } else {
-            log.debug("Not enough context blocks to check difficulty");
+            log.debug("Not enough context blocks to check the difficulty of block '{}'", block.getHash().toString());
         }
     }
 
@@ -644,7 +644,7 @@ public class VeriBlockBlockchain {
     // blocks were added to it successfully.
     // Otherwise, returns false.
     public boolean bootstrap(List<VeriBlockBlock> blocks) throws SQLException, VerificationException {
-        assert(blocks.size() > 0);
+        assert(!blocks.isEmpty());
         boolean bootstrapped = store.getChainHead() != null;
 
         if (!bootstrapped) {

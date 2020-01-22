@@ -68,22 +68,59 @@ public class VeriBlockSecurity {
 
     public AltChainParametersConfig getAltChainParametersConfig() { return this.altChainParametersConfig; }
 
+    private String veriblockContextToString(List<VeriBlockBlock> blocks) {
+        return blocks.isEmpty()
+             ? "empty"
+             : String.format("%s to %s",
+                             blocks.get(0).getHash().toString(),
+                             blocks.get(blocks.size() - 1).getHash().toString());
+    }
+
+    private String bitcoinContextToString(List<BitcoinBlock> blocks) {
+        return blocks.isEmpty()
+             ? "empty"
+             : String.format("%s to %s",
+                             blocks.get(0).getHash().toString(),
+                             blocks.get(blocks.size() - 1).getHash().toString());
+    }
+
+    private String publicationToString(AltPublication publication) {
+        return String.format("ATV with VeriBlock tx id %s, endorsing to %s VeriBlock block, providing VeriBlock context (%s)",
+                             publication.getTransaction().getId().toString(),
+                             publication.getContainingBlock().getHash().toString(),
+                             veriblockContextToString(publication.getContext()));
+    }
+
+    private String publicationToString(VeriBlockPublication publication) {
+        return String.format("VTB with VeriBlock tx id %s in %s block, endorsing %s VeriBlock block to %s Bitcoin block, providing VeriBlock context (%s) and Bitcoin context (%s)",
+                             publication.getTransaction().getId().toString(),
+                             publication.getContainingBlock().getHash().toString(),
+                             publication.getTransaction().getPublishedBlock().getHash().toString(),
+                             publication.getTransaction().getBlockOfProof().getHash().toString(),
+                             veriblockContextToString(publication.getContext()),
+                             bitcoinContextToString(publication.getTransaction().getBlockOfProofContext()));
+    }
+
     public ValidationResult checkATVInternally(AltPublication publication) {
         try {
+            log.debug("CheckATVInternally called for an ", publicationToString(publication));
             ValidationService.verify(publication);
 
             return ValidationResult.success();
         } catch (VerificationException e) {
+            log.debug("CheckATVInternally failed: {}", e.getMessage());
             return ValidationResult.fail(e.getMessage());
         }
     }
 
     public ValidationResult checkVTBInternally(VeriBlockPublication publication) {
         try {
+            log.debug("checkVTBInternally called for a ", publicationToString(publication));
             ValidationService.verify(publication);
 
             return ValidationResult.success();
         } catch (VerificationException e) {
+            log.debug("CheckVTBInternally failed: {}", e.getMessage());
             return ValidationResult.fail(e.getMessage());
         }
     }
@@ -100,6 +137,7 @@ public class VeriBlockSecurity {
         try {
             if (veriblockPublications != null && veriblockPublications.size() > 0) {
                 for (VeriBlockPublication publication : veriblockPublications) {
+                    log.debug("Processing a {}", publicationToString(publication));
                     ValidationService.verify(publication);
                     verifyPublicationContextually(publication);
 
@@ -108,6 +146,7 @@ public class VeriBlockSecurity {
                     List<VeriBlockBlock> veriBlockBlocks = publication.getBlocks();
                     if (veriBlockBlocks.contains(publication.getTransaction().getPublishedBlock())) {
                         // The published block is part of this publication's supplied context, add the blocks individually
+                        log.debug("The published block is part of this publication's supplied context");
                         for (VeriBlockBlock block : veriBlockBlocks) {
                             if (block.equals(publication.getTransaction().getPublishedBlock())) {
                                 changeset.addChanges(veriblockBlockchain.addWithProof(block, publication.getTransaction().getBlockOfProof().getHash()));
@@ -117,6 +156,7 @@ public class VeriBlockSecurity {
                         }
                     } else {
                         // The published block is pre-existing, therefore set its block of proof and add these new blocks
+                        log.debug("The published block is pre-existing");
                         changeset.addChanges(veriblockBlockchain.setBlockOfProof(
                                 publication.getTransaction().getPublishedBlock(),
                                 publication.getTransaction().getBlockOfProof().getHash()));
@@ -127,6 +167,7 @@ public class VeriBlockSecurity {
 
             if (altPublications != null && altPublications.size() > 0) {
                 for (AltPublication publication : altPublications) {
+                    log.debug("Processing an {}", publicationToString(publication));
                     ValidationService.verify(publication);
                     verifyPublicationContextually(publication);
 
@@ -134,6 +175,7 @@ public class VeriBlockSecurity {
                 }
             }
 
+            log.debug("adding a changeset of {} items to the journal", changeset.getChanges().size());
             journal.record(changeset);
 
         } catch (VerificationException e) {
@@ -159,13 +201,19 @@ public class VeriBlockSecurity {
         BlockIdentifier blockIdentifier = BlockIdentifier.wrap(Utils.decodeHex(blockIndex.getHash()));
 
         Changeset changeset = journal.get(blockIdentifier);
+        log.debug("Rewinding a changeset of {} items", changeset.getChanges().size());
         rewind(changeset);
     }
 
     public void addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws VerificationException, BlockStoreException, SQLException {
+        log.info("AddTemporaryPayloads {} VTB(s) and {} ATV(s)",
+                 String.valueOf(veriblockPublications == null ? 0 : veriblockPublications.size()),
+                 String.valueOf(altPublications == null ? 0 : altPublications.size()));
+
         try {
             if (veriblockPublications != null && veriblockPublications.size() > 0) {
                 for (VeriBlockPublication publication : veriblockPublications) {
+                    log.debug("Processing a {}", publicationToString(publication));
                     ValidationService.verify(publication);
                     verifyPublicationContextually(publication);
 
@@ -175,6 +223,7 @@ public class VeriBlockSecurity {
                     List<VeriBlockBlock> veriBlockBlocks = publication.getBlocks();
                     if (veriBlockBlocks.contains(publication.getTransaction().getPublishedBlock())) {
                         // The published block is part of this publication's supplied context, add the blocks individually
+                        log.debug("The published block is part of this publication's supplied context");
                         for (VeriBlockBlock block : veriBlockBlocks) {
                             if (block.equals(publication.getTransaction().getPublishedBlock())) {
                                 veriblockBlockchain.addTemporarily(block, publication.getTransaction().getBlockOfProof().getHash());
@@ -184,6 +233,7 @@ public class VeriBlockSecurity {
                         }
                     } else {
                         // The published block is pre-existing, therefore set its block of proof and add these new blocks
+                        log.debug("The published block is pre-existing");
                         veriblockBlockchain.setBlockOfProofTemporarily(
                                 publication.getTransaction().getPublishedBlock(),
                                 publication.getTransaction().getBlockOfProof().getHash());
@@ -194,6 +244,7 @@ public class VeriBlockSecurity {
 
             if (altPublications != null && altPublications.size() > 0) {
                 for (AltPublication publication : altPublications) {
+                    log.debug("Processing an {}", publicationToString(publication));
                     ValidationService.verify(publication);
                     verifyPublicationContextually(publication);
 
@@ -202,12 +253,14 @@ public class VeriBlockSecurity {
             }
 
         } catch (VerificationException e) {
+            log.debug("AddTemporaryPayloads failed: {}", e.getMessage());
             clearTemporaryPayloads();
             throw e;
         }
     }
 
     public void clearTemporaryPayloads() {
+        log.debug("Removing all temporary payloads");
         veriblockBlockchain.clearTemporaryModifications();
         bitcoinBlockchain.clearTemporaryModifications();
     }
@@ -310,6 +363,9 @@ public class VeriBlockSecurity {
         log.info("UpdateContext with {} Bitcoin and {} VeriBlock blocks",
                  String.valueOf(bitcoinBlocks.size()),
                  String.valueOf(veriBlockBlocks.size()));
+
+        log.debug("Bitcoin context blocks: {} to {}", bitcoinContextToString(bitcoinBlocks));
+        log.debug("VeriBlock context blocks: {} to {}", veriblockContextToString(veriBlockBlocks));
 
         List<Change> changes = new ArrayList<Change>();
         try {

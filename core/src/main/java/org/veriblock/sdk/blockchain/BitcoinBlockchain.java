@@ -318,7 +318,7 @@ public class BitcoinBlockchain {
                 throw new VerificationException("Block is too far in the past");
             }
         } else {
-            log.debug("Not enough context blocks to check timestamp");
+            log.debug("Not enough context blocks to check the timestamp of block '{}'", block.getHash().toString());
         }
     }
 
@@ -403,9 +403,14 @@ public class BitcoinBlockchain {
 
         OptionalLong difficulty = getNextDifficulty(block.getTimestamp(), previous);
 
-        if (difficulty.isPresent() && block.getBits() != difficulty.getAsLong()) {
-            throw new VerificationException("Block does not match computed difficulty adjustment");
+        if (difficulty.isPresent()) {
+            if (block.getBits() != difficulty.getAsLong()) {
+                throw new VerificationException("Block does not match computed difficulty adjustment");
+            }
+        } else {
+            log.debug("Not enough context blocks to check the difficulty of block '{}'", block.getHash().toString());
         }
+
 
     }
 
@@ -434,7 +439,7 @@ public class BitcoinBlockchain {
     // blocks were added to it successfully.
     // Otherwise, returns false.
     public boolean bootstrap(List<BitcoinBlock> blocks, int firstBlockHeight) throws SQLException, VerificationException {
-        assert(blocks.size() > 0);
+        assert(!blocks.isEmpty());
         assert(firstBlockHeight >= 0);
 
         boolean bootstrapped = store.getChainHead() != null;
