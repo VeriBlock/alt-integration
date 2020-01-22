@@ -509,7 +509,7 @@ public class VeriBlockBlockchain {
         // Duplicate?
         StoredVeriBlockBlock duplicate = getInternal(block.getHash());
         if (duplicate != null) {
-            log.info("Block '{}' has already been added", block.getHash().toString());
+            log.trace("Block '{}' has already been added", block.getHash().toString());
             return false;
         }
 
@@ -600,7 +600,7 @@ public class VeriBlockBlockchain {
                 throw new VerificationException("Block is too far in the past");
             }
         } else {
-            log.warn("Not enough context blocks to check timestamp");
+            log.debug("Not enough context blocks to check timestamp");
         }
     }
 
@@ -636,7 +636,7 @@ public class VeriBlockBlockchain {
                 throw new VerificationException("Block does not conform to expected difficulty");
             }
         } else {
-            log.warn("Not enough context blocks to check difficulty");
+            log.debug("Not enough context blocks to check difficulty");
         }
     }
 

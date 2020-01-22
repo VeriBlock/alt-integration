@@ -44,7 +44,7 @@ public class BitcoinStore implements BlockStore<StoredBitcoinBlock, Sha256Hash> 
         try {
             if(databaseConnection != null) databaseConnection.close();
         } catch (SQLException e) {
-            log.debug("Error closing database connection", e);
+            log.error("Error closing database connection", e);
         }
     }
 

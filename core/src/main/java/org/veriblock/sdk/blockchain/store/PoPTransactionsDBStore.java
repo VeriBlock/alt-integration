@@ -63,7 +63,7 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
         try {
             if (connectionResource != null) connectionResource.close();
         } catch (SQLException e) {
-            log.debug("Error closing database connection", e);
+            log.error("Error closing database connection", e);
         }
     }
 

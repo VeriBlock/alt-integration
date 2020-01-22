@@ -110,7 +110,7 @@ public final class Application {
             ForkresolutionComparator.setSecurity(security);
             PopRewardCalculator.setSecurity(security);
         } catch (Exception e) {
-            log.debug("Could not initialize VeriBlock security", e);
+            log.error("Could not initialize VeriBlock security", e);
             return;
         }
 
@@ -130,7 +130,7 @@ public final class Application {
         try {
             server.start();
         } catch (IOException e) {
-            log.debug("Could not start GRPC server", e);
+            log.error("Could not start GRPC server", e);
         }
 
         running = true;
@@ -142,13 +142,13 @@ public final class Application {
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
-            log.warn(packageName + " terminated");
+            log.info(packageName + " terminated");
             terminated = true;
         }
 
         shutdown();
 
-        log.warn(packageName + " stopped");
+        log.info(packageName + " stopped");
     }
 
     public void shutdown() {
