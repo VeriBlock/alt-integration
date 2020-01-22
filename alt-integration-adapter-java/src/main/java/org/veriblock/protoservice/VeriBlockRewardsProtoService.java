@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class VeriBlockRewardsProtoService {
-    private static final Logger log = LoggerFactory.getLogger(VeriBlockSecurityProtoService.class);
+    private static final Logger log = LoggerFactory.getLogger(VeriBlockRewardsProtoService.class);
 
     private VeriBlockRewardsProtoService() { }
     
