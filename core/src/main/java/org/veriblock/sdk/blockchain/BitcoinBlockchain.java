@@ -264,7 +264,7 @@ public class BitcoinBlockchain {
         // Duplicate?
         StoredBitcoinBlock duplicate = getInternal(block.getHash());
         if (duplicate != null) {
-            log.info("Block '{}' has already been added", block.getHash().toString());
+            log.trace("Block '{}' has already been added", block.getHash().toString());
             return false;
         }
 
@@ -318,7 +318,7 @@ public class BitcoinBlockchain {
                 throw new VerificationException("Block is too far in the past");
             }
         } else {
-            log.warn("Not enough context blocks to check timestamp");
+            log.debug("Not enough context blocks to check timestamp");
         }
     }
 
