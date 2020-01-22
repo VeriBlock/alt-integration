@@ -8,6 +8,9 @@
 
 package org.veriblock.sdk;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.veriblock.sdk.auditor.AuditJournal;
 import org.veriblock.sdk.auditor.BlockIdentifier;
 import org.veriblock.sdk.auditor.Change;
@@ -26,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class VeriBlockSecurity {
+    private static final Logger log = LoggerFactory.getLogger(VeriBlockSecurity.class);
 
     private final VeriBlockBlockchain veriblockBlockchain;
     private final BitcoinBlockchain bitcoinBlockchain;
@@ -86,6 +90,11 @@ public class VeriBlockSecurity {
 
     // TODO: Exception when blockIndex.height is less than or equal to highest known
     public void addPayloads(BlockIndex blockIndex, List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws VerificationException, BlockStoreException, SQLException {
+        log.info("AddPayloads {} VTB(s) and {} ATV(s) for block {}:{}",
+                 String.valueOf(veriblockPublications == null ? 0 : veriblockPublications.size()),
+                 String.valueOf(altPublications == null ? 0 : altPublications.size()),
+                 blockIndex.getHash(), String.valueOf(blockIndex.getHeight()));
+
         Changeset changeset = new Changeset(BlockIdentifier.wrap(Utils.decodeHex(blockIndex.getHash())));
 
         try {
@@ -128,6 +137,7 @@ public class VeriBlockSecurity {
             journal.record(changeset);
 
         } catch (VerificationException e) {
+            log.info("AddPayloads failed: {} ", e.getMessage());
             rewind(changeset);
             throw e;
         }
@@ -143,6 +153,9 @@ public class VeriBlockSecurity {
     }
 
     public void removePayloads(BlockIndex blockIndex) throws SQLException {
+        log.info("RemovePayloads for block {}:{}",
+                 blockIndex.getHash(), String.valueOf(blockIndex.getHeight()));
+
         BlockIdentifier blockIdentifier = BlockIdentifier.wrap(Utils.decodeHex(blockIndex.getHash()));
 
         Changeset changeset = journal.get(blockIdentifier);
@@ -293,15 +306,19 @@ public class VeriBlockSecurity {
         }
     }
 
-    public void updateContext(List<BitcoinBlock> bitcoinBlocks, List<VeriBlockBlock> veriBlockBlocks) throws SQLException, VerificationException
-    {
+    public void updateContext(List<BitcoinBlock> bitcoinBlocks, List<VeriBlockBlock> veriBlockBlocks) throws SQLException, VerificationException {
+        log.info("UpdateContext with {} Bitcoin and {} VeriBlock blocks",
+                 String.valueOf(bitcoinBlocks.size()),
+                 String.valueOf(veriBlockBlocks.size()));
+
         List<Change> changes = new ArrayList<Change>();
         try {
             changes.addAll(bitcoinBlockchain.addAll(bitcoinBlocks));
             changes.addAll(veriblockBlockchain.addAll(veriBlockBlocks));
         }
-        catch (VerificationException e)
-        {
+        catch (VerificationException e) {
+            log.info("UpdateContext failed: {} ", e.getMessage());
+
             Collections.reverse(changes);
             Iterator<Change> changeIterator = changes.iterator();
             while (changeIterator.hasNext()) {
