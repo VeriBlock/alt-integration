@@ -440,6 +440,12 @@ public class BitcoinBlockchain {
         boolean bootstrapped = store.getChainHead() != null;
 
         if (!bootstrapped) {
+            log.info("Bootstrapping starting at height {} with {} blocks: {} to {}",
+                     String.valueOf(firstBlockHeight),
+                     String.valueOf(blocks.size()),
+                     blocks.get(0).getHash().toString(),
+                     blocks.get(blocks.size() - 1).getHash().toString());
+
             Sha256Hash prevHash = null;
             for (BitcoinBlock block : blocks) {
                 if (prevHash != null && !block.getPreviousBlock().equals(prevHash) )

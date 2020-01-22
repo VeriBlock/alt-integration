@@ -648,6 +648,12 @@ public class VeriBlockBlockchain {
         boolean bootstrapped = store.getChainHead() != null;
 
         if (!bootstrapped) {
+            log.info("Bootstrapping starting at height {} with {} blocks: {} to {}",
+                     String.valueOf(blocks.get(0).getHeight()),
+                     String.valueOf(blocks.size()),
+                     blocks.get(0).getHash().toString(),
+                     blocks.get(blocks.size() - 1).getHash().toString());
+
             VBlakeHash prevHash = null;
             for (VeriBlockBlock block : blocks) {
                 if (prevHash != null && !block.getPreviousBlock().equals(prevHash) )
