@@ -16,6 +16,7 @@ import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.blockchain.store.StoredVeriBlockBlock;
+import org.veriblock.sdk.blockchain.store.VeriBlockCachedStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.BitcoinMainNetParameters;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
@@ -90,7 +91,8 @@ public class Context {
 
     public static Context init() throws BlockStoreException, SQLException {
        return new Context(new MainNetParameters(), new BitcoinMainNetParameters(),
-                          new VeriBlockStore(ConnectionSelector.setConnectionDefault()),
+                          new VeriBlockCachedStore(
+                                new VeriBlockStore(ConnectionSelector.setConnectionDefault())),
                           new BitcoinStore(ConnectionSelector.setConnectionDefault()),
                           new AuditorChangesStore(ConnectionSelector.setConnectionDefault()),
                           new PoPTransactionsDBStore(ConnectionSelector.setConnectionDefault()));

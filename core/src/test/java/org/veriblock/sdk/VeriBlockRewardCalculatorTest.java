@@ -16,6 +16,7 @@ import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.blockchain.store.VeriBlockCachedStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.BitcoinMainNetParameters;
 import org.veriblock.sdk.conf.MainNetParameters;
@@ -66,7 +67,8 @@ public class VeriBlockRewardCalculatorTest {
         VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock popTxDBStore = new VeriBlockRewardCalculatorTest.PoPTransactionsDBStoreMock();
 
         Context context = new Context(new MainNetParameters(), new BitcoinMainNetParameters(),
-                                      veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+                                      new VeriBlockCachedStore(veriBlockStore),
+                                      bitcoinStore, auditStore, popTxDBStore);
         context.resetSecurity();
         securityMock = new VeriBlockRewardCalculatorTest.VeriBlockSecurityMock(context);
         PopRewardCalculator.setSecurity(securityMock);
