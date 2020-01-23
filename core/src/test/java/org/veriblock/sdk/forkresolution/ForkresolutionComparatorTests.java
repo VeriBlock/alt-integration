@@ -20,6 +20,7 @@ import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.blockchain.store.VeriBlockCachedStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.BitcoinMainNetParameters;
 import org.veriblock.sdk.conf.MainNetParameters;
@@ -62,7 +63,9 @@ public class ForkresolutionComparatorTests {
         AuditorChangesStore auditStore = new AuditorChangesStore(ConnectionSelector.setConnectionInMemory());
         PoPTransactionsDBStoreMock popTxDBStore = new PoPTransactionsDBStoreMock();
 
-        Context context = new Context(new MainNetParameters(), new BitcoinMainNetParameters(), veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+        Context context = new Context(new MainNetParameters(), new BitcoinMainNetParameters(),
+                                      new VeriBlockCachedStore(veriBlockStore),
+                                      bitcoinStore, auditStore, popTxDBStore);
 
         veriBlockSecuritySpy = Mockito.spy(new VeriBlockSecurity(context));
 

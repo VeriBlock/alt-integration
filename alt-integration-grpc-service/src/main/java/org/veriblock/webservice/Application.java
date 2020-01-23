@@ -23,6 +23,7 @@ import org.veriblock.sdk.blockchain.BitcoinBlockchainBootstrapConfig;
 import org.veriblock.sdk.blockchain.VeriBlockBlockchainBootstrapConfig;
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
 import org.veriblock.sdk.blockchain.store.PoPTransactionsDBStore;
+import org.veriblock.sdk.blockchain.store.VeriBlockCachedStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.forkresolution.ForkresolutionComparator;
 import org.veriblock.sdk.forkresolution.ForkresolutionConfig;
@@ -75,7 +76,8 @@ public final class Application {
 
             Context context = new Context(config.getVeriblockNetworkParameters(),
                                           config.getBitcoinNetworkParameters(),
-                                          veriBlockStore, bitcoinStore, auditStore, popTxDBStore);
+                                          new VeriBlockCachedStore(veriBlockStore),
+                                          bitcoinStore, auditStore, popTxDBStore);
             
             security = new VeriBlockSecurity(context);
 
