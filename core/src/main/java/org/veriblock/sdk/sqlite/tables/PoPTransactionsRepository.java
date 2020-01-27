@@ -26,9 +26,7 @@ public class PoPTransactionsRepository {
     {
         this.connectionSource = connection;
 
-        Statement stmt = null;
-        try{
-            stmt = connectionSource.createStatement();
+        try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName
                     + "(\n "
                     + txHashColumnName + " TEXT PRIMARY KEY,\n "
@@ -37,17 +35,12 @@ public class PoPTransactionsRepository {
                     + " FOREIGN KEY (" + altPublicationHashColumnName + ")\n "
                     + " REFERENCES " + AltPublicationRepository.tableName + " (" + AltPublicationRepository.altPublicationHash + ")\n "
                     + ");");
-        }
-        finally{
-            if(stmt != null) stmt.close();
-            stmt = null;
-        }
 
-        try {
-            stmt = connectionSource.createStatement();
+            stmt.execute(String.format("CREATE INDEX IF NOT EXISTS %s ON %s(%s)",
+                                       tableName + endorsedBlockHashColumnName,
+                                       tableName, endorsedBlockHashColumnName));
+
             stmt.execute("PRAGMA journal_mode=WAL;");
-        } finally {
-            if(stmt != null) stmt.close();
         }
     }
 
