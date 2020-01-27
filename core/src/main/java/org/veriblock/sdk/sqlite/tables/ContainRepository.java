@@ -41,9 +41,15 @@ public class ContainRepository {
                     + " FOREIGN KEY (" + txHashColumnName + ")\n "
                     + " REFERENCES " + PoPTransactionsRepository.tableName + " (" + PoPTransactionsRepository.txHashColumnName + ")\n "
                     + ");");
-        }
 
-        try(Statement stmt = connectionSource.createStatement()) {
+            stmt.execute(String.format("CREATE INDEX IF NOT EXISTS %s ON %s(%s)",
+                                       tableName + txHashColumnName,
+                                       tableName, txHashColumnName));
+
+            stmt.execute(String.format("CREATE INDEX IF NOT EXISTS %s ON %s(%s)",
+                                       tableName + blockHashColumnName,
+                                       tableName, blockHashColumnName));
+
             stmt.execute("PRAGMA journal_mode=WAL;");
         }
     }
