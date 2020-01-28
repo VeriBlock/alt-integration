@@ -71,9 +71,11 @@ public class VeriBlockSecurity {
     private String veriblockContextToString(List<VeriBlockBlock> blocks) {
         return blocks.isEmpty()
              ? "empty"
-             : String.format("%s to %s",
+             : String.format("%s:%d to %s:%d",
                              blocks.get(0).getHash().toString(),
-                             blocks.get(blocks.size() - 1).getHash().toString());
+                             blocks.get(0).getHeight(),
+                             blocks.get(blocks.size() - 1).getHash().toString(),
+                             blocks.get(blocks.size() - 1).getHeight());
     }
 
     private String bitcoinContextToString(List<BitcoinBlock> blocks) {
@@ -85,17 +87,20 @@ public class VeriBlockSecurity {
     }
 
     private String publicationToString(AltPublication publication) {
-        return String.format("ATV with VeriBlock tx id %s, endorsing to %s VeriBlock block, providing VeriBlock context (%s)",
+        return String.format("ATV with VeriBlock tx id %s, endorsing to %s:%d VeriBlock block, providing VeriBlock context (%s)",
                              publication.getTransaction().getId().toString(),
                              publication.getContainingBlock().getHash().toString(),
+                             publication.getContainingBlock().getHeight(),
                              veriblockContextToString(publication.getContext()));
     }
 
     private String publicationToString(VeriBlockPublication publication) {
-        return String.format("VTB with VeriBlock tx id %s in %s block, endorsing %s VeriBlock block to %s Bitcoin block, providing VeriBlock context (%s) and Bitcoin context (%s)",
+        return String.format("VTB with VeriBlock tx id %s in %s:%d block, endorsing %s:%d VeriBlock block to %s Bitcoin block, providing VeriBlock context (%s) and Bitcoin context (%s)",
                              publication.getTransaction().getId().toString(),
                              publication.getContainingBlock().getHash().toString(),
+                             publication.getContainingBlock().getHeight(),
                              publication.getTransaction().getPublishedBlock().getHash().toString(),
+                             publication.getTransaction().getPublishedBlock().getHeight(),
                              publication.getTransaction().getBlockOfProof().getHash().toString(),
                              veriblockContextToString(publication.getContext()),
                              bitcoinContextToString(publication.getTransaction().getBlockOfProofContext()));
