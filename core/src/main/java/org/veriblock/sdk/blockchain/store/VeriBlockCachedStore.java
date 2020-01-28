@@ -19,28 +19,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** A BlockStore wrapper that caches the best chain in RAM.
-  *
-  * The implementation is optimized for the case where
-  * the best chain is extremely long and the chain head
-  * changes due to blockchain growth or shallow reorgs.
-  *
-  * Thus, the expected difference between the old and
-  * new best chain is a small number of recent blocks.
-  *
-  * The wrapper works by tracking chain head changes.
-  * The new and old best chains are traced back to the
-  * fork point. The slice between the fork point and
-  * the new chain head is added to the cache. The slice
-  * between the fork point and the old chain head is
-  * dropped from the cache.
-  *
-  * Once more real-world usage scenarios emerge and
-  * stabilize to the point where they can be profiled,
-  * it might be possible to improve the implementation,
-  * for example, by caching only the last X blocks of
-  * the best chain.
-  */
+/**
+ * A BlockStore wrapper that caches the best chain in RAM.
+ * <p>
+ * The implementation is optimized for the case where
+ * the best chain is extremely long and the chain head
+ * changes due to blockchain growth or shallow reorgs.
+ * <p>
+ * Thus, the expected difference between the old and
+ * new best chain is a small number of recent blocks.
+ * <p>
+ * The wrapper works by tracking chain head changes.
+ * The new and old best chains are traced back to the
+ * fork point. The slice between the fork point and
+ * the new chain head is added to the cache. The slice
+ * between the fork point and the old chain head is
+ * dropped from the cache.
+ * <p>
+ * Once more real-world usage scenarios emerge and
+ * stabilize to the point where they can be profiled,
+ * it might be possible to improve the implementation,
+ * for example, by caching only the last X blocks of
+ * the best chain.
+ */
 public class VeriBlockCachedStore implements BlockStore<StoredVeriBlockBlock, VBlakeHash> {
     private static final Logger log = LoggerFactory.getLogger(VeriBlockCachedStore.class);
 
@@ -72,9 +73,9 @@ public class VeriBlockCachedStore implements BlockStore<StoredVeriBlockBlock, VB
 
         // TODO: performance: investigate using the hash length to determine the map to query
         public StoredVeriBlockBlock get(VBlakeHash hash) {
-            return full.getOrDefault(hash,
-                                     previous.getOrDefault(hash,
-                                                           keystone.get(hash)));
+            StoredVeriBlockBlock ks = keystone.get(hash);
+            StoredVeriBlockBlock pr = previous.getOrDefault(hash, ks);
+            return full.getOrDefault(hash, pr);
         }
 
         public StoredVeriBlockBlock remove(VBlakeHash hash) {
@@ -87,15 +88,16 @@ public class VeriBlockCachedStore implements BlockStore<StoredVeriBlockBlock, VB
                 full.remove(fullHash);
                 previous.remove(fullHash.trimToPreviousBlockSize());
                 keystone.remove(fullHash.trimToPreviousKeystoneSize());
-            };
+            }
+            ;
 
             return removed;
         }
     }
-    
+
     public VeriBlockCachedStore(BlockStore<StoredVeriBlockBlock, VBlakeHash> store) throws SQLException {
         this.store = store;
-        
+
         updateBestChain(null, store.getChainHead());
     }
 
@@ -112,14 +114,14 @@ public class VeriBlockCachedStore implements BlockStore<StoredVeriBlockBlock, VB
     // The old and new chain do not need to have a common ancestor.
     private void updateBestChain(StoredVeriBlockBlock oldHead, StoredVeriBlockBlock newHead) throws SQLException {
         StoredVeriBlockBlock forkPoint = newHead;
-        
+
         // Add the new chain to the cache until we hit a block
         // that's already cached. That block is the fork point.
         while (forkPoint != null && bestChain.get(forkPoint.getHash()) == null) {
             bestChain.add(forkPoint);
             forkPoint = get(forkPoint.getBlock().getPreviousBlock());
         }
-        
+
         // Remove the old chain up to the fork point from the cache
         while (oldHead != null && !oldHead.equals(forkPoint)) {
             bestChain.remove(oldHead.getHash());
@@ -152,7 +154,7 @@ public class VeriBlockCachedStore implements BlockStore<StoredVeriBlockBlock, VB
         // erase is not allowed to delete a block pointed to by another block
         // or a chain head, so it cannot affect the best chain
         return store.erase(hash);
-     }
+    }
 
     public StoredVeriBlockBlock replace(VBlakeHash hash, StoredVeriBlockBlock block) throws BlockStoreException, SQLException {
         StoredVeriBlockBlock replaced = store.replace(hash, block);
@@ -160,7 +162,7 @@ public class VeriBlockCachedStore implements BlockStore<StoredVeriBlockBlock, VB
         // if the block is in the best chain, update the best chain
         StoredVeriBlockBlock cached = bestChain.remove(hash);
         if (cached != null) {
-            assert(cached.equals(replaced));
+            assert (cached.equals(replaced));
             bestChain.add(block);
         }
 
