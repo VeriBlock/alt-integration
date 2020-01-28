@@ -86,6 +86,10 @@ public class VeriBlockStore implements BlockStore<StoredVeriBlockBlock, VBlakeHa
         veriBlockRepository.save(storedBlock);
     }
 
+    public void put(List<StoredVeriBlockBlock> storedBlocks) throws BlockStoreException, SQLException {
+        veriBlockRepository.saveAll(storedBlocks);
+    }
+
     public StoredVeriBlockBlock get(VBlakeHash hash) throws BlockStoreException, SQLException {
         List<StoredVeriBlockBlock> blocks = veriBlockRepository.getEndsWithId(hash);
         return blocks.isEmpty() ? null : blocks.get(0);

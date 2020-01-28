@@ -85,6 +85,10 @@ public class BitcoinStore implements BlockStore<StoredBitcoinBlock, Sha256Hash> 
 
         bitcoinRepository.save(storedBlock);
     }
+
+    public void putAll(List<StoredBitcoinBlock> storedBlocks) throws BlockStoreException, SQLException {
+        bitcoinRepository.saveAll(storedBlocks);
+    }
     
     public StoredBitcoinBlock get(Sha256Hash hash) throws BlockStoreException, SQLException {
         return bitcoinRepository.get(hash);
