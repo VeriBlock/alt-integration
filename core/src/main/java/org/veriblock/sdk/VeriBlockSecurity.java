@@ -20,6 +20,7 @@ import org.veriblock.sdk.blockchain.VeriBlockBlockchain;
 import org.veriblock.sdk.blockchain.VeriBlockPublicationUtilities;
 import org.veriblock.sdk.models.*;
 import org.veriblock.sdk.services.ValidationService;
+import org.veriblock.sdk.util.LogFormatter;
 import org.veriblock.sdk.util.Utils;
 
 import java.sql.SQLException;
@@ -68,47 +69,9 @@ public class VeriBlockSecurity {
 
     public AltChainParametersConfig getAltChainParametersConfig() { return this.altChainParametersConfig; }
 
-    private String veriblockContextToString(List<VeriBlockBlock> blocks) {
-        return blocks.isEmpty()
-             ? "empty"
-             : String.format("%s:%d to %s:%d",
-                             blocks.get(0).getHash().toString(),
-                             blocks.get(0).getHeight(),
-                             blocks.get(blocks.size() - 1).getHash().toString(),
-                             blocks.get(blocks.size() - 1).getHeight());
-    }
-
-    private String bitcoinContextToString(List<BitcoinBlock> blocks) {
-        return blocks.isEmpty()
-             ? "empty"
-             : String.format("%s to %s",
-                             blocks.get(0).getHash().toString(),
-                             blocks.get(blocks.size() - 1).getHash().toString());
-    }
-
-    private String publicationToString(AltPublication publication) {
-        return String.format("ATV with VeriBlock tx id %s, endorsing to %s:%d VeriBlock block, providing VeriBlock context (%s)",
-                             publication.getTransaction().getId().toString(),
-                             publication.getContainingBlock().getHash().toString(),
-                             publication.getContainingBlock().getHeight(),
-                             veriblockContextToString(publication.getContext()));
-    }
-
-    private String publicationToString(VeriBlockPublication publication) {
-        return String.format("VTB with VeriBlock tx id %s in %s:%d block, endorsing %s:%d VeriBlock block to %s Bitcoin block, providing VeriBlock context (%s) and Bitcoin context (%s)",
-                             publication.getTransaction().getId().toString(),
-                             publication.getContainingBlock().getHash().toString(),
-                             publication.getContainingBlock().getHeight(),
-                             publication.getTransaction().getPublishedBlock().getHash().toString(),
-                             publication.getTransaction().getPublishedBlock().getHeight(),
-                             publication.getTransaction().getBlockOfProof().getHash().toString(),
-                             veriblockContextToString(publication.getContext()),
-                             bitcoinContextToString(publication.getTransaction().getBlockOfProofContext()));
-    }
-
     public ValidationResult checkATVInternally(AltPublication publication) {
         try {
-            log.debug("CheckATVInternally called for an ", publicationToString(publication));
+            log.debug("CheckATVInternally called for an {}", LogFormatter.toString(publication));
             ValidationService.verify(publication);
 
             return ValidationResult.success();
@@ -120,7 +83,7 @@ public class VeriBlockSecurity {
 
     public ValidationResult checkVTBInternally(VeriBlockPublication publication) {
         try {
-            log.debug("checkVTBInternally called for a ", publicationToString(publication));
+            log.debug("checkVTBInternally called for a {}", LogFormatter.toString(publication));
             ValidationService.verify(publication);
 
             return ValidationResult.success();
@@ -142,7 +105,7 @@ public class VeriBlockSecurity {
         try {
             if (veriblockPublications != null && veriblockPublications.size() > 0) {
                 for (VeriBlockPublication publication : veriblockPublications) {
-                    log.debug("Processing a {}", publicationToString(publication));
+                    log.debug("Processing a {}", LogFormatter.toString(publication));
                     ValidationService.verify(publication);
                     verifyPublicationContextually(publication);
 
@@ -172,7 +135,7 @@ public class VeriBlockSecurity {
 
             if (altPublications != null && altPublications.size() > 0) {
                 for (AltPublication publication : altPublications) {
-                    log.debug("Processing an {}", publicationToString(publication));
+                    log.debug("Processing an {}", LogFormatter.toString(publication));
                     ValidationService.verify(publication);
                     verifyPublicationContextually(publication);
 
@@ -218,7 +181,7 @@ public class VeriBlockSecurity {
         try {
             if (veriblockPublications != null && veriblockPublications.size() > 0) {
                 for (VeriBlockPublication publication : veriblockPublications) {
-                    log.debug("Processing a {}", publicationToString(publication));
+                    log.debug("Processing a {}", LogFormatter.toString(publication));
                     ValidationService.verify(publication);
                     verifyPublicationContextually(publication);
 
@@ -249,7 +212,7 @@ public class VeriBlockSecurity {
 
             if (altPublications != null && altPublications.size() > 0) {
                 for (AltPublication publication : altPublications) {
-                    log.debug("Processing an {}", publicationToString(publication));
+                    log.debug("Processing an {}", LogFormatter.toString(publication));
                     ValidationService.verify(publication);
                     verifyPublicationContextually(publication);
 
@@ -369,8 +332,8 @@ public class VeriBlockSecurity {
                  String.valueOf(bitcoinBlocks.size()),
                  String.valueOf(veriBlockBlocks.size()));
 
-        log.debug("Bitcoin context blocks: {} to {}", bitcoinContextToString(bitcoinBlocks));
-        log.debug("VeriBlock context blocks: {} to {}", veriblockContextToString(veriBlockBlocks));
+        log.debug("Bitcoin context blocks: {} to {}", LogFormatter.bitcoinContextToString(bitcoinBlocks));
+        log.debug("VeriBlock context blocks: {} to {}", LogFormatter.veriblockContextToString(veriBlockBlocks));
 
         List<Change> changes = new ArrayList<Change>();
         try {
