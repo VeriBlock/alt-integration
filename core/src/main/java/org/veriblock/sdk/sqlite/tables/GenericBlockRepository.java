@@ -75,6 +75,21 @@ public class GenericBlockRepository<Block, Id> {
         }
     }
 
+    public void saveAll(List<Block> blocks) throws SQLException {
+        String statement = "REPLACE INTO "
+                + tableBlocks
+                + " (" + getColumnsString() + ") "
+                + "VALUES(" + getValuesString() + ")";
+        connectionSource.setAutoCommit(false);
+        try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
+            for (Block block : blocks) {
+                serializer.toStmt(block, stmt);
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+        }
+    }
+
     public Block get(Id id) throws SQLException {
         String statement = "SELECT * FROM " + tableBlocks + " WHERE id = ?";
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {

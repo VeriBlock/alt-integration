@@ -165,7 +165,7 @@ public class PoPTransactionsDBStore implements PoPTransactionStore {
         return resultData;
     }
 
-    public List<AltChainBlock> getKeyStonesFromBlockHeight(long height) throws SQLException {
+    public List<AltChainBlock> getAltChainBlocksFromBlockHeight(long height) throws SQLException {
         return containRepo.getAllFromHeight(height);
     }
 

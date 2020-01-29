@@ -69,7 +69,7 @@ public interface PoPTransactionStore {
      * @return the list of AltChainBlock
      * @throws SQLException
      */
-    List<AltChainBlock> getKeyStonesFromBlockHeight(long height) throws SQLException;
+    List<AltChainBlock> getAltChainBlocksFromBlockHeight(long height) throws SQLException;
 
     /**
      * Retrieve common keyStone, or null.

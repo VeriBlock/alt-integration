@@ -722,7 +722,7 @@ public class ForkresolutionComparatorTests {
         }
 
         @Override
-        public List<AltChainBlock> getKeyStonesFromBlockHeight(long height) {
+        public List<AltChainBlock> getAltChainBlocksFromBlockHeight(long height) {
             throw new UnsupportedOperationException();
         }
     }
