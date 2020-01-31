@@ -1,0 +1,11 @@
+# Gradle
+.idea/**/gradle.xml
+.idea/**/libraries
+.gradle/
+build/
+
+# Eclipse
+.settings
+.classpath
+.project
+bin/
