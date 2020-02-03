@@ -80,6 +80,8 @@ public class GenericBlockRepository<Block, Id> {
                 + tableBlocks
                 + " (" + getColumnsString() + ") "
                 + "VALUES(" + getValuesString() + ")";
+
+        boolean autoCommit = connectionSource.getAutoCommit();
         connectionSource.setAutoCommit(false);
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             for (Block block : blocks) {
@@ -88,7 +90,7 @@ public class GenericBlockRepository<Block, Id> {
             }
             stmt.executeBatch();
         } finally {
-            connectionSource.setAutoCommit(true);
+            connectionSource.setAutoCommit(autoCommit);
         }
     }
 
