@@ -87,6 +87,8 @@ public class GenericBlockRepository<Block, Id> {
                 stmt.addBatch();
             }
             stmt.executeBatch();
+        } finally {
+            connectionSource.setAutoCommit(true);
         }
     }
 
