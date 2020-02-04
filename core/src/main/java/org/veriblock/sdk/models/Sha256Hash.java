@@ -27,7 +27,8 @@ public class Sha256Hash implements Comparable<Sha256Hash> {
     private final byte[] bytes;
 
     private Sha256Hash(byte[] rawHashBytes, int length) {
-        Preconditions.argument(rawHashBytes != null && rawHashBytes.length == length, "Invalid Sha256 hash");
+        Preconditions.notNull(rawHashBytes, "Sha256 hash cannot be null");
+        Preconditions.argument(rawHashBytes.length == length, () -> "Invalid Sha256 hash: " + Utils.encodeHex(rawHashBytes));
         this.length = length;
         this.bytes = rawHashBytes;
     }

@@ -18,7 +18,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -327,7 +333,6 @@ public class Utils {
         if (toTest == null) {
             throw new IllegalArgumentException("isHex cannot be called with a null String!");
         }
-
 
         for (char c : toTest.toCharArray()) {
             switch (c) {

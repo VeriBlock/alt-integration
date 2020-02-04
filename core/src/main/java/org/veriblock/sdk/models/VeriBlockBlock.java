@@ -80,14 +80,22 @@ public class VeriBlockBlock{
                           int timestamp,
                           int difficulty,
                           int nonce) {
-        Preconditions.argument(previousBlock != null && previousBlock.length >= VBlakeHash.PREVIOUS_BLOCK_LENGTH,
-                "Invalid previous block");
-        Preconditions.argument(previousKeystone != null && previousKeystone.length >= VBlakeHash.PREVIOUS_KEYSTONE_LENGTH,
-                "Invalid previous keystone");
-        Preconditions.argument(secondPreviousKeystone != null && secondPreviousKeystone.length >= VBlakeHash.PREVIOUS_KEYSTONE_LENGTH,
-                "Invalid second previous keystone");
-        Preconditions.argument(merkleRoot != null && merkleRoot.length >= Sha256Hash.VERIBLOCK_MERKLE_ROOT_LENGTH,
-                "Invalid merkle root");
+        Preconditions.argument(previousBlock != null,
+            "Previous block cannot be null");
+        Preconditions.argument(previousBlock.length >= VBlakeHash.PREVIOUS_BLOCK_LENGTH,
+            () -> "Invalid previous block: " + previousBlock.toString());
+        Preconditions.argument(previousKeystone != null,
+            "Previous keystone cannot be null");
+        Preconditions.argument(previousKeystone.length >= VBlakeHash.PREVIOUS_KEYSTONE_LENGTH,
+            () -> "Invalid previous keystone: " + previousKeystone.toString());
+        Preconditions.argument(secondPreviousKeystone != null,
+            "Second previous keystone cannot be null");
+        Preconditions.argument(secondPreviousKeystone.length >= VBlakeHash.PREVIOUS_KEYSTONE_LENGTH,
+            () -> "Invalid second previous keystone: " + secondPreviousKeystone.toString());
+        Preconditions.argument(merkleRoot != null,
+            "Merkle root cannot be null");
+        Preconditions.argument(merkleRoot.length >= Sha256Hash.VERIBLOCK_MERKLE_ROOT_LENGTH,
+            () -> "Invalid merkle root: " + merkleRoot.toString());
 
         this.height = height;
         this.version = version;

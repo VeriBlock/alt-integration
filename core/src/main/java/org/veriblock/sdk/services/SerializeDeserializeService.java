@@ -362,7 +362,8 @@ public class SerializeDeserializeService {
     }
 
     public static VeriBlockBlock parseVeriBlockBlock(byte[] raw){
-        Preconditions.argument(raw != null && raw.length == Constants.HEADER_SIZE_VeriBlockBlock, "Invalid VeriBlock raw data");
+        Preconditions.notNull(raw, "VeriBlock raw data cannot be null");
+        Preconditions.argument(raw.length == Constants.HEADER_SIZE_VeriBlockBlock, () -> "Invalid VeriBlock raw data: " + Utils.encodeHex(raw));
 
         ByteBuffer buffer = ByteBuffer.allocateDirect(raw.length);
 
@@ -597,7 +598,8 @@ public class SerializeDeserializeService {
     }
 
     public static BitcoinBlock parseBitcoinBlock(byte[] bytes) {
-        Preconditions.argument(bytes != null && bytes.length == Constants.HEADER_SIZE_BitcoinBlock, "Invalid raw Bitcoin Block");
+        Preconditions.notNull(bytes, "Raw Bitcoin Block cannot be null");
+        Preconditions.argument(bytes.length == Constants.HEADER_SIZE_BitcoinBlock, "Invalid raw Bitcoin Block: " + Utils.encodeHex(bytes));
 
         ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
 

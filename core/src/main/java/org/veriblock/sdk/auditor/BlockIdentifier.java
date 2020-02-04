@@ -9,6 +9,7 @@
 package org.veriblock.sdk.auditor;
 
 import org.veriblock.sdk.util.Preconditions;
+import org.veriblock.sdk.util.Utils;
 
 import java.util.Arrays;
 
@@ -18,13 +19,15 @@ public class BlockIdentifier {
     private final byte[] value;
 
     private BlockIdentifier(byte[] value) {
-        Preconditions.argument(value != null && value.length == LENGTH, "Invalid block identifier");
+        Preconditions.notNull(value, "Block identifier cannot be null");
+        Preconditions.argument(value.length == LENGTH, () -> "Invalid block identifier: " + Utils.encodeHex(value));
 
         this.value = value;
     }
 
     public static BlockIdentifier wrap(byte[] value) {
-        Preconditions.argument(value != null && value.length <= LENGTH, "Ivalid block identifier");
+        Preconditions.notNull(value, "Block identifier cannot be null");
+        Preconditions.argument(value.length <= LENGTH, () -> "Invalid block identifier: " + Utils.encodeHex(value));
 
         if (value.length == LENGTH) return new BlockIdentifier(value);
 
