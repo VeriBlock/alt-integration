@@ -8,9 +8,11 @@
 
 package org.veriblock.sdk.util;
 
+import java.util.function.Supplier;
+
 public class Preconditions {
     public static <T> void notNull(T object, String errorMessage) {
-        if (object == null) throw new NullPointerException();
+        if (object == null) throw new NullPointerException(errorMessage);
     }
 
     public static void state(boolean state, String errorMessage) {
@@ -19,5 +21,13 @@ public class Preconditions {
 
     public static <T> void argument(boolean state, String errorMessage) {
         if (!state) throw new IllegalArgumentException(errorMessage);
+    }
+
+    /**
+     * Special signature for the cases in which we don't want the error message
+     * to be computed at every call, but only whenever the check fails
+     */
+    public static <T> void argument(boolean state, Supplier<String> errorMessageSupplier) {
+        if (!state) throw new IllegalArgumentException(errorMessageSupplier.get());
     }
 }

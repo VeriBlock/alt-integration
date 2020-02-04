@@ -27,7 +27,8 @@ public class VBlakeHash {
     private final byte[] bytes;
 
     private VBlakeHash(byte[] bytes, int length) {
-        Preconditions.argument(bytes != null && bytes.length == length, "Invalid VBlake hash");
+        Preconditions.notNull(bytes, "VBlake hash cannot be null");
+        Preconditions.argument(bytes.length == length, () -> "Invalid VBlake hash: " + Utils.encodeHex(bytes));
 
         this.length = length;
         this.bytes = bytes;

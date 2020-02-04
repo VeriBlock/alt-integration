@@ -47,7 +47,7 @@ public class StoredBitcoinBlock {
     public StoredBitcoinBlock(BitcoinBlock block, BigInteger work, int blockIndex) {
         Preconditions.notNull(block, "Block cannot be null");
         Preconditions.notNull(work, "Work cannot be null");
-        Preconditions.argument(work.compareTo(BigInteger.ZERO) != -1, "Work must be positive");
+        Preconditions.argument(work.compareTo(BigInteger.ZERO) >= 0, "Work must be positive");
         Preconditions.argument(blockIndex >= 0, "Block index must be positive");
 
         this.hash = block.getHash();
@@ -96,7 +96,8 @@ public class StoredBitcoinBlock {
     }
 
     public static StoredBitcoinBlock deserialize(byte[] bytes) {
-        Preconditions.argument(bytes != null && bytes.length >= SIZE, "Invalid raw Bitcoin Block");
+        Preconditions.notNull(bytes, "Raw Bitcoin Block cannot be null");
+        Preconditions.argument(bytes.length >= SIZE, () -> "Invalid raw Bitcoin Block: " + Utils.encodeHex(bytes));
 
         ByteBuffer local = ByteBuffer.allocateDirect(SIZE);
         local.put(bytes, bytes.length - SIZE, SIZE);

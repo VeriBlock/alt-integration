@@ -50,7 +50,8 @@ public class StoredVeriBlockBlock {
     }
 
     public void setBlockOfProof(Sha256Hash blockOfProof) {
-        Preconditions.argument(blockOfProof != null && blockOfProof.length == Sha256Hash.BITCOIN_LENGTH, "Invalid block of proof");
+        Preconditions.notNull(blockOfProof, "Block of proof cannot be null");
+        Preconditions.argument(blockOfProof.length == Sha256Hash.BITCOIN_LENGTH, () -> "Invalid block of proof: " + blockOfProof.toString());
         this.blockOfProof = blockOfProof;
     }
 
@@ -116,7 +117,8 @@ public class StoredVeriBlockBlock {
     }
 
     public static StoredVeriBlockBlock deserialize(byte[] bytes) {
-        Preconditions.argument(bytes != null && bytes.length >= SIZE, "Invalid raw VeriBlock Block");
+        Preconditions.notNull(bytes, "Raw VeriBlock Block cannot be null");
+        Preconditions.argument(bytes.length >= SIZE, () -> "Invalid raw VeriBlock Block: " + Utils.encodeHex(bytes));
 
         ByteBuffer local = ByteBuffer.allocateDirect(SIZE);
         local.put(bytes, bytes.length - SIZE, SIZE);
