@@ -11,15 +11,13 @@ package org.veriblock.sdk.mock;
 import java.sql.SQLException;
 
 import org.veriblock.sdk.blockchain.store.BitcoinStore;
+import org.veriblock.sdk.blockchain.store.VeriBlockCachedStore;
 import org.veriblock.sdk.blockchain.store.VeriBlockStore;
 import org.veriblock.sdk.conf.BitcoinNetworkParameters;
 import org.veriblock.sdk.conf.VeriBlockNetworkParameters;
 import org.veriblock.sdk.sqlite.ConnectionSelector;
 
 public class MockFactory {
-    private final VeriBlockStore veriBlockStore;
-    private final BitcoinStore bitcoinStore;
-
     private final VeriBlockBlockchain veriBlockBlockchain;
     private final BitcoinBlockchain bitcoinBlockchain;
 
@@ -28,9 +26,9 @@ public class MockFactory {
 
     private final PoPMiningCoordinator coordinator;
 
-    public MockFactory(VeriBlockNetworkParameters veriblockNetworkParameters, BitcoinNetworkParameters bitcoinNetworkParameters) throws SQLException {
-        veriBlockStore = new VeriBlockStore(ConnectionSelector.setConnectionInMemory());
-        bitcoinStore = new BitcoinStore(ConnectionSelector.setConnectionInMemory());
+    public MockFactory(VeriBlockNetworkParameters veriblockNetworkParameters, BitcoinNetworkParameters bitcoinNetworkParameters, ConnectionSelector.Factory connectionFactory) throws SQLException {
+        VeriBlockCachedStore veriBlockStore = new VeriBlockCachedStore(new VeriBlockStore(connectionFactory.createConnection()));
+        BitcoinStore bitcoinStore = new BitcoinStore(connectionFactory.createConnection());
         veriBlockStore.clear();
         bitcoinStore.clear();
 
@@ -43,8 +41,12 @@ public class MockFactory {
         coordinator = new PoPMiningCoordinator(apm, vpm);
     }
 
+    public MockFactory(ConnectionSelector.Factory connectionFactory) throws SQLException {
+        this(VeriBlockDefaults.networkParameters, BitcoinDefaults.networkParameters, connectionFactory);
+    }
+
     public MockFactory() throws SQLException {
-        this(VeriBlockDefaults.networkParameters, BitcoinDefaults.networkParameters);
+        this(() -> ConnectionSelector.setConnectionInMemory());
     }
 
     public VeriBlockBlockchain getVeriBlockBlockchain() {
