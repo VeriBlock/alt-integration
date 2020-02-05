@@ -31,8 +31,8 @@ public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriB
 
         public void toStmt(StoredVeriBlockBlock block, PreparedStatement stmt) throws SQLException {
             int i = 0;
-            stmt.setObject(++i, Utils.encodeHex(block.getHash().getBytes()));
-            stmt.setObject(++i, Utils.encodeHex(block.getBlock().getPreviousBlock().getBytes()));
+            stmt.setObject(++i, new StringBuilder(Utils.encodeHex(block.getHash().getBytes())).reverse().toString());
+            stmt.setObject(++i, new StringBuilder(Utils.encodeHex(block.getBlock().getPreviousBlock().getBytes())).reverse().toString());
             stmt.setObject(++i, block.getHeight());
             stmt.setObject(++i, block.getWork().toString());
             stmt.setObject(++i, Utils.encodeHex(block.getBlockOfProof().getBytes()));
@@ -63,7 +63,7 @@ public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriB
         }
 
         public String idToString(VBlakeHash hash) {
-            return Utils.encodeHex(hash.getBytes());
+            return new StringBuilder(Utils.encodeHex(hash.getBytes())).reverse().toString();
         }
     };
 
