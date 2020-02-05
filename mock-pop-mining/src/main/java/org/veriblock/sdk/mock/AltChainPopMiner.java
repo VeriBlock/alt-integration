@@ -15,7 +15,11 @@ import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.veriblock.sdk.models.Address;
 import org.veriblock.sdk.models.AltPublication;
@@ -28,6 +32,8 @@ import org.veriblock.sdk.util.Utils;
 
 // Also known as APM
 public class AltChainPopMiner {
+    private static final Logger log = LoggerFactory.getLogger(AltChainPopMiner.class);
+
     private final VeriBlockBlockchain veriblockBlockchain;
 
     public AltChainPopMiner(VeriBlockBlockchain veriblockBlockchain) {
@@ -54,37 +60,66 @@ public class AltChainPopMiner {
                 tx.getNetworkByte());
     }
 
+    public static class EndorsementData {
+        PublicationData publicationData;
+        KeyPair key;
+
+        public EndorsementData(PublicationData publicationData, KeyPair key) {
+            this.publicationData = publicationData;
+            this.key = key;
+        }
+    }
+
     public AltPublication mine(PublicationData publicationData, VeriBlockBlock lastKnownVBKBlock, KeyPair key) throws SQLException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
+        return mine(new EndorsementData(publicationData, key), lastKnownVBKBlock);
+    }
 
-        Address address = Address.fromPublicKey(key.getPublic().getEncoded());
+    public AltPublication mine(EndorsementData endorsementData, VeriBlockBlock lastKnownVBKBlock) throws SQLException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
+        return mine(Arrays.asList(endorsementData), lastKnownVBKBlock).get(0);
+    }
 
-        VeriBlockTransaction endorsementTx = signTransaction(
+    private VeriBlockTransaction createEndorsementTx(EndorsementData endorsementData)  throws SignatureException, InvalidKeyException, NoSuchAlgorithmException {
+        Address address = Address.fromPublicKey(endorsementData.key.getPublic().getEncoded());
+
+        return signTransaction(
                 new VeriBlockTransaction(
                         (byte) 1,
                         address,
                         Coin.valueOf(1),
                         new ArrayList<>(),
                         7,
-                        publicationData,
+                        endorsementData.publicationData,
                         new byte[1],
-                        key.getPublic().getEncoded(),
+                        endorsementData.key.getPublic().getEncoded(),
                         veriblockBlockchain.getNetworkParameters().getTransactionMagicByte()),
-                key.getPrivate());
+                endorsementData.key.getPrivate());
+    };
 
-        // publish the endorsement transaction to VeriBlock
+    public List<AltPublication> mine(List<EndorsementData> endorsements, VeriBlockBlock lastKnownVBKBlock) throws SQLException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
+        log.debug("Mining");
+
+        // publish endorsement transactions to VeriBlock
 
         VeriBlockBlockData blockData = new VeriBlockBlockData();
-        blockData.getRegularTransactions().add(endorsementTx);
+
+        for (EndorsementData endorsementData : endorsements) {
+            blockData.getRegularTransactions().add(createEndorsementTx(endorsementData));
+        }
 
         VeriBlockBlock block = veriblockBlockchain.mine(blockData);
 
-        // create an ATV
+        // create ATVs
 
         List<VeriBlockBlock> context = veriblockBlockchain.getContext(lastKnownVBKBlock);
 
-        return new AltPublication(endorsementTx,
-                                  blockData.getRegularMerklePath(0),
-                                  block,
-                                  context);
+        List<AltPublication> atvs = new ArrayList<>(blockData.getRegularTransactions().size());
+        for (int i = 0; i < blockData.getRegularTransactions().size(); i ++) {
+            atvs.add(new AltPublication(blockData.getRegularTransactions().get(i),
+                                        blockData.getRegularMerklePath(i),
+                                        block,
+                                        context));
+        }
+
+        return atvs;
     }
 }
