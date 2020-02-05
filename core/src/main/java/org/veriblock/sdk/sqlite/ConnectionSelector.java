@@ -24,6 +24,10 @@ public class ConnectionSelector {
     public static final String defaultDatabaseName = "database.sqlite";
     public static final String testDatabaseName = "database-test.sqlite";
 
+    public interface Factory {
+        Connection createConnection() throws SQLException;
+    }
+
     static {
         try {
             DriverManager.registerDriver(new JDBC());

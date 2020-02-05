@@ -28,6 +28,7 @@ import org.veriblock.sdk.models.VBlakeHash;
 import org.veriblock.sdk.sqlite.ConnectionSelector;
 import org.veriblock.sdk.util.Preconditions;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Context {
@@ -89,12 +90,18 @@ public class Context {
         popTxStore.clear();
     }
 
-    public static Context init() throws BlockStoreException, SQLException {
-       return new Context(new MainNetParameters(), new BitcoinMainNetParameters(),
+    public static Context init(VeriBlockNetworkParameters veriblockNetworkParameters, BitcoinNetworkParameters bitcoinNetworkParameters, ConnectionSelector.Factory connectionFactory) throws BlockStoreException, SQLException {
+       return new Context(veriblockNetworkParameters, bitcoinNetworkParameters,
                           new VeriBlockCachedStore(
-                                new VeriBlockStore(ConnectionSelector.setConnectionDefault())),
-                          new BitcoinStore(ConnectionSelector.setConnectionDefault()),
-                          new AuditorChangesStore(ConnectionSelector.setConnectionDefault()),
-                          new PoPTransactionsDBStore(ConnectionSelector.setConnectionDefault()));
+                                new VeriBlockStore(connectionFactory.createConnection())),
+                          new BitcoinStore(connectionFactory.createConnection()),
+                          new AuditorChangesStore(connectionFactory.createConnection()),
+                          new PoPTransactionsDBStore(connectionFactory.createConnection()));
     }
+
+    public static Context init() throws BlockStoreException, SQLException {
+        return Context.init(new MainNetParameters(), new BitcoinMainNetParameters(),
+                            () -> ConnectionSelector.setConnectionDefault());
+    }
+
 }
