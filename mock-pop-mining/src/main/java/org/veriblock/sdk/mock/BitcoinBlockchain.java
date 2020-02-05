@@ -27,11 +27,24 @@ import java.util.Map;
 public class BitcoinBlockchain extends org.veriblock.sdk.blockchain.BitcoinBlockchain {
     private final Map<Sha256Hash, BitcoinBlockData> blockDataStore = new HashMap<>();
 
+    private final IndexedBitcoinBlockStore store;
+
+    public BitcoinBlock get(int height) throws SQLException {
+        StoredBitcoinBlock block = store.get(height);
+        return block == null ? null : block.getBlock();
+    };
+
     public BitcoinBlockchain(BitcoinNetworkParameters networkParameters,
-                      BlockStore<StoredBitcoinBlock, Sha256Hash> store) {
-        super(networkParameters, store);
+                             BlockStore<StoredBitcoinBlock, Sha256Hash> store) throws SQLException {
+        this(networkParameters, new IndexedBitcoinBlockStore(store));
     }
 
+    public BitcoinBlockchain(BitcoinNetworkParameters networkParameters,
+                             IndexedBitcoinBlockStore store) {
+
+        super(networkParameters, store);
+        this.store = store;
+    }
 
     // retrieve the blocks between lastKnownBlock and getChainHead()
     public List<BitcoinBlock> getContext(BitcoinBlock lastKnownBlock) throws SQLException {

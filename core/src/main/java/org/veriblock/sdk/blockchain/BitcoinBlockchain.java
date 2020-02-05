@@ -60,7 +60,11 @@ public class BitcoinBlockchain {
         this.temporalStore = new HashMap<>();
         this.networkParameters = networkParameters;
     }
-    
+
+    public BlockStore<StoredBitcoinBlock, Sha256Hash> getStore() {
+        return store;
+    }
+
     public boolean isValidateBlocksDifficulty() {
         return !skipValidateBlocksDifficulty;
     }
