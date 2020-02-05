@@ -83,11 +83,12 @@ public class VeriBlockBlockchain extends org.veriblock.sdk.blockchain.VeriBlockB
     public List<VeriBlockBlock> getContext(VeriBlockBlock lastKnownBlock) throws SQLException {
         List<VeriBlockBlock> context = new ArrayList<>();
 
-        VeriBlockBlock prevBlock = get(getChainHead().getPreviousBlock());
+        // FIXME: using scanBestChain as a workaround as it should be faster in cached stores than a plain get
+        StoredVeriBlockBlock prevBlock = store.scanBestChain(getChainHead().getPreviousBlock());
 
-        while (prevBlock != null && !prevBlock.equals(lastKnownBlock)) {
-            context.add(prevBlock);
-            prevBlock = get(prevBlock.getPreviousBlock());
+        while (prevBlock != null && !prevBlock.getBlock().equals(lastKnownBlock)) {
+            context.add(prevBlock.getBlock());
+            prevBlock = store.scanBestChain(prevBlock.getBlock().getPreviousBlock());
         }
 
         Collections.reverse(context);
