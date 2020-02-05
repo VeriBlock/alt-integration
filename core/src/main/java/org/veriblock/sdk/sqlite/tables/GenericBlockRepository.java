@@ -32,10 +32,9 @@ public class GenericBlockRepository<Block, Id> {
                     + " (\n"
                     + serializer.getSchema()
                     + ");");
-        }
 
-        try (Statement stmt = connectionSource.createStatement()) {
             stmt.execute("PRAGMA journal_mode=WAL;");
+            stmt.execute("PRAGMA case_sensitive_like=ON;");
         }
     }
 
@@ -116,7 +115,7 @@ public class GenericBlockRepository<Block, Id> {
         String statement = "SELECT * FROM " + tableBlocks + " WHERE id LIKE ?";
         try (PreparedStatement stmt = connectionSource.prepareStatement(statement)) {
             int i = 0;
-            stmt.setObject(++i, "%" + serializer.idToString(id));
+            stmt.setObject(++i, serializer.idToString(id) + "%");
 
             List<Block> values = new ArrayList<Block>();
             try (ResultSet resultSet = stmt.executeQuery()) {
