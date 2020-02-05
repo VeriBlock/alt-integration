@@ -17,6 +17,9 @@ import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.veriblock.sdk.models.Address;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.models.BitcoinTransaction;
@@ -27,6 +30,8 @@ import org.veriblock.sdk.services.SerializeDeserializeService;
 import org.veriblock.sdk.util.Utils;
 
 public class VeriBlockPopMiner {
+    private static final Logger log = LoggerFactory.getLogger(VeriBlockPopMiner.class);
+
     private final BitcoinBlockchain bitcoinBlockchain;
     private final VeriBlockBlockchain veriblockBlockchain;
 
@@ -77,10 +82,11 @@ public class VeriBlockPopMiner {
     }
 
     public VeriBlockPublication mine(VeriBlockBlock blockToEndorse, VeriBlockBlock lastKnownVBKBlock, BitcoinBlock lastKnownBTCBlock, KeyPair key) throws SQLException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
+        log.debug("Mining");
 
         Address address = Address.fromPublicKey(key.getPublic().getEncoded());
 
-        // publish an endorsement transaction to Bitcoin
+        log.trace("Publish an endorsement transaction to Bitcoin");
 
         BitcoinTransaction bitcoinProofTx = createBitcoinTx(blockToEndorse, address);
 
@@ -88,7 +94,7 @@ public class VeriBlockPopMiner {
         btcBlockData.add(bitcoinProofTx.getRawBytes());
 
         BitcoinBlock blockOfProof = bitcoinBlockchain.mine(btcBlockData);
-       
+
         // create a VeriBlock PoP transaction
 
         List<BitcoinBlock> blockOfProofContext = bitcoinBlockchain.getContext(lastKnownBTCBlock);
@@ -106,7 +112,7 @@ public class VeriBlockPopMiner {
                                                     veriblockBlockchain.getNetworkParameters().getTransactionMagicByte()),
                                                 key.getPrivate());
 
-        // publish the PoP transaction to VeriBlock
+        log.trace("Publishing the PoP transaction to VeriBlock");
 
         VeriBlockBlockData blockData = new VeriBlockBlockData();
         blockData.getPoPTransactions().add(popTx);
