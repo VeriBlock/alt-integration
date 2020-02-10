@@ -33,6 +33,10 @@ public class GenericBlockRepository<Block, Id> {
                     + serializer.getSchema()
                     + ");");
 
+            stmt.execute(String.format("CREATE INDEX IF NOT EXISTS %s ON %s(%s)",
+                    tableName + "previousId",
+                    tableName, "previousId"));
+
             stmt.execute("PRAGMA journal_mode=WAL;");
             stmt.execute("PRAGMA case_sensitive_like=ON;");
         }
