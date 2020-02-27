@@ -323,6 +323,9 @@ public class VeriBlockSecurity {
         // corner case: the first bootstrap block has no previous block
         // but does connect to the blockchain by definition
         if (bitcoinBlockchain.searchBestChain(block.getHash()) == null) {
+            log.info("Searching best chain for block failed!");
+            log.info("Checking connectivity for Bitcoin block " + block.getHash().toString() + " (header: " + Utils.bytesToHex(block.getRaw()));
+            log.info("Bitcoin blockchain tip: " + bitcoinBlockchain.getChainHead().getHash().toString() + " (header: " + Utils.bytesToHex(bitcoinBlockchain.getChainHead().getRaw()));
             throw new VerificationException("Publication does not connect to Bitcoin blockchain");
         }
     }
