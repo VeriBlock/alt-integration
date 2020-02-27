@@ -8,9 +8,13 @@
 
 package org.veriblock.sdk.auditor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.veriblock.sdk.VeriBlockSecurity;
 import org.veriblock.sdk.auditor.store.ChangeStore;
 import org.veriblock.sdk.auditor.store.StoredChange;
 import org.veriblock.sdk.util.Preconditions;
+import org.veriblock.sdk.util.Utils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class AuditJournal {
+    private static final Logger log = LoggerFactory.getLogger(AuditJournal.class);
 
     private final ChangeStore store;
 
@@ -29,8 +34,23 @@ public class AuditJournal {
     }
 
     public void record(Changeset changeset) throws SQLException {
+        log.info("Recording changeset identified by block " + changeset.getBlockIdentifier().toString());
         BlockIdentifier identifier = changeset.getBlockIdentifier();
         List<Change> changes = changeset.getChanges();
+
+        if (changes != null) {
+            log.info("\tChanges: " + changes.size());
+            for (int i = 0; i < changes.size(); i++) {
+                log.info("\t\tChange " + i + ":");
+                log.info("\t\t\tChange Identifier: " + changes.get(i).getChainIdentifier());
+                log.info("\t\t\tChange Operation: " + changes.get(i).getOperation().name());
+                log.info("\t\t\tChange Old Value: " + Utils.bytesToHex(changes.get(i).getOldValue()));
+                log.info("\t\t\tChange New Value: " + Utils.bytesToHex(changes.get(i).getNewValue()));
+            }
+        } else {
+            log.info("<null changes>");
+        }
+
 
         for (int i = 0; i < changes.size(); i++) {
             StoredChange storedChange = new StoredChange(identifier, i, changes.get(i));

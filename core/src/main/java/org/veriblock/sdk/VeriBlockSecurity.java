@@ -168,7 +168,7 @@ public class VeriBlockSecurity {
                 }
             }
 
-            log.debug("adding a changeset of {} items to the journal", changeset.getChanges().size());
+            log.info("adding a changeset of {} items to the journal", changeset.getChanges().size());
             journal.record(changeset);
 
         } catch (VerificationException e) {
@@ -194,7 +194,7 @@ public class VeriBlockSecurity {
         BlockIdentifier blockIdentifier = BlockIdentifier.wrap(Utils.decodeHex(blockIndex.getHash()));
 
         Changeset changeset = journal.get(blockIdentifier);
-        log.debug("Rewinding a changeset of {} items", changeset.getChanges().size());
+        log.info("Rewinding a changeset of {} items", changeset.getChanges().size());
         rewind(changeset);
     }
 
