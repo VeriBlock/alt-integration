@@ -194,11 +194,13 @@ public class VeriBlockSecurity {
         BlockIdentifier blockIdentifier = BlockIdentifier.wrap(Utils.decodeHex(blockIndex.getHash()));
 
         Changeset changeset = journal.get(blockIdentifier);
-        log.info("Rewinding a changeset of {} items", changeset.getChanges().size());
-        rewind(changeset);
 
         // Clear change/audit history for block for which payloads were removed
+        log.info("Clearing for block identifier " + Utils.encodeHex(blockIdentifier.getBytes()));
         journal.clear(blockIdentifier);
+
+        log.info("Rewinding a changeset of {} items", changeset.getChanges().size());
+        rewind(changeset);
     }
 
     public void addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws VerificationException, BlockStoreException, SQLException {
