@@ -8,6 +8,9 @@
 
 package org.veriblock.sdk.sqlite.tables;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.veriblock.sdk.auditor.store.AuditorChangesStore;
 import org.veriblock.sdk.util.Utils;
 
 import java.sql.Connection;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AuditorChangesRepository {
+    private static final Logger log = LoggerFactory.getLogger(AuditorChangesRepository.class);
     private Connection connectionSource;
 
     public AuditorChangesRepository(Connection connection) throws SQLException {
@@ -90,6 +94,7 @@ public class AuditorChangesRepository {
     }
 
     public void delete(String blockId) throws SQLException {
+        log.info("Deleting with blockId=" + blockId);
         try (PreparedStatement stmt = connectionSource.prepareStatement("DELETE FROM tableAuditorChanges WHERE blockId = ?")) {
             int i = 0;
             stmt.setObject(++i, blockId);
@@ -98,6 +103,7 @@ public class AuditorChangesRepository {
     }
 
     public List<AuditorChangeData> getWithBlockId(String blockId) throws SQLException {
+        log.info("Getting with blockId=" + blockId);
         List<AuditorChangeData> values = new ArrayList<AuditorChangeData>();
         try (PreparedStatement stmt = connectionSource.prepareStatement("SELECT * FROM tableAuditorChanges WHERE blockId = ?")) {
             int i = 0;

@@ -80,6 +80,11 @@ public class AuditorChangesStore implements ChangeStore {
     }
 
     public void clear(BlockIdentifier blockIdentifier) throws SQLException {
+        log.info("Clearing all changes stored for identifier " + Utils.encodeHex(blockIdentifier.getBytes()));
+        List<AuditorChangeData> data = changesRepository.getWithBlockId(Utils.encodeHex(blockIdentifier.getBytes()));
+        log.info("\tBefore clear: " + data.size() + " changes stored.");
         changesRepository.delete(Utils.encodeHex(blockIdentifier.getBytes()));
+        data = changesRepository.getWithBlockId(Utils.encodeHex(blockIdentifier.getBytes()));
+        log.info("\tAfter clear: " + data.size() + " changes stored.");
     }
 }

@@ -34,23 +34,18 @@ public class AuditJournal {
     }
 
     public void record(Changeset changeset) throws SQLException {
-        log.info("Recording changeset identified by block " + changeset.getBlockIdentifier().toString());
+        log.info("Recording changeset containing " + changeset.getChanges().size() + " identified by block " + Utils.bytesToHex(changeset.getBlockIdentifier().getBytes()));
         BlockIdentifier identifier = changeset.getBlockIdentifier();
         List<Change> changes = changeset.getChanges();
 
-        if (changes != null) {
-            log.info("\tChanges: " + changes.size());
-            for (int i = 0; i < changes.size(); i++) {
-                log.info("\t\tChange " + i + ":");
-                log.info("\t\t\tChange Identifier: " + changes.get(i).getChainIdentifier());
-                log.info("\t\t\tChange Operation: " + changes.get(i).getOperation().name());
-                log.info("\t\t\tChange Old Value: " + Utils.bytesToHex(changes.get(i).getOldValue()));
-                log.info("\t\t\tChange New Value: " + Utils.bytesToHex(changes.get(i).getNewValue()));
-            }
-        } else {
-            log.info("<null changes>");
+        log.debug("\tChanges: " + changes.size());
+        for (int i = 0; i < changes.size(); i++) {
+            log.debug("\t\tChange " + i + ":");
+            log.debug("\t\t\tChange Identifier: " + changes.get(i).getChainIdentifier());
+            log.debug("\t\t\tChange Operation: " + changes.get(i).getOperation().name());
+            log.debug("\t\t\tChange Old Value: " + Utils.bytesToHex(changes.get(i).getOldValue()));
+            log.debug("\t\t\tChange New Value: " + Utils.bytesToHex(changes.get(i).getNewValue()));
         }
-
 
         for (int i = 0; i < changes.size(); i++) {
             StoredChange storedChange = new StoredChange(identifier, i, changes.get(i));
