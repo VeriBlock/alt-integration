@@ -196,6 +196,9 @@ public class VeriBlockSecurity {
         Changeset changeset = journal.get(blockIdentifier);
         log.info("Rewinding a changeset of {} items", changeset.getChanges().size());
         rewind(changeset);
+
+        // Clear change/audit history for block for which payloads were removed
+        journal.clear(blockIdentifier);
     }
 
     public void addTemporaryPayloads(List<VeriBlockPublication> veriblockPublications, List<AltPublication> altPublications) throws VerificationException, BlockStoreException, SQLException {

@@ -78,4 +78,8 @@ public class AuditorChangesStore implements ChangeStore {
         
         return changes;
     }
+
+    public void clear(BlockIdentifier blockIdentifier) throws SQLException {
+        changesRepository.delete(Utils.encodeHex(blockIdentifier.getBytes()));
+    }
 }

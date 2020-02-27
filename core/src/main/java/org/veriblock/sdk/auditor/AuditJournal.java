@@ -70,4 +70,8 @@ public class AuditJournal {
         changeset.addChanges(changes);
         return changeset;
     }
+
+    public void clear(BlockIdentifier blockIdentifier) throws SQLException {
+        store.clear(blockIdentifier);
+    }
 }

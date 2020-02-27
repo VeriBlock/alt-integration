@@ -41,4 +41,5 @@ public interface ChangeStore {
      */
     void put(StoredChange change) throws SQLException;
 
+    void clear(BlockIdentifier blockIdentifier) throws SQLException;
 }
