@@ -100,6 +100,19 @@ public class VeriBlockSecurity {
                  String.valueOf(altPublications == null ? 0 : altPublications.size()),
                  blockIndex.getHash(), String.valueOf(blockIndex.getHeight()));
 
+        log.info("All VTB BTC Contexts:");
+        for (int i = 0; i < veriblockPublications.size(); i++) {
+            log.info("\tVTB #" + i);
+            VeriBlockPublication selected = veriblockPublications.get(i);
+            VeriBlockPoPTransaction popTx = selected.getTransaction();
+            List<BitcoinBlock> contextBlocks = popTx.getBlockOfProofContext();
+            BitcoinBlock blockOfProof = popTx.getBlockOfProof();
+            for (int j = 0; j < contextBlocks.size(); j++) {
+                log.info("\t\t" + contextBlocks.get(j).getHash() + " (" + Utils.bytesToHex(contextBlocks.get(j).getRaw()));
+            }
+            log.info("\t\t" + blockOfProof.getHash() + " (" + Utils.bytesToHex(blockOfProof.getRaw()));
+        }
+
         Changeset changeset = new Changeset(BlockIdentifier.wrap(Utils.decodeHex(blockIndex.getHash())));
 
         try {
