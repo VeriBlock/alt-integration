@@ -47,13 +47,23 @@ public class ForkresolutionComparator {
         Collections.sort(leftBranch);  // make the ascending order for the blocks in the collection, it needs for the fork resolution
         Collections.sort(rightBranch);
 
-        addBranchTemporarily(leftBranch);
-        List<Integer> leftReducedPublicationView = getReducedPublicationView(leftBranch);
-        security.clearTemporaryPayloads();
+        List<Integer> leftReducedPublicationView;
+        try {
+            addBranchTemporarily(leftBranch);
+            leftReducedPublicationView = getReducedPublicationView(leftBranch);
+        }
+        finally {
+            security.clearTemporaryPayloads();
+        }
 
-        addBranchTemporarily(rightBranch);
-        List<Integer> rightReducedPublicationView = getReducedPublicationView(rightBranch);
-        security.clearTemporaryPayloads();
+        List<Integer> rightReducedPublicationView;
+        try {
+            addBranchTemporarily(rightBranch);
+            rightReducedPublicationView = getReducedPublicationView(rightBranch);
+        }
+        finally {
+            security.clearTemporaryPayloads();
+        }
 
         int lastKs = Math.max(leftReducedPublicationView.size(), rightReducedPublicationView.size());
         long leftScore = 0, rigthScore = 0;
