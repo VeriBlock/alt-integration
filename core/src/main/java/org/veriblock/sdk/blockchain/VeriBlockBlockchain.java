@@ -458,7 +458,7 @@ public class VeriBlockBlockchain {
                 }
             }
             if (i < candidate.size()) {
-                StoredVeriBlockBlock storedBlock = getInternal(incumbent.get(i).getHash());
+                StoredVeriBlockBlock storedBlock = getInternal(candidate.get(i).getHash());
                 if (storedBlock != null) {
                     Sha256Hash proof = storedBlock.getBlockOfProof();
                     if (!Sha256Hash.ZERO_HASH.equals(proof)) {
