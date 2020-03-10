@@ -25,6 +25,8 @@ import java.util.List;
 
 public class BitcoinBlockRepository extends GenericBlockRepository<StoredBitcoinBlock, Sha256Hash> {
 
+    public static final String TABLE_NAME = "bitcoinBlocks";
+
     private final static BlockSQLSerializer<StoredBitcoinBlock, Sha256Hash> serializer =
                      new BlockSQLSerializer<StoredBitcoinBlock, Sha256Hash>() {
 
@@ -48,12 +50,23 @@ public class BitcoinBlockRepository extends GenericBlockRepository<StoredBitcoin
         }
 
         public String getSchema() {
-            return  " id TEXT PRIMARY KEY,"
+            return  " db_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                  + " id TEXT,"
                   + " previousId TEXT,"
                   + " height INTEGER,"
                   + " work TEXT,"
                   + " data TEXT";
         }
+
+         @Override
+         public String addIndexes() {
+             return "CREATE UNIQUE INDEX IF NOT EXISTS btc_block_id_index ON " + TABLE_NAME + " (id);";
+         }
+
+         @Override
+         public String removeIndexes() {
+             return "DROP INDEX btc_block_id_index;";
+         }
 
         public List<String> getColumns() {
             return Arrays.asList("id", "previousId", "height", "work", "data");
@@ -65,6 +78,6 @@ public class BitcoinBlockRepository extends GenericBlockRepository<StoredBitcoin
     };
 
     public BitcoinBlockRepository(Connection connection) throws SQLException {
-        super(connection, "bitcoinBlocks", serializer);
+        super(connection, TABLE_NAME, serializer);
     }
 }

@@ -40,6 +40,7 @@ public class GenericBlockRepository<Block, Id> {
             stmt.execute("PRAGMA journal_mode=WAL;");
             stmt.execute("PRAGMA case_sensitive_like=ON;");
         }
+        addIndexes();
     }
 
     public void clear() throws SQLException {
@@ -163,4 +164,17 @@ public class GenericBlockRepository<Block, Id> {
             stmt.execute();
         }
     }
+
+    public void addIndexes() throws SQLException {
+        try (Statement stmt = connectionSource.createStatement()) {
+            stmt.execute(serializer.addIndexes());
+        }
+    }
+
+    public void removeIndexes() throws SQLException {
+        try (Statement stmt = connectionSource.createStatement()) {
+            stmt.execute(serializer.removeIndexes());
+        }
+    }
+
 }

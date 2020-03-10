@@ -24,6 +24,10 @@ public interface BlockSQLSerializer<Block, Id> {
     // get the SQL database schema to use to store block data
     String getSchema();
 
+    String addIndexes();
+
+    String removeIndexes();
+
     // get the list of column names that match the schema
     List<String> getColumns();
 

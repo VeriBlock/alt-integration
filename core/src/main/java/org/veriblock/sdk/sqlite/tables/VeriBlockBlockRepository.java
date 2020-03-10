@@ -26,6 +26,8 @@ import java.util.List;
 
 public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriBlockBlock, VBlakeHash> {
 
+    public static final String TABLE_NAME = "veriBlockBlocks";
+
     private final static BlockSQLSerializer<StoredVeriBlockBlock, VBlakeHash> serializer =
                      new BlockSQLSerializer<StoredVeriBlockBlock, VBlakeHash>() {
 
@@ -50,7 +52,8 @@ public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriB
         }
 
         public String getSchema() {
-            return  " id TEXT PRIMARY KEY,"
+            return  " db_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                  + " id TEXT,"
                   + " previousId TEXT,"
                   + " height INTEGER,"
                   + " work TEXT,"
@@ -58,7 +61,17 @@ public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriB
                   + " data TEXT";
         }
 
-        public List<String> getColumns() {
+         @Override
+         public String addIndexes() {
+             return "CREATE UNIQUE INDEX IF NOT EXISTS  vb_block_id_index ON " + TABLE_NAME + " (id);";
+         }
+
+         @Override
+         public String removeIndexes() {
+             return "DROP INDEX vb_block_id_index;";
+         }
+
+         public List<String> getColumns() {
             return Arrays.asList("id", "previousId", "height", "work", "blockOfProof", "data");
         }
 
@@ -68,6 +81,6 @@ public class VeriBlockBlockRepository extends GenericBlockRepository<StoredVeriB
     };
 
     public VeriBlockBlockRepository(Connection connection) throws SQLException {
-        super(connection, "veriBlockBlocks", serializer);
+        super(connection, TABLE_NAME, serializer);
     }
 }
