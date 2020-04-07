@@ -8,6 +8,7 @@
 
 package org.veriblock.sdk.util;
 
+import org.veriblock.sdk.blockchain.store.StoredBitcoinBlock;
 import org.veriblock.sdk.models.AltPublication;
 import org.veriblock.sdk.models.BitcoinBlock;
 import org.veriblock.sdk.models.VeriBlockBlock;
@@ -16,10 +17,64 @@ import org.veriblock.sdk.models.VeriBlockPublication;
 import java.util.List;
 
 public class LogFormatter {
+
+    static public String toString(byte[] array) {
+        return Utils.bytesToHex(array);
+    }
+
+    static public String headerToString(VeriBlockBlock block) {
+        return toString(block.getRaw());
+    }
+
+    static public String headerToString(BitcoinBlock block) {
+        return toString(block.getRaw());
+    }
+
     static public String toString(VeriBlockBlock block) {
-        return String.format("%s:%d",
+        return block == null
+             ? "null"
+             : String.format("%s:%d",
                              block.getHash().toString(),
                              block.getHeight());
+    }
+
+    static public String toStringExtended(VeriBlockBlock block) {
+        return block == null
+             ? "null"
+             : String.format("%s (header: %s)",
+                             toString(block),
+                             headerToString(block));
+    }
+
+    static public String toString(BitcoinBlock block) {
+        return block == null
+             ? "null"
+             : String.format("%s",
+                             block.getHash().toString());
+    }
+
+    static public String toStringExtended(BitcoinBlock block) {
+        return block == null
+             ? "null"
+             : String.format("%s (header: %s)",
+                             toString(block),
+                             headerToString(block));
+    }
+
+    static public String toString(StoredBitcoinBlock block) {
+        return block == null
+             ? "null"
+             : String.format("%s:%d",
+                             toString(block.getBlock()),
+                             block.getHeight());
+    }
+
+    static public String toStringExtended(StoredBitcoinBlock block) {
+        return block == null
+             ? "null"
+             : String.format("%s (header: %s)",
+                             toString(block),
+                             headerToString(block.getBlock()));
     }
 
     static public String toString(AltPublication publication) {
@@ -34,7 +89,7 @@ public class LogFormatter {
                              publication.getTransaction().getId().toString(),
                              toString(publication.getContainingBlock()),
                              toString(publication.getTransaction().getPublishedBlock()),
-                             publication.getTransaction().getBlockOfProof().getHash().toString(),
+                             toString(publication.getTransaction().getBlockOfProof()),
                              veriblockContextToString(publication.getContext()),
                              bitcoinContextToString(publication.getTransaction().getBlockOfProofContext()));
     }
@@ -51,7 +106,7 @@ public class LogFormatter {
         return blocks.isEmpty()
              ? "empty"
              : String.format("%s to %s",
-                             blocks.get(0).getHash().toString(),
-                             blocks.get(blocks.size() - 1).getHash().toString());
+                             toString(blocks.get(0)),
+                             toString(blocks.get(blocks.size() - 1)));
     }
 }
