@@ -8,6 +8,7 @@
 
 package org.veriblock.sdk.models;
 
+import com.google.gson.annotations.SerializedName;
 import org.veriblock.sdk.util.MerklePathUtil;
 import org.veriblock.sdk.util.Preconditions;
 
@@ -17,9 +18,13 @@ import java.util.stream.Collectors;
 
 public class VeriBlockMerklePath extends MerklePath {
     private final int treeIndex;
+    @SerializedName("veriblock_merkle_path_compact_form")
     private String compactFormat;
+    @SerializedName("veriblock_merkle_path_layers")
     private List<Sha256Hash> layers;
+    @SerializedName("veriblock_merkle_path_subject")
     private Sha256Hash subject;
+    @SerializedName("veriblock_merkle_path_index")
     private int index;
 
     public VeriBlockMerklePath(int treeIndex, int index, Sha256Hash subject, List<Sha256Hash> layers) {
