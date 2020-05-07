@@ -118,8 +118,8 @@ public class VeriBlockSecurity {
 
             if (altPublications != null && altPublications.size() > 0) {
                 for (AltPublication publication : altPublications) {
-                    ValidationService.verify(publication);
-                    verifyPublicationContextually(publication);
+//                    ValidationService.verify(publication);
+//                    verifyPublicationContextually(publication);
 
                     changeset.addChanges(veriblockBlockchain.addAll(publication.getBlocks()));
                 }
