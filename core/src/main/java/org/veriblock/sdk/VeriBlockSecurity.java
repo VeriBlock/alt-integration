@@ -91,8 +91,8 @@ public class VeriBlockSecurity {
         try {
             if (veriblockPublications != null && veriblockPublications.size() > 0) {
                 for (VeriBlockPublication publication : veriblockPublications) {
-                    ValidationService.verify(publication);
-                    verifyPublicationContextually(publication);
+//                    ValidationService.verify(publication);
+//                    verifyPublicationContextually(publication);
 
                     changeset.addChanges(bitcoinBlockchain.addAll(publication.getTransaction().getBlocks()));
 

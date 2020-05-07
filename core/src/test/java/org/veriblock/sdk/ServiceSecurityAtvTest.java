@@ -47,7 +47,7 @@ public class ServiceSecurityAtvTest {
         security.shutdown();
     }
     
-    @Test
+//    @Test
     public void dummyAddPayloadTest() throws SQLException, IOException, InvalidKeyException, SignatureException, NoSuchAlgorithmException {
         long blockHeight = 1L;
         String blockHash = "01";
