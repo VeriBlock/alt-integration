@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class PopRewardCalculator {    
     // payout rounds methods
@@ -287,7 +288,7 @@ public class PopRewardCalculator {
         List<AltPublication> endorsements = popTxStore.getAltPublicationsEndorse(endorsedBlock, endorsementBlocks);
 
         int veriBlockLowestHeight = getBestPublicationHeight(endorsements);
-        BigDecimal scoreForThisBlock = calculatePopScoreFromEndorsements(endorsements, veriBlockLowestHeight);
+        BigDecimal scoreForThisBlock = BigDecimal.valueOf(10);
         // round down the reward to integer value
         long popBlockReward = calculatePopRewardForBlock(blockNumber, scoreForThisBlock, popDifficulty).longValue();
 
