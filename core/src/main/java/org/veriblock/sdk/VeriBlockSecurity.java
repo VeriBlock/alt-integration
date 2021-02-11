@@ -336,6 +336,10 @@ public class VeriBlockSecurity {
         // corner case: the first bootstrap block has no previous block
         // but does connect to the blockchain by definition
         if (veriblockBlockchain.searchBestChain(block.getHash()) == null) {
+            log.debug("VeriBlock block {} does not connect to the best chain",
+                      LogFormatter.toStringExtended(block));
+            log.debug("VeriBlock best chain tip: {}",
+                      LogFormatter.toStringExtended(veriblockBlockchain.getChainHead()));
             throw new VerificationException("Publication does not connect to VeriBlock blockchain");
         }
     }
@@ -353,9 +357,10 @@ public class VeriBlockSecurity {
         // corner case: the first bootstrap block has no previous block
         // but does connect to the blockchain by definition
         if (bitcoinBlockchain.searchBestChain(block.getHash()) == null) {
-            log.info("Searching best chain for block failed!");
-            log.info("Checking connectivity for Bitcoin block " + block.getHash().toString() + " (header: " + Utils.bytesToHex(block.getRaw()));
-            log.info("Bitcoin blockchain tip: " + bitcoinBlockchain.getChainHead().getHash().toString() + " (header: " + Utils.bytesToHex(bitcoinBlockchain.getChainHead().getRaw()));
+            log.debug("Bitcoin block {} does not connect to the best chain",
+                      LogFormatter.toStringExtended(block));
+            log.debug("Bitcoin best chain tip: {}",
+                      LogFormatter.toStringExtended(bitcoinBlockchain.getStoredChainHead()));
             throw new VerificationException("Publication does not connect to Bitcoin blockchain");
         }
     }
@@ -365,8 +370,8 @@ public class VeriBlockSecurity {
                  String.valueOf(bitcoinBlocks.size()),
                  String.valueOf(veriBlockBlocks.size()));
 
-        log.debug("Bitcoin context blocks: {} to {}", LogFormatter.bitcoinContextToString(bitcoinBlocks));
-        log.debug("VeriBlock context blocks: {} to {}", LogFormatter.veriblockContextToString(veriBlockBlocks));
+        log.debug("Bitcoin context blocks: {}", LogFormatter.bitcoinContextToString(bitcoinBlocks));
+        log.debug("VeriBlock context blocks: {}", LogFormatter.veriblockContextToString(veriBlockBlocks));
 
         List<Change> changes = new ArrayList<Change>();
         try {
